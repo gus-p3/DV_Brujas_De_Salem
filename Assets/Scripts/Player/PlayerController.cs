@@ -497,10 +497,31 @@ public class PlayerController : MonoBehaviour, IDetectable
         }
 
         Vector2 velocity = rb.linearVelocity;
-        animator.SetFloat(SpeedHash, Mathf.Abs(velocity.x));
-        animator.SetBool(IsGroundedHash, isGrounded);
-        animator.SetFloat(VerticalVelocityHash, velocity.y);
-        animator.SetBool(IsFlyingHash, isFlying);
+        SetAnimatorFloat(SpeedHash, Mathf.Abs(velocity.x));
+        SetAnimatorBool(IsGroundedHash, isGrounded);
+        SetAnimatorFloat(VerticalVelocityHash, velocity.y);
+        SetAnimatorBool(IsFlyingHash, isFlying);
+    }
+
+    private void SetAnimatorFloat(int id, float value)
+    {
+        if (HasParam(id)) animator.SetFloat(id, value);
+    }
+
+    private void SetAnimatorBool(int id, bool value)
+    {
+        if (HasParam(id)) animator.SetBool(id, value);
+    }
+
+    private bool HasParam(int id)
+    {
+        if (animator == null) return false;
+        var p = animator.parameters;
+        for (int i = 0; i < p.Length; i++)
+        {
+            if (p[i].nameHash == id) return true;
+        }
+        return false;
     }
 
     // ----------------------------------------------------------------- Gizmos
