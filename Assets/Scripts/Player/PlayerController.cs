@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -151,8 +151,24 @@ public class PlayerController : MonoBehaviour, IDetectable
     public float FlightEnergy01 => flightEnergy;
 
     // --- Implementación de IDetectable ---
-    public bool IsDetectable => isDetectable;
-    public Transform DetectionPoint => detectionPoint != null ? detectionPoint : transform;
+    public bool IsDetectable 
+    {
+        get
+        {
+            WitchDetectable wd = GetComponent<WitchDetectable>();
+            return wd != null ? wd.IsDetectable : isDetectable;
+        }
+    }
+    
+    public Transform DetectionPoint 
+    {
+        get
+        {
+            WitchDetectable wd = GetComponent<WitchDetectable>();
+            if (wd != null && wd.DetectionPoint != transform) return wd.DetectionPoint;
+            return detectionPoint != null ? detectionPoint : transform;
+        }
+    }
 
     /// <summary>Permite que otro componente (por ejemplo el gato en el maizal) cambie la detectabilidad.</summary>
     public void SetDetectable(bool value)
