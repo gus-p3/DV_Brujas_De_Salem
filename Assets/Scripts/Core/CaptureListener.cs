@@ -23,14 +23,11 @@ public class CaptureListener : MonoBehaviour
         }
     }
 
-    private void HandleTargetCaptured(Transform target)
+    private void HandleTargetCaptured()
     {
-        if (target.CompareTag("Player"))
+        if (GameManager.Instance != null)
         {
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.TriggerGameOver();
-            }
+            GameManager.Instance.TriggerGameOver();
         }
     }
 }
