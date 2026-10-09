@@ -138,4 +138,187 @@ public class UISetup
         txtRect.anchorMin = Vector2.zero; txtRect.anchorMax = Vector2.one; txtRect.sizeDelta = Vector2.zero;
         return btn;
     }
+
+    [MenuItem("Brujas/5. Escenas/Generar HUD en escena actual")]
+    public static void BuildHUD()
+    {
+        GameObject canvasObj = new GameObject("HUD_Canvas");
+        Canvas canvas = canvasObj.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 10;
+        CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920, 1080);
+        scaler.matchWidthOrHeight = 0.5f;
+        canvasObj.AddComponent<GraphicRaycaster>();
+        
+        HUDController hud = canvasObj.AddComponent<HUDController>();
+
+        // Timer
+        GameObject timeObj = new GameObject("TimeText");
+        timeObj.transform.SetParent(canvasObj.transform, false);
+        TextMeshProUGUI timeTxt = timeObj.AddComponent<TextMeshProUGUI>();
+        timeTxt.text = "00:00"; timeTxt.fontSize = 60;
+        timeTxt.alignment = TextAlignmentOptions.Top;
+        RectTransform timeRect = timeObj.GetComponent<RectTransform>();
+        timeRect.anchorMin = new Vector2(0.5f, 1f); timeRect.anchorMax = new Vector2(0.5f, 1f);
+        timeRect.anchoredPosition = new Vector2(0, -50);
+        hud.timeText = timeTxt;
+
+        // Score
+        GameObject scoreObj = new GameObject("ScoreText");
+        scoreObj.transform.SetParent(canvasObj.transform, false);
+        TextMeshProUGUI scoreTxt = scoreObj.AddComponent<TextMeshProUGUI>();
+        scoreTxt.text = "0000"; scoreTxt.fontSize = 60;
+        scoreTxt.alignment = TextAlignmentOptions.TopRight;
+        RectTransform scoreRect = scoreObj.GetComponent<RectTransform>();
+        scoreRect.anchorMin = new Vector2(1f, 1f); scoreRect.anchorMax = new Vector2(1f, 1f);
+        scoreRect.anchoredPosition = new Vector2(-50, -50);
+        hud.scoreText = scoreTxt;
+
+        // Vidas
+        hud.heartIcons = new Image[3];
+        for (int i=0; i<3; i++)
+        {
+            GameObject heartObj = new GameObject("Heart_" + i);
+            heartObj.transform.SetParent(canvasObj.transform, false);
+            Image heartImg = heartObj.AddComponent<Image>();
+            heartImg.color = Color.red; // Placeholder for heart
+            RectTransform hRect = heartObj.GetComponent<RectTransform>();
+            hRect.anchorMin = new Vector2(0, 1); hRect.anchorMax = new Vector2(0, 1);
+            hRect.sizeDelta = new Vector2(60, 60);
+            hRect.anchoredPosition = new Vector2(50 + (i * 70), -50);
+            hud.heartIcons[i] = heartImg;
+        }
+
+        // Hechizos (Esquina inferior izquierda)
+        string[] spellNames = { "Cegar", "Hipnotizar", "Dormir" };
+        Color[] spellColors = { Color.gray, new Color(0.5f, 0f, 0.5f), Color.blue };
+        
+        for (int i=0; i<3; i++)
+        {
+            GameObject spellObj = new GameObject("Spell_" + spellNames[i]);
+            spellObj.transform.SetParent(canvasObj.transform, false);
+            Image spellImg = spellObj.AddComponent<Image>();
+            spellImg.color = spellColors[i]; // Placeholder for potion
+            RectTransform sRect = spellObj.GetComponent<RectTransform>();
+            sRect.anchorMin = new Vector2(0, 0); sRect.anchorMax = new Vector2(0, 0);
+            sRect.sizeDelta = new Vector2(80, 80);
+            sRect.anchoredPosition = new Vector2(60 + (i * 120), 60);
+
+            GameObject txtObj = new GameObject("Count");
+            txtObj.transform.SetParent(spellObj.transform, false);
+            TextMeshProUGUI txt = txtObj.AddComponent<TextMeshProUGUI>();
+            txt.text = "x 0"; txt.fontSize = 30; txt.alignment = TextAlignmentOptions.BottomRight;
+            RectTransform tRect = txtObj.GetComponent<RectTransform>();
+            tRect.anchorMin = Vector2.zero; tRect.anchorMax = Vector2.one;
+            tRect.anchoredPosition = new Vector2(20, -20);
+            
+            if (i==0) hud.blindChargesText = txt;
+            if (i==1) hud.hypnotizeChargesText = txt;
+            if (i==2) hud.sleepChargesText = txt;
+        }
+
+        // Flight Energy
+        GameObject sliderObj = new GameObject("FlightSlider");
+        sliderObj.transform.SetParent(canvasObj.transform, false);
+        Slider slider = sliderObj.AddComponent<Slider>();
+        RectTransform sliderRect = sliderObj.GetComponent<RectTransform>();
+        sliderRect.anchorMin = new Vector2(0.5f, 0); sliderRect.anchorMax = new Vector2(0.5f, 0);
+        sliderRect.sizeDelta = new Vector2(400, 40);
+        sliderRect.anchoredPosition = new Vector2(0, 50);
+
+        GameObject bgObj = new GameObject("Background");
+        bgObj.transform.SetParent(sliderObj.transform, false);
+        Image bgImg = bgObj.AddComponent<Image>(); bgImg.color = Color.black;
+        RectTransform bgRect = bgObj.GetComponent<RectTransform>();
+        bgRect.anchorMin = Vector2.zero; bgRect.anchorMax = Vector2.one; bgRect.sizeDelta = Vector2.zero;
+
+        GameObject fillArea = new GameObject("Fill Area");
+        fillArea.transform.SetParent(sliderObj.transform, false);
+        RectTransform faRect = fillArea.AddComponent<RectTransform>();
+        faRect.anchorMin = Vector2.zero; faRect.anchorMax = Vector2.one; faRect.sizeDelta = Vector2.zero;
+
+        GameObject fillObj = new GameObject("Fill");
+        fillObj.transform.SetParent(fillArea.transform, false);
+        Image fillImg = fillObj.AddComponent<Image>(); fillImg.color = Color.yellow;
+        RectTransform fRect = fillObj.GetComponent<RectTransform>();
+        fRect.anchorMin = Vector2.zero; fRect.anchorMax = Vector2.one; fRect.sizeDelta = Vector2.zero;
+        
+        slider.fillRect = fRect;
+        hud.flightEnergySlider = slider;
+
+        Debug.Log("HUD generado en la escena actual.");
+    }
+
+    [MenuItem("Brujas/8. REPARAR TODO (Animaciones, Bruja y Gato)")]
+    public static void RepararTodo()
+    {
+        // 1. Reconstruir animaciones de la bruja con las curvas correctas
+        WitchAnimationBuilder.Build();
+
+        // 2. Configurar el Prefab de la Bruja
+        string prefabPath = "Assets/Prefabs/Witch.prefab";
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        if (prefab != null)
+        {
+            TransformationManager tm = prefab.GetComponent<TransformationManager>();
+            if (tm == null) tm = prefab.AddComponent<TransformationManager>();
+
+            tm.humanController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Animations/Witch/Witch.controller");
+            tm.catController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Animations/Cat/Cat.controller");
+            tm.obstacleMask = 1 << LayerMask.NameToLayer("Ground");
+            tm.humanColliderSize = new Vector2(0.6f, 1.6f);
+            tm.humanColliderOffset = new Vector2(0f, 0.8f);
+            tm.catColliderSize = new Vector2(0.8f, 0.5f);
+            tm.catColliderOffset = new Vector2(0f, 0.25f);
+            tm.catSpeedMultiplier = 1.3f;
+
+            if (prefab.GetComponent<WitchDetectable>() == null)
+            {
+                prefab.AddComponent<WitchDetectable>();
+            }
+
+            EditorUtility.SetDirty(prefab);
+        }
+
+        // 3. Si hay una Bruja en la escena abierta, configurarla también directamente
+        GameObject sceneWitch = GameObject.Find("Witch");
+        if (sceneWitch != null)
+        {
+            TransformationManager sceneTm = sceneWitch.GetComponent<TransformationManager>();
+            if (sceneTm == null) sceneTm = sceneWitch.AddComponent<TransformationManager>();
+
+            sceneTm.humanController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Animations/Witch/Witch.controller");
+            sceneTm.catController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Animations/Cat/Cat.controller");
+            sceneTm.obstacleMask = 1 << LayerMask.NameToLayer("Ground");
+            sceneTm.humanColliderSize = new Vector2(0.6f, 1.6f);
+            sceneTm.humanColliderOffset = new Vector2(0f, 0.8f);
+            sceneTm.catColliderSize = new Vector2(0.8f, 0.5f);
+            sceneTm.catColliderOffset = new Vector2(0f, 0.25f);
+            sceneTm.catSpeedMultiplier = 1.3f;
+
+            // Asegurar que el Animator de la escena apunte al de la Bruja inicialmente
+            Animator anim = sceneWitch.GetComponentInChildren<Animator>();
+            if (anim != null)
+            {
+                anim.runtimeAnimatorController = sceneTm.humanController;
+                anim.Rebind();
+            }
+
+            if (sceneWitch.GetComponent<WitchDetectable>() == null)
+            {
+                sceneWitch.AddComponent<WitchDetectable>();
+            }
+
+            EditorUtility.SetDirty(sceneWitch);
+            EditorSceneManager.MarkSceneDirty(sceneWitch.scene);
+            EditorSceneManager.SaveScene(sceneWitch.scene);
+        }
+
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log(">>> [REPARACIÓN COMPLETA] Animaciones, Prefab y Bruja en la escena reparados exitosamente.");
+    }
 }

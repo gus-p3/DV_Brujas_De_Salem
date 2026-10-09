@@ -89,8 +89,10 @@ public static class WitchAnimationBuilder
         AnimationClip existing = AssetDatabase.LoadAssetAtPath<AnimationClip>(path);
         if (existing != null)
         {
-            // Se conserva el GUID del clip existente para no romper referencias
-            EditorUtility.CopySerialized(clip, existing);
+            existing.frameRate = fps;
+            AnimationUtility.SetObjectReferenceCurve(existing, SpriteBinding, keys);
+            AnimationUtility.SetAnimationClipSettings(existing, settings);
+            EditorUtility.SetDirty(existing);
             return existing;
         }
 

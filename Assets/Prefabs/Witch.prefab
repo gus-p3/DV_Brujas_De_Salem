@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 6873385379959461159}
   - component: {fileID: 7551838531031708287}
   - component: {fileID: 3835105467249885815}
+  - component: {fileID: -7620222590533321543}
+  - component: {fileID: -7559975629141373121}
   m_Layer: 7
   m_Name: Witch
   m_TagString: Player
@@ -156,6 +158,44 @@ MonoBehaviour:
   isDetectable: 1
   detectionPoint: {fileID: 3203840164133208494}
   useScriptedInput: 0
+--- !u!114 &-7620222590533321543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2484219030927747412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 940362df23badbe4ab2aadc0ad5b1ca2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TransformationManager
+  transformCooldown: 0.75
+  smokeEffect: {fileID: 0}
+  catSpeedMultiplier: 1.3
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 65
+  humanController: {fileID: 9100000, guid: e13beb1af4fbc94489c6daaecf17948e, type: 2}
+  humanColliderSize: {x: 0.6, y: 1.8}
+  humanColliderOffset: {x: 0, y: 0.9}
+  catController: {fileID: 9100000, guid: 24b16964c197ba0469e16f576a829ae9, type: 2}
+  catColliderSize: {x: 0.8, y: 0.5}
+  catColliderOffset: {x: 0, y: 0.25}
+--- !u!114 &-7559975629141373121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2484219030927747412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c909774b02416d41a572d955e0816af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WitchDetectable
+  detectionPoint: {fileID: 0}
+  catDetectionDistance: 2.5
 --- !u!1 &4364815756299105017
 GameObject:
   m_ObjectHideFlags: 0

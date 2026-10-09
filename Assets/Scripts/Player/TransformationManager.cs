@@ -76,7 +76,13 @@ public class TransformationManager : MonoBehaviour
         cooldownTimer = transformCooldown;
         PlaySmoke();
         
-        if (catController != null) anim.runtimeAnimatorController = catController;
+        if (catController != null && anim != null)
+        {
+            anim.runtimeAnimatorController = catController;
+            anim.Rebind();
+            anim.Update(0f);
+        }
+        
         boxCol.size = catColliderSize;
         boxCol.offset = catColliderOffset;
         
@@ -92,12 +98,16 @@ public class TransformationManager : MonoBehaviour
 
     private void TryTransformToHuman()
     {
-        Vector2 checkPos = (Vector2)transform.position + humanColliderOffset;
-        Collider2D hit = Physics2D.OverlapBox(checkPos, humanColliderSize * 0.9f, 0f, obstacleMask);
+        // Verificar espacio libre sobre la cabeza del gato (entre y = 0.6 y 1.6)
+        Vector2 checkCenter = (Vector2)transform.position + new Vector2(0f, 1.1f);
+        Vector2 checkSize = new Vector2(humanColliderSize.x * 0.8f, 0.9f);
         
-        if (hit != null && !hit.isTrigger)
+        LayerMask mask = obstacleMask.value != 0 ? obstacleMask : (LayerMask)(1 << LayerMask.NameToLayer("Ground"));
+        Collider2D hit = Physics2D.OverlapBox(checkCenter, checkSize, 0f, mask);
+        
+        if (hit != null && !hit.isTrigger && hit.transform.root != transform.root)
         {
-            Debug.Log("No hay espacio para transformarse en humana.");
+            Debug.Log($"No hay espacio para transformarse en humana. Obstáculo: {hit.gameObject.name}");
             return;
         }
 
@@ -105,7 +115,13 @@ public class TransformationManager : MonoBehaviour
         cooldownTimer = transformCooldown;
         PlaySmoke();
         
-        if (humanController != null) anim.runtimeAnimatorController = humanController;
+        if (humanController != null && anim != null)
+        {
+            anim.runtimeAnimatorController = humanController;
+            anim.Rebind();
+            anim.Update(0f);
+        }
+        
         boxCol.size = humanColliderSize;
         boxCol.offset = humanColliderOffset;
 
