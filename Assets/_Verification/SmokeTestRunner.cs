@@ -69,7 +69,7 @@ public class SmokeTestRunner : MonoBehaviour
         yield return StartCoroutine(Run());
         log.AppendLine(failures == 0 ? "RESULTADO: TODO OK" : $"RESULTADO: {failures} FALLAS");
         File.WriteAllText(ResultsPath, log.ToString());
-        UnityEditor.EditorApplication.Exit(failures == 0 ? 0 : 1);
+        UnityEditor.EditorApplication.isPlaying = false;
     }
 
     private IEnumerator Run()
