@@ -76,7 +76,13 @@ public class TransformationManager : MonoBehaviour
         cooldownTimer = transformCooldown;
         PlaySmoke();
         
-        if (catController != null) anim.runtimeAnimatorController = catController;
+        if (catController != null && anim != null)
+        {
+            anim.runtimeAnimatorController = catController;
+            anim.Rebind();
+            anim.Update(0f);
+        }
+        
         boxCol.size = catColliderSize;
         boxCol.offset = catColliderOffset;
         
@@ -92,16 +98,16 @@ public class TransformationManager : MonoBehaviour
 
     private void TryTransformToHuman()
     {
-        Vector2 checkPos = (Vector2)transform.position + humanColliderOffset;
-        // Hacer la caja más pequeña y subirla para no chocar con el suelo
-        Vector2 smallerBox = new Vector2(humanColliderSize.x * 0.5f, humanColliderSize.y * 0.5f);
-        Vector2 higherPos = checkPos + new Vector2(0f, 0.5f);
+        // Verificar espacio libre sobre la cabeza del gato (entre y = 0.6 y 1.6)
+        Vector2 checkCenter = (Vector2)transform.position + new Vector2(0f, 1.1f);
+        Vector2 checkSize = new Vector2(humanColliderSize.x * 0.8f, 0.9f);
         
-        Collider2D hit = Physics2D.OverlapBox(higherPos, smallerBox, 0f, obstacleMask);
+        LayerMask mask = obstacleMask.value != 0 ? obstacleMask : (LayerMask)(1 << LayerMask.NameToLayer("Ground"));
+        Collider2D hit = Physics2D.OverlapBox(checkCenter, checkSize, 0f, mask);
         
-        if (hit != null && !hit.isTrigger && hit.gameObject != this.gameObject)
+        if (hit != null && !hit.isTrigger && hit.transform.root != transform.root)
         {
-            Debug.Log($"No hay espacio para transformarse. Chocando con: {hit.gameObject.name}");
+            Debug.Log($"No hay espacio para transformarse en humana. Obstáculo: {hit.gameObject.name}");
             return;
         }
 
@@ -109,7 +115,13 @@ public class TransformationManager : MonoBehaviour
         cooldownTimer = transformCooldown;
         PlaySmoke();
         
-        if (humanController != null) anim.runtimeAnimatorController = humanController;
+        if (humanController != null && anim != null)
+        {
+            anim.runtimeAnimatorController = humanController;
+            anim.Rebind();
+            anim.Update(0f);
+        }
+        
         boxCol.size = humanColliderSize;
         boxCol.offset = humanColliderOffset;
 

@@ -251,31 +251,74 @@ public class UISetup
         Debug.Log("HUD generado en la escena actual.");
     }
 
-    [MenuItem("Brujas/7. Player/Configurar Prefab Bruja (Gato)")]
-    public static void SetupWitchPrefab()
+    [MenuItem("Brujas/8. REPARAR TODO (Animaciones, Bruja y Gato)")]
+    public static void RepararTodo()
     {
+        // 1. Reconstruir animaciones de la bruja con las curvas correctas
+        WitchAnimationBuilder.Build();
+
+        // 2. Configurar el Prefab de la Bruja
         string prefabPath = "Assets/Prefabs/Witch.prefab";
         GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
         if (prefab != null)
         {
-            if (prefab.GetComponent<TransformationManager>() == null)
-            {
-                TransformationManager tm = prefab.AddComponent<TransformationManager>();
-                tm.humanController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Animations/Witch/Witch.controller");
-                tm.catController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Animations/Cat/Cat.controller");
-                tm.obstacleMask = LayerMask.GetMask("Default", "Ground");
-            }
+            TransformationManager tm = prefab.GetComponent<TransformationManager>();
+            if (tm == null) tm = prefab.AddComponent<TransformationManager>();
+
+            tm.humanController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Animations/Witch/Witch.controller");
+            tm.catController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Animations/Cat/Cat.controller");
+            tm.obstacleMask = 1 << LayerMask.NameToLayer("Ground");
+            tm.humanColliderSize = new Vector2(0.6f, 1.6f);
+            tm.humanColliderOffset = new Vector2(0f, 0.8f);
+            tm.catColliderSize = new Vector2(0.8f, 0.5f);
+            tm.catColliderOffset = new Vector2(0f, 0.25f);
+            tm.catSpeedMultiplier = 1.3f;
+
             if (prefab.GetComponent<WitchDetectable>() == null)
             {
                 prefab.AddComponent<WitchDetectable>();
             }
+
             EditorUtility.SetDirty(prefab);
-            AssetDatabase.SaveAssets();
-            Debug.Log("Prefab de Bruja actualizado exitosamente con los componentes del Gato.");
         }
-        else
+
+        // 3. Si hay una Bruja en la escena abierta, configurarla también directamente
+        GameObject sceneWitch = GameObject.Find("Witch");
+        if (sceneWitch != null)
         {
-            Debug.LogError("No se encontró el prefab en " + prefabPath);
+            TransformationManager sceneTm = sceneWitch.GetComponent<TransformationManager>();
+            if (sceneTm == null) sceneTm = sceneWitch.AddComponent<TransformationManager>();
+
+            sceneTm.humanController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Animations/Witch/Witch.controller");
+            sceneTm.catController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Animations/Cat/Cat.controller");
+            sceneTm.obstacleMask = 1 << LayerMask.NameToLayer("Ground");
+            sceneTm.humanColliderSize = new Vector2(0.6f, 1.6f);
+            sceneTm.humanColliderOffset = new Vector2(0f, 0.8f);
+            sceneTm.catColliderSize = new Vector2(0.8f, 0.5f);
+            sceneTm.catColliderOffset = new Vector2(0f, 0.25f);
+            sceneTm.catSpeedMultiplier = 1.3f;
+
+            // Asegurar que el Animator de la escena apunte al de la Bruja inicialmente
+            Animator anim = sceneWitch.GetComponentInChildren<Animator>();
+            if (anim != null)
+            {
+                anim.runtimeAnimatorController = sceneTm.humanController;
+                anim.Rebind();
+            }
+
+            if (sceneWitch.GetComponent<WitchDetectable>() == null)
+            {
+                sceneWitch.AddComponent<WitchDetectable>();
+            }
+
+            EditorUtility.SetDirty(sceneWitch);
+            EditorSceneManager.MarkSceneDirty(sceneWitch.scene);
+            EditorSceneManager.SaveScene(sceneWitch.scene);
         }
+
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log(">>> [REPARACIÓN COMPLETA] Animaciones, Prefab y Bruja en la escena reparados exitosamente.");
     }
 }
