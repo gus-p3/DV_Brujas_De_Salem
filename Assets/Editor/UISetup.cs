@@ -138,4 +138,32 @@ public class UISetup
         txtRect.anchorMin = Vector2.zero; txtRect.anchorMax = Vector2.one; txtRect.sizeDelta = Vector2.zero;
         return btn;
     }
+
+    [MenuItem("Brujas/7. Player/Configurar Prefab Bruja (Gato)")]
+    public static void SetupWitchPrefab()
+    {
+        string prefabPath = "Assets/Prefabs/Witch.prefab";
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        if (prefab != null)
+        {
+            if (prefab.GetComponent<TransformationManager>() == null)
+            {
+                TransformationManager tm = prefab.AddComponent<TransformationManager>();
+                tm.humanController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Animations/Witch/Witch.controller");
+                tm.catController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Animations/Cat/Cat.controller");
+                tm.obstacleMask = LayerMask.GetMask("Default", "Ground");
+            }
+            if (prefab.GetComponent<WitchDetectable>() == null)
+            {
+                prefab.AddComponent<WitchDetectable>();
+            }
+            EditorUtility.SetDirty(prefab);
+            AssetDatabase.SaveAssets();
+            Debug.Log("Prefab de Bruja actualizado exitosamente con los componentes del Gato.");
+        }
+        else
+        {
+            Debug.LogError("No se encontró el prefab en " + prefabPath);
+        }
+    }
 }
