@@ -93,11 +93,15 @@ public class TransformationManager : MonoBehaviour
     private void TryTransformToHuman()
     {
         Vector2 checkPos = (Vector2)transform.position + humanColliderOffset;
-        Collider2D hit = Physics2D.OverlapBox(checkPos, humanColliderSize * 0.9f, 0f, obstacleMask);
+        // Hacer la caja más pequeña y subirla para no chocar con el suelo
+        Vector2 smallerBox = new Vector2(humanColliderSize.x * 0.5f, humanColliderSize.y * 0.5f);
+        Vector2 higherPos = checkPos + new Vector2(0f, 0.5f);
         
-        if (hit != null && !hit.isTrigger)
+        Collider2D hit = Physics2D.OverlapBox(higherPos, smallerBox, 0f, obstacleMask);
+        
+        if (hit != null && !hit.isTrigger && hit.gameObject != this.gameObject)
         {
-            Debug.Log("No hay espacio para transformarse en humana.");
+            Debug.Log($"No hay espacio para transformarse. Chocando con: {hit.gameObject.name}");
             return;
         }
 
