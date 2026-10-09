@@ -1,0 +1,46 @@
+# Unity - carpetas generadas automáticamente
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+
+# Archivos de IDE y soluciones generadas
+.vs/
+.vscode/
+.idea/
+*.csproj
+*.sln
+*.slnx
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Compilaciones y paquetes
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# Crash logs de Unity
+sysinfo.txt
+crashlytics-build.properties
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Scripts temporales de procesamiento de arte (no forman parte del juego)
+/Tools/_tmp/
