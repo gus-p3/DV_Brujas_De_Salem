@@ -138,7 +138,7 @@ public class TransformationManager : MonoBehaviour
         if (smokeEffect != null) smokeEffect.Play();
         if (AudioManager.Instance != null)
         {
-            // Opcional: reproducir sonido
+            AudioManager.Instance.PlayTransformSound();
         }
     }
 }
