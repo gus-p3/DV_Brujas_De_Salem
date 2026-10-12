@@ -3,13 +3,15 @@ using UnityEngine.UI;
 
 public class GameOverPanel : MonoBehaviour
 {
+    public TMPro.TextMeshProUGUI messageText;
+    public Image fireImage;
     public Button retryBtn;
     public Button menuBtn;
 
     private void Awake()
     {
-        retryBtn.onClick.AddListener(() => GameManager.Instance.RestartLevel());
-        menuBtn.onClick.AddListener(() => GameManager.Instance.LoadMainMenu());
+        if (retryBtn != null) retryBtn.onClick.AddListener(() => GameManager.Instance.RestartLevel());
+        if (menuBtn != null) menuBtn.onClick.AddListener(() => GameManager.Instance.LoadMainMenu());
     }
 
     private void Start()
@@ -26,6 +28,11 @@ public class GameOverPanel : MonoBehaviour
 
     private void HandleStateChanged(GameState state)
     {
-        gameObject.SetActive(state == GameState.GameOver);
+        bool isGameOver = (state == GameState.GameOver);
+        gameObject.SetActive(isGameOver);
+        if (isGameOver && messageText != null)
+        {
+            messageText.text = "La hoguera te alcanzó…";
+        }
     }
 }
