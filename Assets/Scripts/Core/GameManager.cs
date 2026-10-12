@@ -83,6 +83,42 @@ public class GameManager : MonoBehaviour
         OnStateChanged?.Invoke(CurrentState);
     }
 
+    public void AddScore(int amount)
+    {
+        Score += amount;
+        OnStatsUpdated?.Invoke();
+    }
+
+    public void TakeDamage(int amount = 1)
+    {
+        Lives = Mathf.Max(0, Lives - amount);
+        OnStatsUpdated?.Invoke();
+        if (Lives <= 0)
+        {
+            TriggerGameOver();
+        }
+    }
+
+    public void AddSpellCharges(int blind, int hypnotize, int sleep)
+    {
+        BlindCharges += blind;
+        HypnotizeCharges += hypnotize;
+        SleepCharges += sleep;
+        OnStatsUpdated?.Invoke();
+    }
+
+    public bool TryConsumeSpell(int spellType)
+    {
+        // 0: Cegar, 1: Hipnotizar, 2: Dormir
+        bool success = false;
+        if (spellType == 0 && BlindCharges > 0) { BlindCharges--; success = true; }
+        else if (spellType == 1 && HypnotizeCharges > 0) { HypnotizeCharges--; success = true; }
+        else if (spellType == 2 && SleepCharges > 0) { SleepCharges--; success = true; }
+
+        if (success) OnStatsUpdated?.Invoke();
+        return success;
+    }
+
     public void StartLevel()
     {
         Lives = 3;
@@ -123,7 +159,11 @@ public class GameManager : MonoBehaviour
     {
         if (CurrentState != GameState.Playing) return;
         
-        // Asumiendo muerte instantánea por hoguera según rúbrica "La hoguera te alcanzó..."
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayCaptureSound();
+        }
+
         SetState(GameState.GameOver);
     }
 
