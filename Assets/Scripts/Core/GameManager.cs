@@ -126,6 +126,11 @@ public class GameManager : MonoBehaviour
         TimeElapsed = 0f;
         SetState(GameState.Playing);
         OnStatsUpdated?.Invoke();
+
+        if (AudioManager.Instance != null && AudioManager.Instance.levelMusicClip != null)
+        {
+            AudioManager.Instance.PlayMusic(AudioManager.Instance.levelMusicClip);
+        }
     }
 
     public void PauseGame()
@@ -171,6 +176,10 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         SetState(GameState.Playing);
+        if (AudioManager.Instance != null && AudioManager.Instance.menuMusicClip != null)
+        {
+            AudioManager.Instance.PlayMusic(AudioManager.Instance.menuMusicClip);
+        }
         SceneManager.LoadScene("MainMenu");
     }
 

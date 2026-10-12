@@ -57,6 +57,11 @@ public class MainMenuController : MonoBehaviour
             qualityDropdown.value = QualitySettings.GetQualityLevel();
             qualityDropdown.onValueChanged.AddListener(v => QualitySettings.SetQualityLevel(v));
         }
+
+        if (AudioManager.Instance != null && AudioManager.Instance.menuMusicClip != null)
+        {
+            AudioManager.Instance.PlayMusic(AudioManager.Instance.menuMusicClip);
+        }
     }
 
     public void StartNewGame()
