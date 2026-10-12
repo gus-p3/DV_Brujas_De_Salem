@@ -10,23 +10,41 @@ public class GameOverPanel : MonoBehaviour
 
     private void Awake()
     {
-        if (retryBtn != null) retryBtn.onClick.AddListener(() => GameManager.Instance.RestartLevel());
-        if (menuBtn != null) menuBtn.onClick.AddListener(() => GameManager.Instance.LoadMainMenu());
+        if (retryBtn != null) 
+        {
+            retryBtn.onClick.RemoveAllListeners();
+            retryBtn.onClick.AddListener(() => {
+                if (GameManager.Instance != null) GameManager.Instance.RestartLevel();
+            });
+        }
+        if (menuBtn != null) 
+        {
+            menuBtn.onClick.RemoveAllListeners();
+            menuBtn.onClick.AddListener(() => {
+                if (GameManager.Instance != null) GameManager.Instance.LoadMainMenu();
+            });
+        }
     }
 
     private void Start()
     {
-        GameManager.Instance.OnStateChanged += HandleStateChanged;
-        gameObject.SetActive(false);
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnStateChanged -= HandleStateChanged;
+            GameManager.Instance.OnStateChanged += HandleStateChanged;
+            HandleStateChanged(GameManager.Instance.CurrentState);
+        }
     }
 
     private void OnDestroy()
     {
         if (GameManager.Instance != null)
+        {
             GameManager.Instance.OnStateChanged -= HandleStateChanged;
+        }
     }
 
-    private void HandleStateChanged(GameState state)
+    public void HandleStateChanged(GameState state)
     {
         bool isGameOver = (state == GameState.GameOver);
         gameObject.SetActive(isGameOver);

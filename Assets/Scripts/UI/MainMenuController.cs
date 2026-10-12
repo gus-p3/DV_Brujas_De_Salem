@@ -17,6 +17,10 @@ public class MainMenuController : MonoBehaviour
     public Button creditsButton;
     public Button exitButton;
 
+    [Header("Back Buttons")]
+    public Button backFromOptionsButton;
+    public Button backFromCreditsButton;
+
     [Header("Options")]
     public Slider musicSlider;
     public Slider sfxSlider;
@@ -28,19 +32,80 @@ public class MainMenuController : MonoBehaviour
         ShowMainPanel();
 
         // Check if there is saved progress
-        continueButton.interactable = SaveSystem.HasProgress();
+        if (continueButton != null)
+        {
+            continueButton.interactable = SaveSystem.HasProgress();
+            continueButton.onClick.RemoveAllListeners();
+            continueButton.onClick.AddListener(ContinueGame);
+        }
 
-        // Listeners
-        playButton.onClick.AddListener(StartNewGame);
-        continueButton.onClick.AddListener(ContinueGame);
-        optionsButton.onClick.AddListener(ShowOptions);
-        creditsButton.onClick.AddListener(ShowCredits);
-        exitButton.onClick.AddListener(ExitGame);
+        // Listeners for main buttons
+        if (playButton != null)
+        {
+            playButton.onClick.RemoveAllListeners();
+            playButton.onClick.AddListener(StartNewGame);
+        }
+
+        if (optionsButton != null)
+        {
+            optionsButton.onClick.RemoveAllListeners();
+            optionsButton.onClick.AddListener(ShowOptions);
+        }
+
+        if (creditsButton != null)
+        {
+            creditsButton.onClick.RemoveAllListeners();
+            creditsButton.onClick.AddListener(ShowCredits);
+        }
+
+        if (exitButton != null)
+        {
+            exitButton.onClick.RemoveAllListeners();
+            exitButton.onClick.AddListener(ExitGame);
+        }
+
+        // Auto-discover Back Buttons in children if not assigned
+        if (backFromOptionsButton == null && optionsPanel != null)
+        {
+            foreach (var b in optionsPanel.GetComponentsInChildren<Button>(true))
+            {
+                if (b.name.ToLower().Contains("back") || b.name.ToLower().Contains("volver"))
+                {
+                    backFromOptionsButton = b;
+                    break;
+                }
+            }
+        }
+
+        if (backFromCreditsButton == null && creditsPanel != null)
+        {
+            foreach (var b in creditsPanel.GetComponentsInChildren<Button>(true))
+            {
+                if (b.name.ToLower().Contains("back") || b.name.ToLower().Contains("volver"))
+                {
+                    backFromCreditsButton = b;
+                    break;
+                }
+            }
+        }
+
+        if (backFromOptionsButton != null)
+        {
+            backFromOptionsButton.onClick.RemoveAllListeners();
+            backFromOptionsButton.onClick.AddListener(ShowMainPanel);
+        }
+
+        if (backFromCreditsButton != null)
+        {
+            backFromCreditsButton.onClick.RemoveAllListeners();
+            backFromCreditsButton.onClick.AddListener(ShowMainPanel);
+        }
 
         // Options Setup
         if (musicSlider != null)
         {
             musicSlider.value = PlayerPrefs.GetFloat("MusicVolume", 0.75f);
+            musicSlider.onValueChanged.RemoveAllListeners();
             musicSlider.onValueChanged.AddListener(v => {
                 if (AudioManager.Instance != null) AudioManager.Instance.SetMusicVolume(v);
             });
@@ -48,6 +113,7 @@ public class MainMenuController : MonoBehaviour
         if (sfxSlider != null)
         {
             sfxSlider.value = PlayerPrefs.GetFloat("SFXVolume", 0.75f);
+            sfxSlider.onValueChanged.RemoveAllListeners();
             sfxSlider.onValueChanged.AddListener(v => {
                 if (AudioManager.Instance != null) AudioManager.Instance.SetSFXVolume(v);
             });
@@ -55,6 +121,7 @@ public class MainMenuController : MonoBehaviour
         if (qualityDropdown != null)
         {
             qualityDropdown.value = QualitySettings.GetQualityLevel();
+            qualityDropdown.onValueChanged.RemoveAllListeners();
             qualityDropdown.onValueChanged.AddListener(v => QualitySettings.SetQualityLevel(v));
         }
 
@@ -66,7 +133,7 @@ public class MainMenuController : MonoBehaviour
 
     public void StartNewGame()
     {
-        SceneManager.LoadScene(1); // Load level 1
+        SceneManager.LoadScene(1); // Load level 1 (Test_Bruja)
         if (GameManager.Instance != null) GameManager.Instance.StartLevel();
     }
 
@@ -79,23 +146,23 @@ public class MainMenuController : MonoBehaviour
 
     public void ShowMainPanel()
     {
-        mainPanel.SetActive(true);
-        optionsPanel.SetActive(false);
-        creditsPanel.SetActive(false);
+        if (mainPanel != null) mainPanel.SetActive(true);
+        if (optionsPanel != null) optionsPanel.SetActive(false);
+        if (creditsPanel != null) creditsPanel.SetActive(false);
     }
 
     public void ShowOptions()
     {
-        mainPanel.SetActive(false);
-        optionsPanel.SetActive(true);
-        creditsPanel.SetActive(false);
+        if (mainPanel != null) mainPanel.SetActive(false);
+        if (optionsPanel != null) optionsPanel.SetActive(true);
+        if (creditsPanel != null) creditsPanel.SetActive(false);
     }
 
     public void ShowCredits()
     {
-        mainPanel.SetActive(false);
-        optionsPanel.SetActive(false);
-        creditsPanel.SetActive(true);
+        if (mainPanel != null) mainPanel.SetActive(false);
+        if (optionsPanel != null) optionsPanel.SetActive(false);
+        if (creditsPanel != null) creditsPanel.SetActive(true);
     }
 
     public void ExitGame()

@@ -104,7 +104,7 @@ public class UISetup
         mmc.qualityDropdown = CreateStyledDropdown("QualityDropdown", optionsPanel.transform, new Vector2(0, -145));
 
         Button backFromOpt = CreateStyledButton("BackButton", "Volver", optionsPanel.transform, new Vector2(0, -260));
-        backFromOpt.onClick.AddListener(() => mmc.ShowMainPanel());
+        mmc.backFromOptionsButton = backFromOpt;
         optionsPanel.SetActive(false);
 
         // Credits Panel
@@ -133,8 +133,13 @@ public class UISetup
         ctcRect.sizeDelta = Vector2.zero;
 
         Button backFromCred = CreateStyledButton("BackButton", "Volver", creditsPanel.transform, new Vector2(0, -260));
-        backFromCred.onClick.AddListener(() => mmc.ShowMainPanel());
+        mmc.backFromCreditsButton = backFromCred;
         creditsPanel.SetActive(false);
+
+        if (cameraObj.GetComponent<AudioListener>() == null)
+        {
+            cameraObj.AddComponent<AudioListener>();
+        }
 
         // Managers
         InstantiateManagersIfMissing();

@@ -12,20 +12,43 @@ public class PausePanel : MonoBehaviour
 
     private void Awake()
     {
-        resumeBtn.onClick.AddListener(() => GameManager.Instance.ResumeGame());
-        restartBtn.onClick.AddListener(() => GameManager.Instance.RestartLevel());
-        menuBtn.onClick.AddListener(() => GameManager.Instance.LoadMainMenu());
+        if (resumeBtn != null)
+        {
+            resumeBtn.onClick.RemoveAllListeners();
+            resumeBtn.onClick.AddListener(() => {
+                if (GameManager.Instance != null) GameManager.Instance.ResumeGame();
+            });
+        }
+        if (restartBtn != null)
+        {
+            restartBtn.onClick.RemoveAllListeners();
+            restartBtn.onClick.AddListener(() => {
+                if (GameManager.Instance != null) GameManager.Instance.RestartLevel();
+            });
+        }
+        if (menuBtn != null)
+        {
+            menuBtn.onClick.RemoveAllListeners();
+            menuBtn.onClick.AddListener(() => {
+                if (GameManager.Instance != null) GameManager.Instance.LoadMainMenu();
+            });
+        }
         
         if (optionsBtn != null && optionsPanel != null)
         {
+            optionsBtn.onClick.RemoveAllListeners();
             optionsBtn.onClick.AddListener(() => optionsPanel.SetActive(!optionsPanel.activeSelf));
         }
     }
 
     private void Start()
     {
-        GameManager.Instance.OnStateChanged += HandleStateChanged;
-        gameObject.SetActive(false);
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnStateChanged -= HandleStateChanged;
+            GameManager.Instance.OnStateChanged += HandleStateChanged;
+            HandleStateChanged(GameManager.Instance.CurrentState);
+        }
     }
 
     private void OnDestroy()
@@ -34,7 +57,7 @@ public class PausePanel : MonoBehaviour
             GameManager.Instance.OnStateChanged -= HandleStateChanged;
     }
 
-    private void HandleStateChanged(GameState state)
+    public void HandleStateChanged(GameState state)
     {
         gameObject.SetActive(state == GameState.Paused);
         if (optionsPanel != null) optionsPanel.SetActive(false);

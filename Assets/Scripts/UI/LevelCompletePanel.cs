@@ -11,14 +11,30 @@ public class LevelCompletePanel : MonoBehaviour
 
     private void Awake()
     {
-        nextLevelBtn.onClick.AddListener(() => GameManager.Instance.LoadNextLevel());
-        menuBtn.onClick.AddListener(() => GameManager.Instance.LoadMainMenu());
+        if (nextLevelBtn != null)
+        {
+            nextLevelBtn.onClick.RemoveAllListeners();
+            nextLevelBtn.onClick.AddListener(() => {
+                if (GameManager.Instance != null) GameManager.Instance.LoadNextLevel();
+            });
+        }
+        if (menuBtn != null)
+        {
+            menuBtn.onClick.RemoveAllListeners();
+            menuBtn.onClick.AddListener(() => {
+                if (GameManager.Instance != null) GameManager.Instance.LoadMainMenu();
+            });
+        }
     }
 
     private void Start()
     {
-        GameManager.Instance.OnStateChanged += HandleStateChanged;
-        gameObject.SetActive(false);
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnStateChanged -= HandleStateChanged;
+            GameManager.Instance.OnStateChanged += HandleStateChanged;
+            HandleStateChanged(GameManager.Instance.CurrentState);
+        }
     }
 
     private void OnDestroy()
@@ -27,16 +43,16 @@ public class LevelCompletePanel : MonoBehaviour
             GameManager.Instance.OnStateChanged -= HandleStateChanged;
     }
 
-    private void HandleStateChanged(GameState state)
+    public void HandleStateChanged(GameState state)
     {
         bool isActive = (state == GameState.LevelComplete);
         gameObject.SetActive(isActive);
 
-        if (isActive)
+        if (isActive && GameManager.Instance != null)
         {
-            scoreText.text = "Puntaje: " + GameManager.Instance.Score;
+            if (scoreText != null) scoreText.text = "Puntaje: " + GameManager.Instance.Score;
             float t = GameManager.Instance.TimeElapsed;
-            timeText.text = $"Tiempo: {Mathf.FloorToInt(t/60):00}:{Mathf.FloorToInt(t%60):00}";
+            if (timeText != null) timeText.text = $"Tiempo: {Mathf.FloorToInt(t/60):00}:{Mathf.FloorToInt(t%60):00}";
         }
     }
 }
