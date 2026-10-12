@@ -21,6 +21,22 @@ public class HUDController : MonoBehaviour
 
     private PlayerController player;
 
+    private void Awake()
+    {
+        EnsureEventSystem();
+    }
+
+    private void EnsureEventSystem()
+    {
+        if (Object.FindFirstObjectByType<UnityEngine.EventSystems.EventSystem>() == null)
+        {
+            GameObject esObj = new GameObject("EventSystem");
+            esObj.AddComponent<UnityEngine.EventSystems.EventSystem>();
+            esObj.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+            Debug.Log("[HUDController] EventSystem creado dinámicamente en escena.");
+        }
+    }
+
     private void Start()
     {
         if (GameManager.Instance != null)

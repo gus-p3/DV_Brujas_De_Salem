@@ -293,8 +293,9 @@ public class UISetup
         // 2. Paneles de Estado (Pausa, Fin de Nivel, Game Over)
         BuildGameplayPanels(canvasObj.transform, hud);
 
-        // 3. Asegurar Managers y CaptureListener
+        // 3. Asegurar Managers, EventSystem y CaptureListener
         InstantiateManagersIfMissing();
+        EnsureEventSystem();
         EnsureCaptureListener();
 
         Debug.Log("[UISetup] HUD y paneles de estado generados correctamente.");
@@ -316,6 +317,7 @@ public class UISetup
         pausePanel.restartBtn = CreateStyledButton("RestartButton", "Reiniciar", pausePanelObj.transform, new Vector2(0, 20));
         pausePanel.optionsBtn = CreateStyledButton("OptionsButton", "Opciones", pausePanelObj.transform, new Vector2(0, -70));
         pausePanel.menuBtn = CreateStyledButton("MenuButton", "Salir al Menú", pausePanelObj.transform, new Vector2(0, -160));
+        pausePanel.SetupButtons();
 
         // Subpanel opciones dentro de pausa
         GameObject subOptions = new GameObject("SubOptionsPanel");
@@ -349,6 +351,7 @@ public class UISetup
         winPanel.timeText = CreateLabel("TimeText", "Tiempo: 00:00", winPanelObj.transform, new Vector2(0, 40));
         winPanel.nextLevelBtn = CreateStyledButton("NextLevelBtn", "Siguiente Nivel", winPanelObj.transform, new Vector2(0, -60));
         winPanel.menuBtn = CreateStyledButton("MenuBtn", "Salir al Menú", winPanelObj.transform, new Vector2(0, -150));
+        winPanel.SetupButtons();
         winPanelObj.SetActive(false);
 
         // Panel de Game Over (Hoguera)
@@ -364,6 +367,7 @@ public class UISetup
         GameObject fireObj = new GameObject("BonfireImage");
         fireObj.transform.SetParent(goPanelObj.transform, false);
         Image fireImg = fireObj.AddComponent<Image>();
+        fireImg.raycastTarget = false;
         Sprite fireSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/UI/game_over_fire.png");
         if (fireSprite != null) fireImg.sprite = fireSprite;
         RectTransform fireRect = fireObj.GetComponent<RectTransform>();
@@ -374,11 +378,24 @@ public class UISetup
         TextMeshProUGUI goMsg = CreateLabel("GameOverMessage", "La hoguera te alcanzó…", goPanelObj.transform, new Vector2(0, -70));
         goMsg.fontSize = 46;
         goMsg.color = new Color(0.96f, 0.65f, 0.25f);
+        goMsg.raycastTarget = false;
         goPanel.messageText = goMsg;
 
         goPanel.retryBtn = CreateStyledButton("RetryBtn", "Reintentar", goPanelObj.transform, new Vector2(-160, -190));
         goPanel.menuBtn = CreateStyledButton("MenuBtn", "Salir al Menú", goPanelObj.transform, new Vector2(160, -190));
+        goPanel.SetupButtons();
         goPanelObj.SetActive(false);
+    }
+
+    private static void EnsureEventSystem()
+    {
+        if (Object.FindFirstObjectByType<UnityEngine.EventSystems.EventSystem>() == null)
+        {
+            GameObject esObj = new GameObject("EventSystem");
+            esObj.AddComponent<UnityEngine.EventSystems.EventSystem>();
+            esObj.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+            Debug.Log("[UISetup] EventSystem creado.");
+        }
     }
 
     private static void InstantiateManagersIfMissing()
@@ -434,6 +451,7 @@ public class UISetup
         tmp.fontStyle = FontStyles.Bold;
         tmp.alignment = TextAlignmentOptions.Center;
         tmp.color = Color.white;
+        tmp.raycastTarget = false;
         RectTransform txtRect = txtObj.GetComponent<RectTransform>();
         txtRect.anchorMin = Vector2.zero; 
         txtRect.anchorMax = Vector2.one; 

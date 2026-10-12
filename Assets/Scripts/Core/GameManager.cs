@@ -43,10 +43,37 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Time.timeScale = 1f;
+        if (scene.name == "MainMenu" || scene.buildIndex == 0)
+        {
+            SetState(GameState.Playing);
+            if (AudioManager.Instance != null && AudioManager.Instance.menuMusicClip != null)
+            {
+                AudioManager.Instance.PlayMusic(AudioManager.Instance.menuMusicClip);
+            }
+        }
+        else
+        {
+            StartLevel();
+        }
+    }
+
     private void Start()
     {
         string activeScene = SceneManager.GetActiveScene().name;
-        if (activeScene != "MainMenu")
+        if (activeScene != "MainMenu" && SceneManager.GetActiveScene().buildIndex != 0)
         {
             StartLevel();
         }
@@ -157,8 +184,8 @@ public class GameManager : MonoBehaviour
     public void RestartLevel()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        StartLevel();
+        int activeIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(activeIndex);
     }
 
     public void CompleteLevel()
@@ -189,7 +216,7 @@ public class GameManager : MonoBehaviour
         {
             AudioManager.Instance.PlayMusic(AudioManager.Instance.menuMusicClip);
         }
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene(0);
     }
 
     public void LoadNextLevel()

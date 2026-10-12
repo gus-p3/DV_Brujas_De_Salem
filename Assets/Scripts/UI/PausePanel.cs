@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PausePanel : MonoBehaviour
 {
@@ -12,37 +13,17 @@ public class PausePanel : MonoBehaviour
 
     private void Awake()
     {
-        if (resumeBtn != null)
-        {
-            resumeBtn.onClick.RemoveAllListeners();
-            resumeBtn.onClick.AddListener(() => {
-                if (GameManager.Instance != null) GameManager.Instance.ResumeGame();
-            });
-        }
-        if (restartBtn != null)
-        {
-            restartBtn.onClick.RemoveAllListeners();
-            restartBtn.onClick.AddListener(() => {
-                if (GameManager.Instance != null) GameManager.Instance.RestartLevel();
-            });
-        }
-        if (menuBtn != null)
-        {
-            menuBtn.onClick.RemoveAllListeners();
-            menuBtn.onClick.AddListener(() => {
-                if (GameManager.Instance != null) GameManager.Instance.LoadMainMenu();
-            });
-        }
-        
-        if (optionsBtn != null && optionsPanel != null)
-        {
-            optionsBtn.onClick.RemoveAllListeners();
-            optionsBtn.onClick.AddListener(() => optionsPanel.SetActive(!optionsPanel.activeSelf));
-        }
+        SetupButtons();
+    }
+
+    private void OnEnable()
+    {
+        SetupButtons();
     }
 
     private void Start()
     {
+        SetupButtons();
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnStateChanged -= HandleStateChanged;
@@ -57,9 +38,59 @@ public class PausePanel : MonoBehaviour
             GameManager.Instance.OnStateChanged -= HandleStateChanged;
     }
 
+    public void SetupButtons()
+    {
+        if (resumeBtn != null)
+        {
+            resumeBtn.onClick.RemoveAllListeners();
+            resumeBtn.onClick.AddListener(OnResumeClicked);
+        }
+        if (restartBtn != null)
+        {
+            restartBtn.onClick.RemoveAllListeners();
+            restartBtn.onClick.AddListener(OnRestartClicked);
+        }
+        if (menuBtn != null)
+        {
+            menuBtn.onClick.RemoveAllListeners();
+            menuBtn.onClick.AddListener(OnMenuClicked);
+        }
+        if (optionsBtn != null && optionsPanel != null)
+        {
+            optionsBtn.onClick.RemoveAllListeners();
+            optionsBtn.onClick.AddListener(() => optionsPanel.SetActive(!optionsPanel.activeSelf));
+        }
+    }
+
+    public void OnResumeClicked()
+    {
+        Debug.Log("[PausePanel] Reanudar pulsado.");
+        if (GameManager.Instance != null) GameManager.Instance.ResumeGame();
+        else { Time.timeScale = 1f; gameObject.SetActive(false); }
+    }
+
+    public void OnRestartClicked()
+    {
+        Debug.Log("[PausePanel] Reiniciar pulsado.");
+        if (GameManager.Instance != null) GameManager.Instance.RestartLevel();
+        else { Time.timeScale = 1f; SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); }
+    }
+
+    public void OnMenuClicked()
+    {
+        Debug.Log("[PausePanel] Salir al Menú pulsado.");
+        if (GameManager.Instance != null) GameManager.Instance.LoadMainMenu();
+        else { Time.timeScale = 1f; SceneManager.LoadScene(0); }
+    }
+
     public void HandleStateChanged(GameState state)
     {
-        gameObject.SetActive(state == GameState.Paused);
-        if (optionsPanel != null) optionsPanel.SetActive(false);
+        bool isPaused = (state == GameState.Paused);
+        gameObject.SetActive(isPaused);
+        if (isPaused)
+        {
+            SetupButtons();
+            if (optionsPanel != null) optionsPanel.SetActive(false);
+        }
     }
 }
