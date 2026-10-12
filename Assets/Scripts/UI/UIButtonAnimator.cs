@@ -34,6 +34,10 @@ public class UIButtonAnimator : MonoBehaviour, IPointerEnterHandler, IPointerExi
     {
         targetScale = originalScale * pressScale;
         RestartCoroutine();
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayButtonClickSound();
+        }
     }
 
     public void OnPointerUp(PointerEventData eventData)

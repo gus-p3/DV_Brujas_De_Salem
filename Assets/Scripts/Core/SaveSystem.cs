@@ -32,4 +32,9 @@ public static class SaveSystem
     {
         return PlayerPrefs.HasKey(MaxLevelKey);
     }
+
+    public static int GetHighScore(int levelIndex)
+    {
+        return PlayerPrefs.GetInt(HighScoreKeyPrefix + levelIndex, 0);
+    }
 }

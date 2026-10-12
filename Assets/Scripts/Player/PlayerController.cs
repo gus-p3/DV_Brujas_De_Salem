@@ -379,6 +379,10 @@ public class PlayerController : MonoBehaviour, IDetectable
             isJumping = true;
             jumpBufferCounter = 0f;
             coyoteCounter = 0f;
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayJumpSound();
+            }
         }
 
         // Altura variable: soltar el botón corta el salto mientras sube

@@ -4,6 +4,7 @@ using UnityEngine;
 public class WitchDetectable : MonoBehaviour, IDetectable
 {
     private TransformationManager tm;
+    private PlayerController pc;
     
     [Tooltip("Punto que usan los guardias para medir distancia. Si está vacío se usa el transform.")]
     [SerializeField] private Transform detectionPoint;
@@ -14,6 +15,15 @@ public class WitchDetectable : MonoBehaviour, IDetectable
     private void Awake()
     {
         tm = GetComponent<TransformationManager>();
+        pc = GetComponent<PlayerController>();
+    }
+
+    private void Update()
+    {
+        if (pc != null)
+        {
+            pc.SetDetectable(IsDetectable);
+        }
     }
 
     public bool IsDetectable
@@ -27,12 +37,10 @@ public class WitchDetectable : MonoBehaviour, IDetectable
                 if (tm.IsInHideout) return false;
                 
                 // Gato fuera de la zona -> detectable solo a corta distancia.
-                // Ya que no podemos cambiar la firma de IDetectable ni EnemySight, 
-                // verificamos si hay algún guardia cerca. Si no hay guardias cerca, devolvemos false.
-                Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, catDetectionDistance, LayerMask.GetMask("Enemy"));
-                foreach (var col in enemies)
+                EnemySight[] enemies = Object.FindObjectsByType<EnemySight>(FindObjectsSortMode.None);
+                foreach (var enemy in enemies)
                 {
-                    if (col.GetComponent<EnemySight>() != null)
+                    if (enemy != null && Vector2.Distance(transform.position, enemy.transform.position) <= catDetectionDistance)
                     {
                         return true;
                     }
