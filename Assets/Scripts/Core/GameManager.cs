@@ -43,6 +43,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        string activeScene = SceneManager.GetActiveScene().name;
+        if (activeScene != "MainMenu")
+        {
+            StartLevel();
+        }
+    }
+
     private void Update()
     {
         if (CurrentState == GameState.Playing)

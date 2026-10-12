@@ -14,6 +14,11 @@ public class HUDController : MonoBehaviour
     public TextMeshProUGUI hypnotizeChargesText;
     public TextMeshProUGUI sleepChargesText;
 
+    [Header("Panels")]
+    public PausePanel pausePanel;
+    public LevelCompletePanel levelCompletePanel;
+    public GameOverPanel gameOverPanel;
+
     private PlayerController player;
 
     private void Start()
@@ -21,7 +26,9 @@ public class HUDController : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnStatsUpdated += UpdateStatsUI;
+            GameManager.Instance.OnStateChanged += HandleStateChanged;
             UpdateStatsUI();
+            HandleStateChanged(GameManager.Instance.CurrentState);
         }
 
         player = Object.FindFirstObjectByType<PlayerController>();
@@ -37,6 +44,7 @@ public class HUDController : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnStatsUpdated -= UpdateStatsUI;
+            GameManager.Instance.OnStateChanged -= HandleStateChanged;
         }
         if (player != null)
         {
@@ -52,6 +60,32 @@ public class HUDController : MonoBehaviour
             int minutes = Mathf.FloorToInt(time / 60f);
             int seconds = Mathf.FloorToInt(time % 60f);
             timeText.text = $"{minutes:00}:{seconds:00}";
+        }
+    }
+
+    private void HandleStateChanged(GameState state)
+    {
+        if (pausePanel != null)
+        {
+            pausePanel.gameObject.SetActive(state == GameState.Paused);
+        }
+        if (levelCompletePanel != null)
+        {
+            levelCompletePanel.gameObject.SetActive(state == GameState.LevelComplete);
+            if (state == GameState.LevelComplete && levelCompletePanel.scoreText != null && GameManager.Instance != null)
+            {
+                levelCompletePanel.scoreText.text = "Puntaje: " + GameManager.Instance.Score;
+                float t = GameManager.Instance.TimeElapsed;
+                levelCompletePanel.timeText.text = $"Tiempo: {Mathf.FloorToInt(t/60):00}:{Mathf.FloorToInt(t%60):00}";
+            }
+        }
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.gameObject.SetActive(state == GameState.GameOver);
+            if (state == GameState.GameOver && gameOverPanel.messageText != null)
+            {
+                gameOverPanel.messageText.text = "La hoguera te alcanzó…";
+            }
         }
     }
 

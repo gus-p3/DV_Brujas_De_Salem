@@ -286,7 +286,7 @@ public class UISetup
         hud.flightEnergySlider = slider;
 
         // 2. Paneles de Estado (Pausa, Fin de Nivel, Game Over)
-        BuildGameplayPanels(canvasObj.transform);
+        BuildGameplayPanels(canvasObj.transform, hud);
 
         // 3. Asegurar Managers y CaptureListener
         InstantiateManagersIfMissing();
@@ -295,7 +295,7 @@ public class UISetup
         Debug.Log("[UISetup] HUD y paneles de estado generados correctamente.");
     }
 
-    private static void BuildGameplayPanels(Transform canvasTransform)
+    private static void BuildGameplayPanels(Transform canvasTransform, HUDController hud)
     {
         // Panel de Pausa
         GameObject pausePanelObj = new GameObject("PausePanel");
@@ -304,6 +304,7 @@ public class UISetup
         pRect.anchorMin = Vector2.zero; pRect.anchorMax = Vector2.one; pRect.sizeDelta = Vector2.zero;
         pausePanelObj.AddComponent<Image>().color = new Color(0.08f, 0.05f, 0.03f, 0.88f);
         PausePanel pausePanel = pausePanelObj.AddComponent<PausePanel>();
+        hud.pausePanel = pausePanel;
 
         CreatePanelTitle("PauseTitle", "Pausa", pausePanelObj.transform, new Vector2(0, 220));
         pausePanel.resumeBtn = CreateStyledButton("ResumeButton", "Reanudar", pausePanelObj.transform, new Vector2(0, 110));
@@ -336,6 +337,7 @@ public class UISetup
         wRect.anchorMin = Vector2.zero; wRect.anchorMax = Vector2.one; wRect.sizeDelta = Vector2.zero;
         winPanelObj.AddComponent<Image>().color = new Color(0.12f, 0.08f, 0.04f, 0.92f);
         LevelCompletePanel winPanel = winPanelObj.AddComponent<LevelCompletePanel>();
+        hud.levelCompletePanel = winPanel;
 
         CreatePanelTitle("WinTitle", "¡Nivel completado!", winPanelObj.transform, new Vector2(0, 220));
         winPanel.scoreText = CreateLabel("ScoreText", "Puntaje: 0000", winPanelObj.transform, new Vector2(0, 110));
@@ -351,6 +353,7 @@ public class UISetup
         goRect.anchorMin = Vector2.zero; goRect.anchorMax = Vector2.one; goRect.sizeDelta = Vector2.zero;
         goPanelObj.AddComponent<Image>().color = new Color(0.18f, 0.05f, 0.03f, 0.94f);
         GameOverPanel goPanel = goPanelObj.AddComponent<GameOverPanel>();
+        hud.gameOverPanel = goPanel;
 
         // Imagen de la hoguera
         GameObject fireObj = new GameObject("BonfireImage");
