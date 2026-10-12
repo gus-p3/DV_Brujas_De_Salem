@@ -307,7 +307,7 @@ public class EnemySight : MonoBehaviour
 
     private void LogCapture()
     {
-        Debug.Log($"[EnemySight] {name}: objetivo capturado (pendiente de conectar con GameManager).", this);
+        Debug.Log($"[EnemySight] {name}: objetivo capturado por el farol.", this);
     }
 
     // -------------------------------------------------------------- Cono (Mesh)

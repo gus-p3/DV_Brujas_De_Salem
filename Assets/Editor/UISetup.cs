@@ -104,7 +104,7 @@ public class UISetup
         mmc.qualityDropdown = CreateStyledDropdown("QualityDropdown", optionsPanel.transform, new Vector2(0, -145));
 
         Button backFromOpt = CreateStyledButton("BackButton", "Volver", optionsPanel.transform, new Vector2(0, -260));
-        backFromOpt.onClick.AddListener(() => mmc.ShowMainPanel());
+        mmc.backFromOptionsButton = backFromOpt;
         optionsPanel.SetActive(false);
 
         // Credits Panel
@@ -133,8 +133,13 @@ public class UISetup
         ctcRect.sizeDelta = Vector2.zero;
 
         Button backFromCred = CreateStyledButton("BackButton", "Volver", creditsPanel.transform, new Vector2(0, -260));
-        backFromCred.onClick.AddListener(() => mmc.ShowMainPanel());
+        mmc.backFromCreditsButton = backFromCred;
         creditsPanel.SetActive(false);
+
+        if (cameraObj.GetComponent<AudioListener>() == null)
+        {
+            cameraObj.AddComponent<AudioListener>();
+        }
 
         // Managers
         InstantiateManagersIfMissing();
@@ -286,16 +291,17 @@ public class UISetup
         hud.flightEnergySlider = slider;
 
         // 2. Paneles de Estado (Pausa, Fin de Nivel, Game Over)
-        BuildGameplayPanels(canvasObj.transform);
+        BuildGameplayPanels(canvasObj.transform, hud);
 
-        // 3. Asegurar Managers y CaptureListener
+        // 3. Asegurar Managers, EventSystem y CaptureListener
         InstantiateManagersIfMissing();
+        EnsureEventSystem();
         EnsureCaptureListener();
 
         Debug.Log("[UISetup] HUD y paneles de estado generados correctamente.");
     }
 
-    private static void BuildGameplayPanels(Transform canvasTransform)
+    private static void BuildGameplayPanels(Transform canvasTransform, HUDController hud)
     {
         // Panel de Pausa
         GameObject pausePanelObj = new GameObject("PausePanel");
@@ -304,12 +310,14 @@ public class UISetup
         pRect.anchorMin = Vector2.zero; pRect.anchorMax = Vector2.one; pRect.sizeDelta = Vector2.zero;
         pausePanelObj.AddComponent<Image>().color = new Color(0.08f, 0.05f, 0.03f, 0.88f);
         PausePanel pausePanel = pausePanelObj.AddComponent<PausePanel>();
+        hud.pausePanel = pausePanel;
 
         CreatePanelTitle("PauseTitle", "Pausa", pausePanelObj.transform, new Vector2(0, 220));
         pausePanel.resumeBtn = CreateStyledButton("ResumeButton", "Reanudar", pausePanelObj.transform, new Vector2(0, 110));
         pausePanel.restartBtn = CreateStyledButton("RestartButton", "Reiniciar", pausePanelObj.transform, new Vector2(0, 20));
         pausePanel.optionsBtn = CreateStyledButton("OptionsButton", "Opciones", pausePanelObj.transform, new Vector2(0, -70));
         pausePanel.menuBtn = CreateStyledButton("MenuButton", "Salir al Menú", pausePanelObj.transform, new Vector2(0, -160));
+        pausePanel.SetupButtons();
 
         // Subpanel opciones dentro de pausa
         GameObject subOptions = new GameObject("SubOptionsPanel");
@@ -336,12 +344,14 @@ public class UISetup
         wRect.anchorMin = Vector2.zero; wRect.anchorMax = Vector2.one; wRect.sizeDelta = Vector2.zero;
         winPanelObj.AddComponent<Image>().color = new Color(0.12f, 0.08f, 0.04f, 0.92f);
         LevelCompletePanel winPanel = winPanelObj.AddComponent<LevelCompletePanel>();
+        hud.levelCompletePanel = winPanel;
 
         CreatePanelTitle("WinTitle", "¡Nivel completado!", winPanelObj.transform, new Vector2(0, 220));
         winPanel.scoreText = CreateLabel("ScoreText", "Puntaje: 0000", winPanelObj.transform, new Vector2(0, 110));
         winPanel.timeText = CreateLabel("TimeText", "Tiempo: 00:00", winPanelObj.transform, new Vector2(0, 40));
         winPanel.nextLevelBtn = CreateStyledButton("NextLevelBtn", "Siguiente Nivel", winPanelObj.transform, new Vector2(0, -60));
         winPanel.menuBtn = CreateStyledButton("MenuBtn", "Salir al Menú", winPanelObj.transform, new Vector2(0, -150));
+        winPanel.SetupButtons();
         winPanelObj.SetActive(false);
 
         // Panel de Game Over (Hoguera)
@@ -351,11 +361,13 @@ public class UISetup
         goRect.anchorMin = Vector2.zero; goRect.anchorMax = Vector2.one; goRect.sizeDelta = Vector2.zero;
         goPanelObj.AddComponent<Image>().color = new Color(0.18f, 0.05f, 0.03f, 0.94f);
         GameOverPanel goPanel = goPanelObj.AddComponent<GameOverPanel>();
+        hud.gameOverPanel = goPanel;
 
         // Imagen de la hoguera
         GameObject fireObj = new GameObject("BonfireImage");
         fireObj.transform.SetParent(goPanelObj.transform, false);
         Image fireImg = fireObj.AddComponent<Image>();
+        fireImg.raycastTarget = false;
         Sprite fireSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/UI/game_over_fire.png");
         if (fireSprite != null) fireImg.sprite = fireSprite;
         RectTransform fireRect = fireObj.GetComponent<RectTransform>();
@@ -366,11 +378,24 @@ public class UISetup
         TextMeshProUGUI goMsg = CreateLabel("GameOverMessage", "La hoguera te alcanzó…", goPanelObj.transform, new Vector2(0, -70));
         goMsg.fontSize = 46;
         goMsg.color = new Color(0.96f, 0.65f, 0.25f);
+        goMsg.raycastTarget = false;
         goPanel.messageText = goMsg;
 
         goPanel.retryBtn = CreateStyledButton("RetryBtn", "Reintentar", goPanelObj.transform, new Vector2(-160, -190));
         goPanel.menuBtn = CreateStyledButton("MenuBtn", "Salir al Menú", goPanelObj.transform, new Vector2(160, -190));
+        goPanel.SetupButtons();
         goPanelObj.SetActive(false);
+    }
+
+    private static void EnsureEventSystem()
+    {
+        if (Object.FindFirstObjectByType<UnityEngine.EventSystems.EventSystem>() == null)
+        {
+            GameObject esObj = new GameObject("EventSystem");
+            esObj.AddComponent<UnityEngine.EventSystems.EventSystem>();
+            esObj.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+            Debug.Log("[UISetup] EventSystem creado.");
+        }
     }
 
     private static void InstantiateManagersIfMissing()
@@ -426,6 +451,7 @@ public class UISetup
         tmp.fontStyle = FontStyles.Bold;
         tmp.alignment = TextAlignmentOptions.Center;
         tmp.color = Color.white;
+        tmp.raycastTarget = false;
         RectTransform txtRect = txtObj.GetComponent<RectTransform>();
         txtRect.anchorMin = Vector2.zero; 
         txtRect.anchorMax = Vector2.one; 
