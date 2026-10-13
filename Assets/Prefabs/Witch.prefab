@@ -141,7 +141,7 @@ MonoBehaviour:
   groundCheckSkin: 0.02
   groundedMaxUpwardSpeed: 0.1
   noFrictionMaterial: {fileID: 6200000, guid: dc42c7611576a1a4f850722411315baf, type: 2}
-  canFly: 0
+  canFly: 1
   flightKey: 102
   flightAltButton: Fire2
   flySpeed: 5
@@ -175,10 +175,10 @@ MonoBehaviour:
   catSpeedMultiplier: 1.3
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 65
+    m_Bits: 64
   humanController: {fileID: 9100000, guid: e13beb1af4fbc94489c6daaecf17948e, type: 2}
-  humanColliderSize: {x: 0.6, y: 1.8}
-  humanColliderOffset: {x: 0, y: 0.9}
+  humanColliderSize: {x: 0.6, y: 1.6}
+  humanColliderOffset: {x: 0, y: 0.8}
   catController: {fileID: 9100000, guid: 24b16964c197ba0469e16f576a829ae9, type: 2}
   catColliderSize: {x: 0.8, y: 0.5}
   catColliderOffset: {x: 0, y: 0.25}
@@ -329,7 +329,7 @@ Animator:
   m_GameObject: {fileID: 8031860601558102642}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: e13beb1af4fbc94489c6daaecf17948e, type: 2}
+  m_Controller: {fileID: 0}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
