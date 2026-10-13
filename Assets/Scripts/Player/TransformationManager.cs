@@ -13,13 +13,13 @@ public class TransformationManager : MonoBehaviour
 
     [Header("Human Form")]
     public RuntimeAnimatorController humanController;
-    public Vector2 humanColliderSize = new Vector2(0.6f, 1.8f);
-    public Vector2 humanColliderOffset = new Vector2(0f, 0.9f);
+    public Vector2 humanColliderSize = new Vector2(0.6f, 1.6f);
+    public Vector2 humanColliderOffset = new Vector2(0f, 0.856f);
 
     [Header("Cat Form")]
     public RuntimeAnimatorController catController;
     public Vector2 catColliderSize = new Vector2(0.8f, 0.5f);
-    public Vector2 catColliderOffset = new Vector2(0f, 0.25f);
+    public Vector2 catColliderOffset = new Vector2(0f, 0.306f);
 
     public bool IsCatForm { get; private set; }
     public bool IsInHideout { get; set; }

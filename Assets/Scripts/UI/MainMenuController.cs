@@ -133,7 +133,7 @@ public class MainMenuController : MonoBehaviour
 
     public void StartNewGame()
     {
-        SceneManager.LoadScene(1); // Load level 1 (Test_Bruja)
+        SceneManager.LoadScene("Level1");
         if (GameManager.Instance != null) GameManager.Instance.StartLevel();
     }
 
