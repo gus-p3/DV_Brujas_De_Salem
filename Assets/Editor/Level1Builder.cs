@@ -118,19 +118,19 @@ public static class Level1Builder
         platformsRoot.transform.SetParent(worldRoot.transform);
 
         // Zona 2: Bosque bajo (3 plataformas)
-        CreatePlatform(platformsRoot, "Platform_Z2_1", logA, new Vector2(25f, 1.8f), groundLayer);
-        CreatePlatform(platformsRoot, "Platform_Z2_2", logB, new Vector2(30f, 3.3f), groundLayer);
-        CreatePlatform(platformsRoot, "Platform_Z2_3_High", logC, new Vector2(36f, 4.8f), groundLayer); // Aquí va Item_Spawn_Branch
+        CreatePlatform(platformsRoot, "Platform_Z2_1", logA, new Vector2(24f, 1.8f), groundLayer);
+        CreatePlatform(platformsRoot, "Platform_Z2_2", logB, new Vector2(31f, 3.2f), groundLayer);
+        CreatePlatform(platformsRoot, "Platform_Z2_3_High", logC, new Vector2(39f, 4.6f), groundLayer); // Aquí va Item_Spawn_Branch
 
         // Zona 3: Maizal grande (2 plataformas)
         CreatePlatform(platformsRoot, "Platform_Z3_1", logA, new Vector2(48f, 2.2f), groundLayer);
-        CreatePlatform(platformsRoot, "Platform_Z3_2", logB, new Vector2(58f, 3.0f), groundLayer);
+        CreatePlatform(platformsRoot, "Platform_Z3_2", logB, new Vector2(57f, 3.2f), groundLayer);
 
         // Zona 4: Bosque alto (4 plataformas escalonadas con brecha)
-        CreatePlatform(platformsRoot, "Platform_Z4_1", logA, new Vector2(66f, 2.2f), groundLayer);
-        CreatePlatform(platformsRoot, "Platform_Z4_2", logB, new Vector2(71f, 3.8f), groundLayer);
-        CreatePlatform(platformsRoot, "Platform_Z4_3", logC, new Vector2(77f, 5.2f), groundLayer);
-        CreatePlatform(platformsRoot, "Platform_Z4_4_Final", logB, new Vector2(83f, 3.8f), groundLayer); // Aquí va Item_Spawn_Rope
+        CreatePlatform(platformsRoot, "Platform_Z4_1", logA, new Vector2(65f, 2.0f), groundLayer);
+        CreatePlatform(platformsRoot, "Platform_Z4_2", logB, new Vector2(72f, 3.4f), groundLayer);
+        CreatePlatform(platformsRoot, "Platform_Z4_3", logC, new Vector2(80f, 4.8f), groundLayer);
+        CreatePlatform(platformsRoot, "Platform_Z4_4_Final", logB, new Vector2(88f, 3.4f), groundLayer); // Aquí va Item_Spawn_Rope
 
         // 7. Zonas de Maizal (HideoutZone y arte de maíz)
         GameObject maizalesRoot = new GameObject("Cornfields");
@@ -160,11 +160,11 @@ public static class Level1Builder
 
         // 9. Marcadores de Spawn (Empty con nombres exactos)
         GameObject spawnsRoot = new GameObject("Spawns");
-        CreateSpawnMarker(spawnsRoot, "Guard_Spawn_1", new Vector3(32f, 0.8f, 0f));
-        CreateSpawnMarker(spawnsRoot, "Guard_Spawn_2", new Vector3(60f, 0.8f, 0f));
-        CreateSpawnMarker(spawnsRoot, "Item_Spawn_Branch", new Vector3(36f, 5.6f, 0f));
-        CreateSpawnMarker(spawnsRoot, "Item_Spawn_Straw", new Vector3(50f, 0.5f, 0f));
-        CreateSpawnMarker(spawnsRoot, "Item_Spawn_Rope", new Vector3(83f, 4.6f, 0f));
+        CreateSpawnMarker(spawnsRoot, "Guard_Spawn_1", new Vector3(31f, 0.8f, 0f));
+        CreateSpawnMarker(spawnsRoot, "Guard_Spawn_2", new Vector3(62f, 0.8f, 0f));
+        CreateSpawnMarker(spawnsRoot, "Item_Spawn_Branch", new Vector3(39f, 5.6f, 0f));
+        CreateSpawnMarker(spawnsRoot, "Item_Spawn_Straw", new Vector3(52f, 0.8f, 0f));
+        CreateSpawnMarker(spawnsRoot, "Item_Spawn_Rope", new Vector3(88f, 4.4f, 0f));
 
         // Meta del Nivel (Goal_Spawn y Portón)
         GameObject goalSpawn = CreateSpawnMarker(spawnsRoot, "Goal_Spawn", new Vector3(95f, 0f, 0f));
@@ -252,8 +252,18 @@ public static class Level1Builder
         BoxCollider2D col = plat.AddComponent<BoxCollider2D>();
         float w = sprite.rect.width / sprite.pixelsPerUnit;
         float h = sprite.rect.height / sprite.pixelsPerUnit;
-        col.size = new Vector2(w, h * 0.7f);
-        col.offset = new Vector2(0f, 0f);
+        
+        // El collider se alinea con la superficie superior del tronco (madera y musgo)
+        // y se estrecha ligeramente (92%) para evitar choques con esquinas invisibles
+        float colHeight = h * 0.7f;
+        col.size = new Vector2(w * 0.92f, colHeight);
+        col.offset = new Vector2(0f, (h * 0.5f) - (colHeight * 0.5f));
+        col.usedByEffector = true;
+
+        PlatformEffector2D effector = plat.AddComponent<PlatformEffector2D>();
+        effector.useOneWay = true;
+        effector.useOneWayGrouping = true;
+        effector.surfaceArc = 170f;
     }
 
     private static void CreateCornfield(GameObject parent, string name, float centerX, float width, Sprite clusterSprite, Sprite sA, Sprite sB, Sprite sC)
