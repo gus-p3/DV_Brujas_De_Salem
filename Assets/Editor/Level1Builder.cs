@@ -92,8 +92,8 @@ public static class Level1Builder
         groundObj.transform.position = new Vector3(50f, -2f, 0f);
 
         BoxCollider2D groundCol = groundObj.AddComponent<BoxCollider2D>();
-        groundCol.size = new Vector2(115f, 4f);
-        groundCol.offset = Vector2.zero; // La superficie superior queda exactamente en y = 0
+        groundCol.size = new Vector2(115f, 4.17f);
+        groundCol.offset = new Vector2(0f, 0.085f); // col.max.y = -2.0 + 0.085 + 2.085 = +0.17f (alineado con el césped)
 
         // Repetir visualmente el suelo a lo largo de las 115 unidades
         float tileWidth = groundSprite.rect.width / groundSprite.pixelsPerUnit; // 8 unidades
@@ -152,7 +152,7 @@ public static class Level1Builder
         GameObject tutorialsRoot = new GameObject("Tutorials");
         tutorialsRoot.transform.SetParent(worldRoot.transform);
 
-        CreateTutorialSign(tutorialsRoot, "Tutorial_Sign_1", new Vector2(6f, 1.2f), signSprite,
+        CreateTutorialSign(tutorialsRoot, "Tutorial_Sign_1", new Vector2(4f, 1.2f), signSprite,
             "Pulsa T para transformarte en gato y ocultarte en el maizal");
 
         CreateTutorialSign(tutorialsRoot, "Tutorial_Sign_2", new Vector2(20f, 1.2f), signSprite,
@@ -203,10 +203,10 @@ public static class Level1Builder
         // 11. Main Camera
         GameObject cameraObj = new GameObject("Main Camera");
         cameraObj.tag = "MainCamera";
-        cameraObj.transform.position = new Vector3(0f, 2.5f, -10f);
+        cameraObj.transform.position = new Vector3(0f, 1.2f, -10f);
         Camera cam = cameraObj.AddComponent<Camera>();
         cam.orthographic = true;
-        cam.orthographicSize = 4.5f; // Altura ortográfica elegida en Paso 0
+        cam.orthographicSize = 4.5f; // Altura ortográfica
         cam.clearFlags = CameraClearFlags.SolidColor;
         cam.backgroundColor = new Color(0.12f, 0.08f, 0.22f);
         cameraObj.AddComponent<AudioListener>();
@@ -217,8 +217,9 @@ public static class Level1Builder
             follow.SetTarget(witch.transform);
         }
         SerializedObject soFollow = new SerializedObject(follow);
+        soFollow.FindProperty("offset").vector3Value = new Vector3(0f, 1.2f, -10f);
         soFollow.FindProperty("useLimits").boolValue = true;
-        soFollow.FindProperty("minLimit").vector2Value = new Vector2(-5f, -1f);
+        soFollow.FindProperty("minLimit").vector2Value = new Vector2(-5f, 0.17f);
         soFollow.FindProperty("maxLimit").vector2Value = new Vector2(110f, 15f);
         soFollow.ApplyModifiedPropertiesWithoutUndo();
 
@@ -251,13 +252,13 @@ public static class Level1Builder
 
         BoxCollider2D col = plat.AddComponent<BoxCollider2D>();
         float w = sprite.rect.width / sprite.pixelsPerUnit;
-        float h = sprite.rect.height / sprite.pixelsPerUnit;
         
-        // El collider se alinea con la superficie superior del tronco (madera y musgo)
-        // y se estrecha ligeramente (92%) para evitar choques con esquinas invisibles
-        float colHeight = h * 0.7f;
-        col.size = new Vector2(w * 0.92f, colHeight);
-        col.offset = new Vector2(0f, (h * 0.5f) - (colHeight * 0.5f));
+        // Superficie superior según sprite real: Log A ~0.28u, Log B ~0.30u, Log C ~0.23u (media ~0.27u)
+        // Fijamos la cara superior del collider en +0.27u relativo al centro de la plataforma con grosor 0.35u
+        float targetTop = 0.27f;
+        float colThickness = 0.35f;
+        col.size = new Vector2(w * 0.92f, colThickness);
+        col.offset = new Vector2(0f, targetTop - (colThickness * 0.5f));
         col.usedByEffector = true;
 
         PlatformEffector2D effector = plat.AddComponent<PlatformEffector2D>();
@@ -272,8 +273,10 @@ public static class Level1Builder
         cf.transform.SetParent(parent.transform, false);
         cf.transform.position = new Vector3(centerX, 0f, 0f);
 
-        // Hideout Zone Trigger
+        // Hideout Zone Trigger y componente de fundido
         HideoutZone hz = cf.AddComponent<HideoutZone>();
+        cf.AddComponent<CornFoliageFade>();
+
         BoxCollider2D col = cf.GetComponent<BoxCollider2D>();
         col.isTrigger = true;
         col.size = new Vector2(width, 4.5f);
@@ -292,7 +295,7 @@ public static class Level1Builder
             sr.sortingOrder = 0;
         }
 
-        // Tallos al frente (delante de la bruja para ocultar al gato, Foreground orden 5)
+        // Tallos al frente (delante de la bruja, Foreground orden 5, alfa base 0.55f)
         Sprite[] stalks = { sA, sB, sC };
         int stalkCount = Mathf.CeilToInt(width / 1.5f);
         for (int i = 0; i < stalkCount; i++)
@@ -302,6 +305,7 @@ public static class Level1Builder
             st.transform.localPosition = new Vector3((-width / 2f) + (i * 1.5f) + 0.5f, 2.5f, 0f);
             SpriteRenderer sr = st.AddComponent<SpriteRenderer>();
             sr.sprite = stalks[i % stalks.Length];
+            sr.color = new Color(1f, 1f, 1f, 0.55f);
             sr.sortingLayerName = "Foreground";
             sr.sortingOrder = 5;
         }
@@ -315,7 +319,7 @@ public static class Level1Builder
 
         SpriteRenderer sr = signObj.AddComponent<SpriteRenderer>();
         sr.sprite = signSprite;
-        sr.sortingLayerName = "Gameplay";
+        sr.sortingLayerName = "Midground";
         sr.sortingOrder = 1;
 
         // Texto en World Space sobre el letrero
