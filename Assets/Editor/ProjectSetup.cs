@@ -31,11 +31,41 @@ public static class ProjectSetup
 
         EnsureLayers(tagManager);
         EnsureTag(tagManager, PlayerTag);
+        EnsureSortingLayers(tagManager);
         tagManager.ApplyModifiedProperties();
 
         ConfigureCollisionMatrix();
         AssetDatabase.SaveAssets();
-        Debug.Log("[ProjectSetup] Layers, tag Player y matriz de colisiones 2D configurados.");
+        Debug.Log("[ProjectSetup] Layers, sorting layers, tag Player y matriz de colisiones 2D configurados.");
+    }
+
+    private static void EnsureSortingLayers(SerializedObject tagManager)
+    {
+        SerializedProperty sortingLayers = tagManager.FindProperty("m_SortingLayers");
+        string[] requiredSortingLayers = { "Background", "Midground", "Gameplay", "Foreground" };
+
+        foreach (string layerName in requiredSortingLayers)
+        {
+            bool exists = false;
+            for (int i = 0; i < sortingLayers.arraySize; i++)
+            {
+                if (sortingLayers.GetArrayElementAtIndex(i).FindPropertyRelative("name").stringValue == layerName)
+                {
+                    exists = true;
+                    break;
+                }
+            }
+
+            if (!exists)
+            {
+                int newIndex = sortingLayers.arraySize;
+                sortingLayers.InsertArrayElementAtIndex(newIndex);
+                SerializedProperty newLayer = sortingLayers.GetArrayElementAtIndex(newIndex);
+                newLayer.FindPropertyRelative("name").stringValue = layerName;
+                newLayer.FindPropertyRelative("uniqueID").intValue = UnityEngine.Random.Range(100000, 999999);
+                newLayer.FindPropertyRelative("locked").boolValue = false;
+            }
+        }
     }
 
     private static void EnsureLayers(SerializedObject tagManager)

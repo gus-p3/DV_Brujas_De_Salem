@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: ab5202a8fbd6fd443858746b05aad9fe
   - enabled: 1
+    path: Assets/Scenes/Level1.unity
+    guid: 71cbd5ecda1f96e43b2491e1718a05a0
+  - enabled: 1
     path: Assets/Scenes/Test_Bruja.unity
     guid: 281321e6708696c468ec98a165b8896d
   m_configObjects:
