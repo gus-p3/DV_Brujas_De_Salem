@@ -183,11 +183,12 @@ public class UISetup
         RectTransform timeRect = timeObj.GetComponent<RectTransform>();
         timeRect.anchorMin = new Vector2(0.5f, 1f); 
         timeRect.anchorMax = new Vector2(0.5f, 1f);
-        timeRect.sizeDelta = new Vector2(300, 80);
-        timeRect.anchoredPosition = new Vector2(0, -40);
+        timeRect.pivot = new Vector2(0.5f, 1f);
+        timeRect.sizeDelta = new Vector2(300, 70);
+        timeRect.anchoredPosition = new Vector2(0, -24);
         hud.timeText = timeTxt;
 
-        // Score (Top Right)
+        // Score (Top Right - anclado con pivote (1,1) para no recortarse en ningún aspecto)
         GameObject scoreObj = new GameObject("ScoreText");
         scoreObj.transform.SetParent(canvasObj.transform, false);
         TextMeshProUGUI scoreTxt = scoreObj.AddComponent<TextMeshProUGUI>();
@@ -199,32 +200,36 @@ public class UISetup
         RectTransform scoreRect = scoreObj.GetComponent<RectTransform>();
         scoreRect.anchorMin = new Vector2(1f, 1f); 
         scoreRect.anchorMax = new Vector2(1f, 1f);
-        scoreRect.sizeDelta = new Vector2(350, 80);
-        scoreRect.anchoredPosition = new Vector2(-60, -40);
+        scoreRect.pivot = new Vector2(1f, 1f);
+        scoreRect.sizeDelta = new Vector2(300, 70);
+        scoreRect.anchoredPosition = new Vector2(-24, -24);
         hud.scoreText = scoreTxt;
 
-        // Vidas (Top Left - 3 Hearts)
+        // Vidas (Top Left - 3 Corazones con sprite decorativo)
+        Sprite heartSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/UI/ui_icon_heart.png");
         hud.heartIcons = new Image[3];
         for (int i = 0; i < 3; i++)
         {
             GameObject heartObj = new GameObject("Heart_" + i);
             heartObj.transform.SetParent(canvasObj.transform, false);
             Image heartImg = heartObj.AddComponent<Image>();
-            heartImg.color = new Color(0.9f, 0.2f, 0.2f);
+            if (heartSprite != null) heartImg.sprite = heartSprite;
+            else heartImg.color = new Color(0.9f, 0.2f, 0.2f);
             RectTransform hRect = heartObj.GetComponent<RectTransform>();
             hRect.anchorMin = new Vector2(0, 1); 
             hRect.anchorMax = new Vector2(0, 1);
-            hRect.sizeDelta = new Vector2(50, 50);
-            hRect.anchoredPosition = new Vector2(60 + (i * 65), -50);
+            hRect.pivot = new Vector2(0, 1);
+            hRect.sizeDelta = new Vector2(56, 56);
+            hRect.anchoredPosition = new Vector2(24 + (i * 68), -24);
             hud.heartIcons[i] = heartImg;
         }
 
-        // Hechizos (Bottom Left: Cegar gris/blanco, Hipnotizar violeta, Dormir azul)
+        // Hechizos (Bottom Left: Matraces con sprites limpios y contadores "x N")
         string[] spellNames = { "Cegar", "Hipnotizar", "Dormir" };
-        Color[] spellColors = { 
-            new Color(0.85f, 0.85f, 0.85f), 
-            new Color(0.68f, 0.25f, 0.85f), 
-            new Color(0.25f, 0.55f, 0.95f) 
+        string[] spellSpritePaths = {
+            "Assets/Art/UI/ui_icon_flask_blind.png",
+            "Assets/Art/UI/ui_icon_flask_hypnotize.png",
+            "Assets/Art/UI/ui_icon_flask_sleep.png"
         };
         
         for (int i = 0; i < 3; i++)
@@ -232,46 +237,51 @@ public class UISetup
             GameObject spellObj = new GameObject("Flask_" + spellNames[i]);
             spellObj.transform.SetParent(canvasObj.transform, false);
             Image spellImg = spellObj.AddComponent<Image>();
-            spellImg.color = spellColors[i];
+            Sprite flaskSprite = AssetDatabase.LoadAssetAtPath<Sprite>(spellSpritePaths[i]);
+            if (flaskSprite != null) spellImg.sprite = flaskSprite;
+            else spellImg.color = Color.white;
+
             RectTransform sRect = spellObj.GetComponent<RectTransform>();
             sRect.anchorMin = new Vector2(0, 0); 
             sRect.anchorMax = new Vector2(0, 0);
-            sRect.sizeDelta = new Vector2(55, 55);
-            sRect.anchoredPosition = new Vector2(60 + (i * 110), 60);
+            sRect.pivot = new Vector2(0, 0);
+            sRect.sizeDelta = new Vector2(56, 56);
+            sRect.anchoredPosition = new Vector2(24 + (i * 96), 24);
 
             GameObject txtObj = new GameObject("Count");
             txtObj.transform.SetParent(spellObj.transform, false);
             TextMeshProUGUI txt = txtObj.AddComponent<TextMeshProUGUI>();
             txt.text = "x 0"; 
-            txt.fontSize = 28; 
+            txt.fontSize = 26; 
             txt.fontStyle = FontStyles.Bold;
             txt.color = Color.white;
             txt.alignment = TextAlignmentOptions.BottomRight;
             RectTransform tRect = txtObj.GetComponent<RectTransform>();
             tRect.anchorMin = Vector2.zero; 
             tRect.anchorMax = Vector2.one;
-            tRect.sizeDelta = new Vector2(45, 0);
-            tRect.anchoredPosition = new Vector2(30, -5);
+            tRect.sizeDelta = new Vector2(40, 0);
+            tRect.anchoredPosition = new Vector2(34, -4);
             
             if (i == 0) hud.blindChargesText = txt;
             if (i == 1) hud.hypnotizeChargesText = txt;
             if (i == 2) hud.sleepChargesText = txt;
         }
 
-        // Flight Energy Slider (Bottom Center)
+        // Flight Energy Slider (Top Center, debajo del cronómetro)
         GameObject sliderObj = new GameObject("FlightSlider");
         sliderObj.transform.SetParent(canvasObj.transform, false);
         Slider slider = sliderObj.AddComponent<Slider>();
         RectTransform sliderRect = sliderObj.GetComponent<RectTransform>();
-        sliderRect.anchorMin = new Vector2(0.5f, 0); 
-        sliderRect.anchorMax = new Vector2(0.5f, 0);
-        sliderRect.sizeDelta = new Vector2(380, 28);
-        sliderRect.anchoredPosition = new Vector2(0, 50);
+        sliderRect.anchorMin = new Vector2(0.5f, 1f); 
+        sliderRect.anchorMax = new Vector2(0.5f, 1f);
+        sliderRect.pivot = new Vector2(0.5f, 1f);
+        sliderRect.sizeDelta = new Vector2(320, 20);
+        sliderRect.anchoredPosition = new Vector2(0, -96);
 
         GameObject bgSliderObj = new GameObject("Background");
         bgSliderObj.transform.SetParent(sliderObj.transform, false);
         Image bgImg = bgSliderObj.AddComponent<Image>(); 
-        bgImg.color = new Color(0.15f, 0.1f, 0.05f, 0.85f);
+        bgImg.color = new Color(0.12f, 0.08f, 0.05f, 0.85f);
         RectTransform bgRect = bgSliderObj.GetComponent<RectTransform>();
         bgRect.anchorMin = Vector2.zero; bgRect.anchorMax = Vector2.one; bgRect.sizeDelta = Vector2.zero;
 

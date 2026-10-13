@@ -51,7 +51,13 @@ public class HUDController : MonoBehaviour
         if (player != null)
         {
             player.OnFlightEnergyChanged += UpdateFlightEnergy;
+            player.OnFlightChanged += HandleFlightChanged;
             UpdateFlightEnergy(player.FlightEnergy01);
+            SetFlightSliderVisible(player.CanFly || player.IsFlying);
+        }
+        else if (flightEnergySlider != null)
+        {
+            flightEnergySlider.gameObject.SetActive(false);
         }
     }
 
@@ -65,6 +71,23 @@ public class HUDController : MonoBehaviour
         if (player != null)
         {
             player.OnFlightEnergyChanged -= UpdateFlightEnergy;
+            player.OnFlightChanged -= HandleFlightChanged;
+        }
+    }
+
+    private void HandleFlightChanged(bool isFlying)
+    {
+        if (player != null)
+        {
+            SetFlightSliderVisible(player.CanFly || isFlying);
+        }
+    }
+
+    public void SetFlightSliderVisible(bool visible)
+    {
+        if (flightEnergySlider != null)
+        {
+            flightEnergySlider.gameObject.SetActive(visible);
         }
     }
 
