@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3835105467249885815}
   - component: {fileID: -7620222590533321543}
   - component: {fileID: -7559975629141373121}
+  - component: {fileID: 2430778405580967504}
   m_Layer: 7
   m_Name: Witch
   m_TagString: Player
@@ -196,6 +197,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WitchDetectable
   detectionPoint: {fileID: 0}
   catDetectionDistance: 2.5
+--- !u!114 &2430778405580967504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2484219030927747412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f049529b84e13684ab84292118b5368c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BroomInventory
+  completionParticles: {fileID: 0}
 --- !u!1 &4364815756299105017
 GameObject:
   m_ObjectHideFlags: 0
