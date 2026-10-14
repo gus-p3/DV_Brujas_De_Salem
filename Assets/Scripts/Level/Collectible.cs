@@ -14,7 +14,7 @@ public enum BroomPart
 /// <summary>
 /// Ítem recolectable en el nivel (rama, paja o cuerda).
 /// Solo puede ser recogido por la bruja en forma humana (TransformationManager.CanCollect).
-/// Flota suavemente en su posición inicial.
+/// Flota suavemente en su posición inicial y se recoge al entrar en contacto o proximidad.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
 public class Collectible : MonoBehaviour
@@ -37,6 +37,10 @@ public class Collectible : MonoBehaviour
     [Tooltip("Velocidad de oscilación.")]
     [SerializeField] private float bobSpeed = 3.5f;
 
+    [Header("Zona de Proximidad")]
+    [Tooltip("Radio de proximidad para recoger si el jugador está junto al objeto.")]
+    [SerializeField] private float proximityRadius = 1.3f;
+
     public BroomPart Part => part;
     public int ScoreValue => scoreValue;
 
@@ -48,7 +52,7 @@ public class Collectible : MonoBehaviour
     private void Awake()
     {
         col = GetComponent<Collider2D>();
-        col.isTrigger = true;
+        if (col != null) col.isTrigger = true;
         initialPosition = transform.position;
 
         int colLayer = LayerMask.NameToLayer("Collectible");
@@ -74,9 +78,44 @@ public class Collectible : MonoBehaviour
         // Flotación suave
         float newY = initialPosition.y + Mathf.Sin(Time.time * bobSpeed) * bobAmplitude;
         transform.position = new Vector3(initialPosition.x, newY, initialPosition.z);
+
+        // Detección por proximidad complementaria si la física aún no disparó el trigger
+        if (!isCollected)
+        {
+            CheckProximity();
+        }
+    }
+
+    private void CheckProximity()
+    {
+        if (isCollected) return;
+
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, proximityRadius);
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (isCollected) break;
+            if (hits[i] == null) continue;
+
+            PlayerController pc = hits[i].GetComponentInParent<PlayerController>();
+            if (pc != null)
+            {
+                TryProcessCollection(hits[i]);
+                break;
+            }
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
+    {
+        TryProcessCollection(other);
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        TryProcessCollection(other);
+    }
+
+    private void TryProcessCollection(Collider2D other)
     {
         if (isCollected) return;
 
@@ -131,5 +170,11 @@ public class Collectible : MonoBehaviour
         }
 
         Destroy(gameObject);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, proximityRadius);
     }
 }
