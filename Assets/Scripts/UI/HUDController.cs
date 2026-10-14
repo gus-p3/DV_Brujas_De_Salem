@@ -19,6 +19,11 @@ public class HUDController : MonoBehaviour
     public LevelCompletePanel levelCompletePanel;
     public GameOverPanel gameOverPanel;
 
+    [Header("Messages")]
+    [Tooltip("Texto en pantalla para avisos breves al jugador.")]
+    public TextMeshProUGUI messageBannerText;
+    private Coroutine messageCoroutine;
+
     private PlayerController player;
 
     private void Awake()
@@ -149,5 +154,29 @@ public class HUDController : MonoBehaviour
         {
             flightEnergySlider.value = energy01;
         }
+    }
+
+    /// <summary>
+    /// Muestra un mensaje emergente en pantalla durante el tiempo indicado (en tiempo no escalado).
+    /// </summary>
+    public void ShowMessage(string message, float duration = 2.5f)
+    {
+        if (messageBannerText == null) return;
+        if (messageCoroutine != null) StopCoroutine(messageCoroutine);
+        messageCoroutine = StartCoroutine(ShowMessageRoutine(message, duration));
+    }
+
+    private System.Collections.IEnumerator ShowMessageRoutine(string message, float duration)
+    {
+        messageBannerText.text = message;
+        messageBannerText.gameObject.SetActive(true);
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+        messageBannerText.gameObject.SetActive(false);
+        messageCoroutine = null;
     }
 }

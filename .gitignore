@@ -44,3 +44,5 @@ desktop.ini
 
 # Scripts temporales de procesamiento de arte (no forman parte del juego)
 /Tools/_tmp/
+
+.vsconfig

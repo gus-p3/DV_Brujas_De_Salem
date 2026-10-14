@@ -39,23 +39,36 @@ public class TransformationManager : MonoBehaviour
 
     private void Awake()
     {
-        pc = GetComponent<PlayerController>();
-        boxCol = GetComponent<BoxCollider2D>();
-        anim = GetComponentInChildren<Animator>();
+        EnsureComponents();
+    }
+
+    private void EnsureComponents()
+    {
+        if (pc == null) pc = GetComponent<PlayerController>();
+        if (boxCol == null) boxCol = GetComponent<BoxCollider2D>();
+        if (anim == null) anim = GetComponentInChildren<Animator>();
         
         // Guardar la velocidad original por reflexión para no alterar la firma pública
-        moveSpeedField = typeof(PlayerController).GetField("moveSpeed", BindingFlags.NonPublic | BindingFlags.Instance);
-        if (moveSpeedField != null)
+        if (moveSpeedField == null)
         {
-            originalMoveSpeed = (float)moveSpeedField.GetValue(pc);
+            moveSpeedField = typeof(PlayerController).GetField("moveSpeed", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (moveSpeedField != null && pc != null)
+            {
+                originalMoveSpeed = (float)moveSpeedField.GetValue(pc);
+            }
         }
     }
 
     private void Start()
     {
+        EnsureComponents();
         if (humanController == null && anim != null)
         {
             humanController = anim.runtimeAnimatorController;
+        }
+        else if (anim != null && anim.runtimeAnimatorController == null && humanController != null)
+        {
+            anim.runtimeAnimatorController = humanController;
         }
     }
 
@@ -72,6 +85,7 @@ public class TransformationManager : MonoBehaviour
 
     private void TransformToCat()
     {
+        EnsureComponents();
         IsCatForm = true;
         cooldownTimer = transformCooldown;
         PlaySmoke();
@@ -83,12 +97,15 @@ public class TransformationManager : MonoBehaviour
             anim.Update(0f);
         }
         
-        boxCol.size = catColliderSize;
-        boxCol.offset = catColliderOffset;
+        if (boxCol != null)
+        {
+            boxCol.size = catColliderSize;
+            boxCol.offset = catColliderOffset;
+        }
         
-        if (pc.IsFlying) pc.ToggleFlight();
+        if (pc != null && pc.IsFlying) pc.ToggleFlight();
         
-        if (moveSpeedField != null)
+        if (moveSpeedField != null && pc != null)
         {
             moveSpeedField.SetValue(pc, originalMoveSpeed * catSpeedMultiplier);
         }
@@ -98,6 +115,7 @@ public class TransformationManager : MonoBehaviour
 
     private void TryTransformToHuman()
     {
+        EnsureComponents();
         // Verificar espacio libre sobre la cabeza del gato (entre y = 0.6 y 1.6)
         Vector2 checkCenter = (Vector2)transform.position + new Vector2(0f, 1.1f);
         Vector2 checkSize = new Vector2(humanColliderSize.x * 0.8f, 0.9f);
@@ -122,10 +140,13 @@ public class TransformationManager : MonoBehaviour
             anim.Update(0f);
         }
         
-        boxCol.size = humanColliderSize;
-        boxCol.offset = humanColliderOffset;
+        if (boxCol != null)
+        {
+            boxCol.size = humanColliderSize;
+            boxCol.offset = humanColliderOffset;
+        }
 
-        if (moveSpeedField != null)
+        if (moveSpeedField != null && pc != null)
         {
             moveSpeedField.SetValue(pc, originalMoveSpeed);
         }
