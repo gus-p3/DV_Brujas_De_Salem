@@ -56,6 +56,12 @@ public class Collectible : MonoBehaviour
         {
             gameObject.layer = colLayer;
         }
+
+        int playerLayer = LayerMask.NameToLayer("Player");
+        if (colLayer >= 0 && playerLayer >= 0)
+        {
+            Physics2D.IgnoreLayerCollision(playerLayer, colLayer, false);
+        }
     }
 
     private void Update()
