@@ -109,11 +109,11 @@ public class Checkpoint : MonoBehaviour
             AudioManager.Instance.PlaySFX(clip);
         }
 
-        // 4. Mostrar aviso durante 1.5 s
+        // 4. Mostrar aviso durante 1.0 s
         HUDController hud = Object.FindFirstObjectByType<HUDController>();
         if (hud != null)
         {
-            hud.ShowMessage("Punto de control", 1.5f);
+            hud.ShowMessage("Punto de control", 1.0f);
         }
 
         Debug.Log($"[Checkpoint] {name} activado exitosamente en {RespawnPosition}.");

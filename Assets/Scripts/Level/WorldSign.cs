@@ -39,6 +39,13 @@ public class WorldSign : MonoBehaviour
         if (textMesh != null)
         {
             textMesh.text = ControlsMap.Resolve(message);
+            textMesh.textWrappingMode = TextWrappingModes.Normal;
+            textMesh.alignment = TextAlignmentOptions.Center;
+            RectTransform rt = textMesh.rectTransform;
+            if (rt != null)
+            {
+                rt.sizeDelta = new Vector2(Mathf.Max(rt.sizeDelta.x, 5.0f), Mathf.Max(rt.sizeDelta.y, 2.0f));
+            }
             SetTextAlpha(0f);
         }
     }
@@ -78,6 +85,27 @@ public class WorldSign : MonoBehaviour
         currentAlpha = Mathf.MoveTowards(currentAlpha, targetAlpha, fadeSpeed * Time.deltaTime);
 
         SetTextAlpha(currentAlpha);
+    }
+
+    private void LateUpdate()
+    {
+        AdjustPositionToCameraBounds();
+    }
+
+    private void AdjustPositionToCameraBounds()
+    {
+        if (textMesh == null || currentAlpha <= 0.05f) return;
+        Camera cam = Camera.main;
+        if (cam == null) return;
+
+        Vector3 screenPos = cam.WorldToViewportPoint(textMesh.transform.position);
+        float clampedX = Mathf.Clamp(screenPos.x, 0.15f, 0.85f);
+        if (!Mathf.Approximately(screenPos.x, clampedX))
+        {
+            screenPos.x = clampedX;
+            Vector3 worldPos = cam.ViewportToWorldPoint(screenPos);
+            textMesh.transform.position = new Vector3(worldPos.x, textMesh.transform.position.y, textMesh.transform.position.z);
+        }
     }
 
     private void SetTextAlpha(float alpha)
