@@ -132,6 +132,12 @@ public class PlayerController : MonoBehaviour, IDetectable
     /// <summary>Se dispara cuando cambia la energía de vuelo, normalizada de 0 a 1.</summary>
     public event Action<float> OnFlightEnergyChanged;
 
+    /// <summary>Indica hacia dónde está orientada la bruja (true = derecha, false = izquierda).</summary>
+    public bool FacingRight => facingRight;
+
+    /// <summary>Dirección horizontal unitaria hacia donde mira la bruja (+1 o -1).</summary>
+    public int FacingDirection => facingRight ? 1 : -1;
+
     /// <summary>Permite volar. Se habilita al reunir las 3 partes de la escoba.</summary>
     public bool CanFly
     {

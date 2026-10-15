@@ -91,6 +91,11 @@ public class EnemySight : MonoBehaviour
 
     private Transform Origin => lanternOrigin != null ? lanternOrigin : transform;
 
+    private bool isSuppressed = false;
+    private Color? suppressedColor = null;
+
+    public bool IsSuppressed => isSuppressed;
+
     private void Awake()
     {
         rayCount = Mathf.Max(2, rayCount);
@@ -173,6 +178,22 @@ public class EnemySight : MonoBehaviour
         IDetectable bestTarget = null;
         float bestDistance = float.MaxValue;
 
+        if (isSuppressed)
+        {
+            for (int i = 0; i < rayCount; i++)
+            {
+                Vector2 dir = Rotate(forward, startAngle + step * i);
+                float length = viewDistance;
+                RaycastHit2D wall = Physics2D.Raycast(origin, dir, viewDistance, obstacleMask);
+                if (wall.collider != null) length = wall.distance;
+                rayDirections[i] = dir;
+                rayLengths[i] = length;
+            }
+            targetVisible = false;
+            currentTarget = null;
+            return;
+        }
+
         for (int i = 0; i < rayCount; i++)
         {
             Vector2 dir = Rotate(forward, startAngle + step * i);
@@ -221,6 +242,12 @@ public class EnemySight : MonoBehaviour
 
     private void UpdateState(float dt)
     {
+        if (isSuppressed)
+        {
+            if (state != AlertState.Calm) SetState(AlertState.Calm);
+            return;
+        }
+
         switch (state)
         {
             case AlertState.Calm:
@@ -326,6 +353,36 @@ public class EnemySight : MonoBehaviour
         ResetToCalm();
     }
 
+    /// <summary>
+    /// Suprime o restablece la capacidad visual del guardia ante el impacto de pociones (Cegar, Dormir).
+    /// </summary>
+    public void SetVisionSuppressed(bool suppressed, Color? overrideColor = null)
+    {
+        isSuppressed = suppressed;
+        suppressedColor = overrideColor;
+        if (suppressed)
+        {
+            targetVisible = false;
+            currentTarget = null;
+            ResetToCalm();
+            if (overrideColor.HasValue)
+            {
+                if (coneRenderer != null) coneRenderer.enabled = true;
+                currentColor = overrideColor.Value;
+                if (runtimeMaterial != null) runtimeMaterial.color = currentColor;
+            }
+            else
+            {
+                if (coneRenderer != null) coneRenderer.enabled = false;
+            }
+        }
+        else
+        {
+            if (coneRenderer != null) coneRenderer.enabled = true;
+            ResetToCalm();
+        }
+    }
+
     private void LogCapture()
     {
         Debug.Log($"[EnemySight] {name}: objetivo capturado por el farol.", this);
@@ -426,7 +483,7 @@ public class EnemySight : MonoBehaviour
             return;
         }
 
-        Color target = StateColor(state);
+        Color target = (isSuppressed && suppressedColor.HasValue) ? suppressedColor.Value : StateColor(state);
         currentColor = Color.Lerp(currentColor, target, 1f - Mathf.Exp(-colorLerpSpeed * Time.deltaTime));
         runtimeMaterial.color = currentColor;
     }
