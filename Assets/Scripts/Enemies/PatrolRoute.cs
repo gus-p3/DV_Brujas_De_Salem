@@ -283,14 +283,15 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
 
         float dirX = Mathf.Sign(diffX);
         
-        // Verificar borde de plataforma antes de avanzar
-        if (!HasGroundAhead(dirX))
+        // Verificar borde de plataforma o choque con muro antes de avanzar
+        if (!HasGroundAhead(dirX) || HasWallAhead(dirX))
         {
-            // No hay suelo hacia el waypoint, iniciar espera y cambiar de dirección
+            // No hay suelo o hay muro hacia el waypoint: iniciar espera y cambiar de dirección
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             currentState = PatrolState.Waiting;
             waitTimer = waitTimeAtPoint;
             AdvanceWaypoint();
+            FaceDirection(-dirX);
             return;
         }
 
@@ -437,10 +438,29 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
             facingRight = wantRight;
 
             // Escala local en X para orientar visual y cono de visión
-            Vector3 scale = visualTransform.localScale;
-            scale.x = Mathf.Abs(scale.x) * (facingRight ? 1f : -1f);
-            visualTransform.localScale = scale;
+            if (visualTransform != null)
+            {
+                Vector3 scale = visualTransform.localScale;
+                scale.x = Mathf.Abs(scale.x) * (facingRight ? 1f : -1f);
+                visualTransform.localScale = scale;
+            }
+
+            // Sincronizar posición y orientación del farol
+            Transform lantern = transform.Find("LanternOrigin");
+            if (lantern != null)
+            {
+                Vector3 lp = lantern.localPosition;
+                lp.x = Mathf.Abs(lp.x) * (facingRight ? 1f : -1f);
+                lantern.localPosition = lp;
+            }
         }
+    }
+
+    private bool HasWallAhead(float dirX)
+    {
+        Vector2 checkOrigin = (Vector2)transform.position + Vector2.up * 0.5f;
+        RaycastHit2D hit = Physics2D.Raycast(checkOrigin, Vector2.right * dirX, 0.8f, groundMask);
+        return hit.collider != null && !hit.collider.isTrigger;
     }
 
     private bool HasGroundAhead(float dirX)
@@ -508,6 +528,11 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
         if (debugLogs)
         {
             Debug.Log($"[PatrolRoute] {name}: ¡Objetivo capturado! Delegando resolución al sistema de captura.", this);
+        }
+
+        if (enemySight != null && enemySight.CurrentState != AlertState.Capture)
+        {
+            enemySight.TriggerCaptureFromPatrol();
         }
     }
 

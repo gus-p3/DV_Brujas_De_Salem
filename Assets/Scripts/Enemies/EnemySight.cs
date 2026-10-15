@@ -98,6 +98,12 @@ public class EnemySight : MonoBehaviour
 
     private void Awake()
     {
+        if (facingReference == null)
+        {
+            Transform visual = transform.Find("Visual");
+            if (visual != null) facingReference = visual;
+        }
+
         rayCount = Mathf.Max(2, rayCount);
         rayDirections = new Vector2[rayCount];
         rayLengths = new float[rayCount];
@@ -213,11 +219,26 @@ public class EnemySight : MonoBehaviour
                 IDetectable detectable = hit.collider.GetComponentInParent<IDetectable>();
                 if (detectable != null && detectable.IsDetectable)
                 {
-                    seen = true;
-                    if (hit.distance < bestDistance)
+                    // Comprobación explícita de sigilo en el maizal:
+                    // Si el jugador está en forma de gato Y se encuentra dentro del trigger del maizal, ignorar la detección
+                    TransformationManager tm = hit.collider.GetComponentInParent<TransformationManager>();
+                    bool isHiddenInCornfield = tm != null && tm.IsCatForm && tm.IsInHideout;
+
+                    if (!isHiddenInCornfield)
                     {
-                        bestDistance = hit.distance;
-                        bestTarget = detectable;
+                        // Comprobación de línea de visión directa mediante Linecast entre el farol y el objetivo filtrando suelo/obstáculos
+                        RaycastHit2D losCheck = Physics2D.Linecast(origin, detectable.DetectionPoint.position, obstacleMask);
+                        bool isOccluded = losCheck.collider != null && !losCheck.collider.isTrigger && losCheck.collider.transform.root != hit.collider.transform.root;
+
+                        if (!isOccluded)
+                        {
+                            seen = true;
+                            if (hit.distance < bestDistance)
+                            {
+                                bestDistance = hit.distance;
+                                bestTarget = detectable;
+                            }
+                        }
                     }
                 }
             }
@@ -246,6 +267,22 @@ public class EnemySight : MonoBehaviour
         {
             if (state != AlertState.Calm) SetState(AlertState.Calm);
             return;
+        }
+
+        // Si el objetivo actual es el gato oculto en el maizal, cancelar sospecha/alerta inmediatamente
+        if (currentTarget != null && currentTarget.DetectionPoint != null)
+        {
+            TransformationManager tm = currentTarget.DetectionPoint.GetComponentInParent<TransformationManager>();
+            if (tm != null && tm.IsCatForm && tm.IsInHideout)
+            {
+                targetVisible = false;
+                currentTarget = null;
+                if (state != AlertState.Calm)
+                {
+                    SetState(AlertState.Calm);
+                }
+                return;
+            }
         }
 
         switch (state)
@@ -281,7 +318,7 @@ public class EnemySight : MonoBehaviour
                     lostTimer = 0f;
                     if (IsWithinCaptureDistance())
                     {
-                        // Si el objetivo está en periodo de invulnerabilidad, se ignora la captura
+                        // Si el objetivo está en periodo de invulnerabilidad, se ignora la captura temporalmente
                         PlayerInvulnerability inv = null;
                         if (currentTarget != null && currentTarget.DetectionPoint != null)
                         {
@@ -304,7 +341,20 @@ public class EnemySight : MonoBehaviour
                 break;
 
             case AlertState.Capture:
-                // Estado final: se mantiene hasta que alguien llame a ResetToCalm o ResetState
+                // Si el jugador permanece en el cono rojo y expira su invulnerabilidad, volver a capturar/dañar
+                if (targetVisible && IsWithinCaptureDistance())
+                {
+                    PlayerInvulnerability inv = null;
+                    if (currentTarget != null && currentTarget.DetectionPoint != null)
+                    {
+                        inv = currentTarget.DetectionPoint.GetComponentInParent<PlayerInvulnerability>();
+                    }
+                    if (inv == null || !inv.IsInvulnerable)
+                    {
+                        OnTargetCaptured?.Invoke();
+                        OnTargetCapturedByGuard?.Invoke(this);
+                    }
+                }
                 break;
         }
     }
@@ -323,8 +373,32 @@ public class EnemySight : MonoBehaviour
             return false;
         }
 
-        float distance = Vector2.Distance(Origin.position, currentTarget.DetectionPoint.position);
-        return distance < captureDistance;
+        float distanceOrigin = Vector2.Distance(Origin.position, currentTarget.DetectionPoint.position);
+        float distanceRoot = Vector2.Distance(transform.position, currentTarget.DetectionPoint.position);
+        return Mathf.Min(distanceOrigin, distanceRoot) <= captureDistance + 0.35f;
+    }
+
+    /// <summary>
+    /// Llamado por PatrolRoute al alcanzar al jugador para forzar la resolución de captura.
+    /// </summary>
+    public void TriggerCaptureFromPatrol()
+    {
+        PlayerInvulnerability inv = null;
+        if (currentTarget != null && currentTarget.DetectionPoint != null)
+        {
+            inv = currentTarget.DetectionPoint.GetComponentInParent<PlayerInvulnerability>();
+        }
+        else
+        {
+            PlayerController pc = UnityEngine.Object.FindFirstObjectByType<PlayerController>();
+            if (pc != null) inv = pc.GetComponent<PlayerInvulnerability>();
+        }
+
+        if (inv != null && inv.IsInvulnerable) return;
+
+        SetState(AlertState.Capture);
+        OnTargetCaptured?.Invoke();
+        OnTargetCapturedByGuard?.Invoke(this);
     }
 
     private void SetState(AlertState newState)
