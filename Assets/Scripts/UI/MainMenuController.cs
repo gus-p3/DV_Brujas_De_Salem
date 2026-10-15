@@ -133,6 +133,7 @@ public class MainMenuController : MonoBehaviour
 
     public void StartNewGame()
     {
+        TutorialManager.ResetSeenTips();
         SceneManager.LoadScene("Level1");
         if (GameManager.Instance != null) GameManager.Instance.StartLevel();
     }
