@@ -444,6 +444,28 @@ public class PlayerController : MonoBehaviour, IDetectable
         OnFlightChanged?.Invoke(false);
     }
 
+    /// <summary>Cancela el vuelo inmediatamente y restaura la gravedad base.</summary>
+    public void CancelFlight()
+    {
+        if (isFlying)
+        {
+            StopFlight();
+        }
+        if (rb != null)
+        {
+            rb.gravityScale = baseGravityScale;
+        }
+    }
+
+    /// <summary>Restablece la velocidad y las fuerzas físicas del jugador.</summary>
+    public void ResetPhysics(Vector2 newVelocity)
+    {
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
+        rb.linearVelocity = newVelocity;
+        rb.angularVelocity = 0f;
+        CancelFlight();
+    }
+
     private void HandleFlight()
     {
         // Aterrizaje voluntario: tocando suelo y pulsando hacia abajo

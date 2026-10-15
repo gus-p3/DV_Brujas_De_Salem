@@ -83,6 +83,9 @@ public class EnemySight : MonoBehaviour
     /// <summary>Se dispara una sola vez cuando el objetivo es capturado.</summary>
     public event Action OnTargetCaptured;
 
+    /// <summary>Se dispara pasando la referencia del guardia emisor de la captura.</summary>
+    public event Action<EnemySight> OnTargetCapturedByGuard;
+
     public AlertState CurrentState => state;
     public bool IsTargetVisible => targetVisible;
 
@@ -251,8 +254,20 @@ public class EnemySight : MonoBehaviour
                     lostTimer = 0f;
                     if (IsWithinCaptureDistance())
                     {
+                        // Si el objetivo está en periodo de invulnerabilidad, se ignora la captura
+                        PlayerInvulnerability inv = null;
+                        if (currentTarget != null && currentTarget.DetectionPoint != null)
+                        {
+                            inv = currentTarget.DetectionPoint.GetComponentInParent<PlayerInvulnerability>();
+                        }
+                        if (inv != null && inv.IsInvulnerable)
+                        {
+                            break;
+                        }
+
                         SetState(AlertState.Capture);
                         OnTargetCaptured?.Invoke();
+                        OnTargetCapturedByGuard?.Invoke(this);
                     }
                 }
                 else if (TickLostTimer(dt))
@@ -262,7 +277,7 @@ public class EnemySight : MonoBehaviour
                 break;
 
             case AlertState.Capture:
-                // Estado final: se mantiene hasta que alguien llame a ResetToCalm
+                // Estado final: se mantiene hasta que alguien llame a ResetToCalm o ResetState
                 break;
         }
     }
@@ -303,6 +318,12 @@ public class EnemySight : MonoBehaviour
         lostTimer = 0f;
         currentTarget = null;
         SetState(AlertState.Calm);
+    }
+
+    /// <summary>Alias explícito de reinicio de estado para el sistema de captura y checkpoints.</summary>
+    public void ResetState()
+    {
+        ResetToCalm();
     }
 
     private void LogCapture()

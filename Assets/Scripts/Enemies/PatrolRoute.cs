@@ -403,14 +403,38 @@ public class PatrolRoute : MonoBehaviour
     {
         currentState = PatrolState.Disabled;
         rb.linearVelocity = Vector2.zero;
-
-        if (GameManager.Instance != null)
+        if (debugLogs)
         {
-            GameManager.Instance.TriggerGameOver();
+            Debug.Log($"[PatrolRoute] {name}: ¡Objetivo capturado! Delegando resolución al sistema de captura.", this);
         }
-        else
+    }
+
+    /// <summary>
+    /// Restablece la posición del guardia al primer waypoint y reinicia su estado de patrulla a Calma.
+    /// </summary>
+    public void ResetToFirstWaypoint()
+    {
+        if (waypoints != null && waypoints.Length > 0 && waypoints[0] != null)
         {
-            Debug.Log($"[PatrolRoute] {name}: ¡Objetivo capturado! (Sin GameManager en escena)", this);
+            Vector3 startPos = waypoints[0].position;
+            transform.position = new Vector3(startPos.x, transform.position.y, transform.position.z);
+        }
+
+        currentWaypointIndex = 0;
+        patrolDirection = 1;
+        waitTimer = 0f;
+        currentState = PatrolState.Patrolling;
+        rb.linearVelocity = Vector2.zero;
+
+        if (enemySight != null)
+        {
+            enemySight.ResetState();
+        }
+
+        UpdateAnimator();
+        if (debugLogs)
+        {
+            Debug.Log($"[PatrolRoute] {name}: reiniciado al primer waypoint.", this);
         }
     }
 
