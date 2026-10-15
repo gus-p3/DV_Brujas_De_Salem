@@ -2417,7 +2417,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &367689786
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3424,6 +3424,74 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &463778636
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 463778637}
+  - component: {fileID: 463778638}
+  m_Layer: 0
+  m_Name: HeartsUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &463778637
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 463778636}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 518132661}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &463778638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 463778636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab8ff53cf3e61c74a806e9e4f23a23f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HeartsUI
+  fullHeartSprite: {fileID: 21300000, guid: 4c4664abc811a6e479d4d5e5b92e8ee3, type: 3}
+  emptyHeartSprite: {fileID: 21300000, guid: 61045c26e7972db4da7ac01916c0c063, type: 3}
+  breakFrames:
+  - {fileID: -7505228620879730108, guid: ec464e63c94a36c449c3639723175954, type: 3}
+  - {fileID: 6215152325820733452, guid: ec464e63c94a36c449c3639723175954, type: 3}
+  - {fileID: 1063325134305957738, guid: ec464e63c94a36c449c3639723175954, type: 3}
+  - {fileID: 2045787355568039205, guid: ec464e63c94a36c449c3639723175954, type: 3}
+  - {fileID: -3172227701382022117, guid: ec464e63c94a36c449c3639723175954, type: 3}
+  - {fileID: -6056926416287775964, guid: ec464e63c94a36c449c3639723175954, type: 3}
+  healFrames:
+  - {fileID: -899733778243840793, guid: 00477d91e9a431f45933c7e6ddb2dd1c, type: 3}
+  - {fileID: -9206853371119461342, guid: 00477d91e9a431f45933c7e6ddb2dd1c, type: 3}
+  - {fileID: 5313093478116612017, guid: 00477d91e9a431f45933c7e6ddb2dd1c, type: 3}
+  - {fileID: -5476251585665886700, guid: 00477d91e9a431f45933c7e6ddb2dd1c, type: 3}
+  heartSize: {x: 36, y: 36}
+  spacing: 8
+  margin: {x: 24, y: 24}
+  animationFps: 10
+  shakeDuration: 0.15
+  shakeMagnitude: 4
 --- !u!1 &481789473
 GameObject:
   m_ObjectHideFlags: 0
@@ -4022,6 +4090,7 @@ RectTransform:
   - {fileID: 2055924160}
   - {fileID: 940486987}
   - {fileID: 1063092475}
+  - {fileID: 463778637}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -5184,7 +5253,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &781768441
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9278,7 +9347,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1506770640
 MonoBehaviour:
   m_ObjectHideFlags: 0
