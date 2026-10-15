@@ -242,5 +242,12 @@ public static class HeartAndTutorialTestMenu
     {
         Level1TutorialRedesign.BuildZones1To5();
     }
+
+    [MenuItem("Brujas/Tutorial Largo/Construir Zonas 6 a 9")]
+    public static void MenuBuildZones6To9()
+    {
+        Level1TutorialRedesign.BuildZones6To9();
+    }
 }
+
 

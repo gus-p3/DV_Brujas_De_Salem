@@ -532,4 +532,270 @@ public static class Level1TutorialRedesign
             instance.transform.position = pos;
         }
     }
+
+    [MenuItem("Brujas/Tutorial Largo/3. Construir Zonas 6 a 9 (Commit 4)")]
+    public static void BuildZones6To9()
+    {
+        EnsureSceneAndBackup();
+        Scene scene = SceneManager.GetActiveScene();
+
+        int groundLayer = LayerMask.NameToLayer("Ground");
+        if (groundLayer < 0) groundLayer = 0;
+
+        GameObject zonesRoot = GameObject.Find("_Zones");
+        if (zonesRoot == null) zonesRoot = new GameObject("_Zones");
+
+        for (int i = 6; i <= 9; i++)
+        {
+            Transform existing = zonesRoot.transform.Find($"Zone_{i}");
+            if (existing != null) Object.DestroyImmediate(existing.gameObject);
+        }
+
+        BuildZone6(zonesRoot.transform, groundLayer);
+        BuildZone7(zonesRoot.transform, groundLayer);
+        BuildZone8(zonesRoot.transform, groundLayer);
+        BuildZone9(zonesRoot.transform, groundLayer);
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        AssetDatabase.SaveAssets();
+        Debug.Log("[Redesign] Zonas 6 a 9 construidas y guardadas exitosamente en Level1.unity.");
+    }
+
+    private static void BuildZone6(Transform parent, int groundLayer)
+    {
+        // Z6 Gato: 126-152 u (Túnel de tronco hueco, altura libre y=1.05)
+        GameObject z6 = new GameObject("Zone_6_GatoTunel");
+        z6.transform.SetParent(parent);
+
+        Sprite tunnelBack = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Log_Tunnel_Back.png");
+        Sprite tunnelFront = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Log_Tunnel_Front.png");
+        Sprite logC = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Platform_Log_C.png");
+
+        // Visual del túnel trasero (orden 1) y frontal (orden 8)
+        if (tunnelBack != null)
+        {
+            GameObject tbObj = new GameObject("Tunnel_Visual_Back");
+            tbObj.transform.SetParent(z6.transform, false);
+            tbObj.transform.position = new Vector3(140f, 1.6f, 0f);
+            tbObj.transform.localScale = new Vector3(2.0f, 1.3f, 1f);
+            SpriteRenderer tbSr = tbObj.AddComponent<SpriteRenderer>();
+            tbSr.sprite = tunnelBack;
+            tbSr.sortingLayerName = "Gameplay";
+            tbSr.sortingOrder = 1;
+        }
+
+        if (tunnelFront != null)
+        {
+            GameObject tfObj = new GameObject("Tunnel_Visual_Front");
+            tfObj.transform.SetParent(z6.transform, false);
+            tfObj.transform.position = new Vector3(140f, 1.6f, 0f);
+            tfObj.transform.localScale = new Vector3(2.0f, 1.3f, 1f);
+            SpriteRenderer tfSr = tfObj.AddComponent<SpriteRenderer>();
+            tfSr.sprite = tunnelFront;
+            tfSr.sortingLayerName = "Gameplay";
+            tfSr.sortingOrder = 8;
+        }
+
+        // Techo físico del tronco: apertura libre de 1.05u desde el suelo (+0.17f a +1.05f = 0.88u libre)
+        // El collider humano mide 1.60u de alto, colisiona físicamente.
+        // El gato mide 0.50u de alto, pasa sin problemas.
+        GameObject ceiling = new GameObject("Tunnel_Solid_Ceiling");
+        ceiling.transform.SetParent(z6.transform, false);
+        ceiling.layer = groundLayer;
+        ceiling.transform.position = new Vector3(140f, 2.2f, 0f);
+        BoxCollider2D ceilCol = ceiling.AddComponent<BoxCollider2D>();
+        ceilCol.size = new Vector2(16.5f, 2.3f); // Base del collider en 2.2 - 1.15 = 1.05f
+
+        // CatOnlyPassage a la entrada (x=131.5) y a la salida (x=148.5)
+        CreateCatPassage(z6, "CatOnlyPassage_Entry", new Vector3(131.5f, 1.0f, 0f));
+        CreateCatPassage(z6, "CatOnlyPassage_Exit", new Vector3(148.5f, 1.0f, 0f));
+
+        // Cámara amplia adentro: Cuerda en x=145 y Corazón en x=142
+        InstantiateBroomPiece("Collectible_Rope", BroomPart.Rope, new Vector3(145f, 0.6f, 0f), z6.transform);
+        InstantiateHeartPickup(new Vector3(142f, 0.6f, 0f), z6.transform);
+
+        // Pasarela superior y guardia patrullando por arriba/afuera del tronco (x=132 a 148 a y=3.4)
+        CreatePlatform(z6, "Platform_Tunnel_Roof", logC, new Vector2(140f, 3.4f), groundLayer);
+        CreateGuard(z6, "Guard_Z6_Roof", new Vector3(134f, 4.1f, 0f), 132f, 147f, 1.8f);
+
+        // CP6 en x = 150
+        CreateCheckpoint(z6, "Checkpoint_Z6", new Vector3(150f, 0.2f, 0f));
+    }
+
+    private static void BuildZone7(Transform parent, int groundLayer)
+    {
+        // Z7 Vuelo 1: 152-180 u (Repisas altas a y=5.0, brecha de 10u x=164-174)
+        GameObject z7 = new GameObject("Zone_7_Vuelo1");
+        z7.transform.SetParent(parent);
+
+        Sprite ledgeA = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Ledge_Rock_A.png");
+        Sprite ledgeB = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Ledge_Rock_B.png");
+
+        // Repisas altas a y = 5.0 con premios
+        if (ledgeA != null)
+        {
+            CreatePlatform(z7, "Ledge_High_Reward_1", ledgeA, new Vector2(158f, 5.0f), groundLayer);
+            InstantiatePotionPickup(PotionType.Hypnotize, new Vector3(158f, 5.5f, 0f), z7.transform);
+        }
+        if (ledgeB != null)
+        {
+            CreatePlatform(z7, "Ledge_High_Reward_2", ledgeB, new Vector2(176f, 5.0f), groundLayer);
+            InstantiatePotionPickup(PotionType.Blind, new Vector3(176f, 5.5f, 0f), z7.transform);
+        }
+
+        // FlightOnlyHint antes de la brecha en x = 162
+        CreateFlightHint(z7, "FlightHint_Z7", new Vector3(162f, 1.2f, 0f));
+
+        // Brecha de 10 u: x = 164 a 174 (sin suelo, caída a KillZone)
+        // Suelo seguro al otro lado de la brecha: x = 174 a 180
+        CreateGroundSection(z7, "Ground_Z7_Landing", 174f, 180f, groundLayer);
+
+        // CP7 en x = 178
+        CreateCheckpoint(z7, "Checkpoint_Z7", new Vector3(178f, 0.2f, 0f));
+    }
+
+    private static void BuildZone8(Transform parent, int groundLayer)
+    {
+        // Z8 Reto combinado: 180-206 u
+        GameObject z8 = new GameObject("Zone_8_RetoCombinado");
+        z8.transform.SetParent(parent);
+
+        // Suelo continuo de Z8: x = 180 a 208
+        CreateGroundSection(z8, "Ground_Z8", 180f, 208f, groundLayer);
+
+        // Frascos de pociones y corazón al inicio (x = 181-183)
+        InstantiatePotionPickup(PotionType.Sleep, new Vector3(181f, 0.5f, 0f), z8.transform);
+        InstantiatePotionPickup(PotionType.Blind, new Vector3(182f, 0.5f, 0f), z8.transform);
+        InstantiateHeartPickup(new Vector3(183f, 0.5f, 0f), z8.transform);
+
+        // Plataformas sobre desniveles
+        Sprite logA = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Platform_Log_A.png");
+        Sprite logB = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Platform_Log_B.png");
+        CreatePlatform(z8, "Platform_Z8_1", logA, new Vector2(187f, 2.2f), groundLayer);
+        CreatePlatform(z8, "Platform_Z8_2", logB, new Vector2(197f, 2.5f), groundLayer);
+
+        // 2 Maizales con HideoutZone
+        Sprite cluster = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Corn_Cluster.png");
+        Sprite sA = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Corn_Stalk_A.png");
+        Sprite sB = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Corn_Stalk_B.png");
+        Sprite sC = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Corn_Stalk_C.png");
+        CreateCornfield(z8, "Cornfield_Z8_A", 190f, 7f, cluster, sA, sB, sC);
+        CreateCornfield(z8, "Cornfield_Z8_B", 200f, 6f, cluster, sA, sB, sC);
+
+        // 2 Guardias patrullando
+        CreateGuard(z8, "Guard_Z8_1", new Vector3(186f, 0.8f, 0f), 185f, 193f, 2.0f);
+        CreateGuard(z8, "Guard_Z8_2", new Vector3(198f, 0.8f, 0f), 196f, 203f, 2.2f);
+
+        // 3 Aldeanos erráticos
+        CreateVillager(z8, "Villager_Z8_1", "Villager", new Vector3(188f, 0.6f, 0f), WanderPattern.WalkAndReturn);
+        CreateVillager(z8, "Villager_Z8_2", "VillagerF", new Vector3(194f, 0.6f, 0f), WanderPattern.LookAround);
+        CreateVillager(z8, "Villager_Z8_3", "Villager", new Vector3(201f, 0.6f, 0f), WanderPattern.ShortStops);
+
+        // CP8 en x = 204
+        CreateCheckpoint(z8, "Checkpoint_Z8", new Vector3(204f, 0.2f, 0f));
+    }
+
+    private static void BuildZone9(Transform parent, int groundLayer)
+    {
+        // Z9 Vuelo final y meta: 206-232 u (Brecha de 16u x=208-224 con isla en x=216, meta en x=228)
+        GameObject z9 = new GameObject("Zone_9_VueloMeta");
+        z9.transform.SetParent(parent);
+
+        Sprite logB = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Platform_Log_B.png");
+        Sprite gateSprite = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Goal_Gate.png");
+
+        // Plataforma isla de descanso en x = 216, y = 1.5
+        CreatePlatform(z9, "Island_Rest_Z9", logB, new Vector2(216f, 1.5f), groundLayer);
+
+        // Suelo final de x = 224 a 234
+        CreateGroundSection(z9, "Ground_Z9_Final", 224f, 235f, groundLayer);
+
+        // Meta del Nivel (LevelGoal) en x = 228
+        GameObject goalObj = new GameObject("LevelGoal");
+        goalObj.transform.SetParent(z9.transform, false);
+        goalObj.transform.position = new Vector3(228f, 0.05f, 0f);
+
+        if (gateSprite != null)
+        {
+            GameObject gateVis = new GameObject("Goal_Gate_Visual");
+            gateVis.transform.SetParent(goalObj.transform, false);
+            gateVis.transform.localPosition = new Vector3(0f, 2.5f, 0f);
+            SpriteRenderer gateSr = gateVis.AddComponent<SpriteRenderer>();
+            gateSr.sprite = gateSprite;
+            gateSr.sortingLayerName = "Gameplay";
+            gateSr.sortingOrder = 1;
+        }
+
+        BoxCollider2D goalCol = goalObj.AddComponent<BoxCollider2D>();
+        goalCol.isTrigger = true;
+        goalCol.size = new Vector2(2.5f, 4.5f);
+        goalCol.offset = new Vector2(0f, 2.25f);
+        goalObj.AddComponent<LevelGoal>();
+    }
+
+    private static void CreateCatPassage(GameObject parent, string name, Vector3 pos)
+    {
+        GameObject passageObj = new GameObject(name);
+        passageObj.transform.SetParent(parent.transform, false);
+        passageObj.transform.position = pos;
+
+        BoxCollider2D col = passageObj.AddComponent<BoxCollider2D>();
+        col.isTrigger = true;
+        col.size = new Vector2(1.5f, 3.5f);
+        col.offset = new Vector2(0f, 1.75f);
+
+        passageObj.AddComponent<CatOnlyPassage>();
+    }
+
+    private static void CreateFlightHint(GameObject parent, string name, Vector3 pos)
+    {
+        GameObject hintObj = new GameObject(name);
+        hintObj.transform.SetParent(parent.transform, false);
+        hintObj.transform.position = pos;
+
+        BoxCollider2D col = hintObj.AddComponent<BoxCollider2D>();
+        col.isTrigger = true;
+        col.size = new Vector2(2f, 4f);
+        col.offset = new Vector2(0f, 2f);
+
+        hintObj.AddComponent<FlightOnlyHint>();
+    }
+
+    private static void CreateGroundSection(GameObject parent, string name, float startX, float endX, int groundLayer)
+    {
+        float width = endX - startX;
+        float centerX = startX + (width * 0.5f);
+
+        GameObject gObj = new GameObject(name);
+        gObj.transform.SetParent(parent.transform, false);
+        gObj.layer = groundLayer;
+        gObj.transform.position = new Vector3(centerX, 0f, 0f);
+
+        BoxCollider2D col = gObj.AddComponent<BoxCollider2D>();
+        col.size = new Vector2(width, 4.17f);
+        col.offset = new Vector2(0f, -1.915f);
+
+        Sprite groundSprite = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Ground_Tile.png");
+        if (groundSprite != null)
+        {
+            float tileWidth = groundSprite.rect.width / groundSprite.pixelsPerUnit;
+            int count = Mathf.CeilToInt(width / tileWidth) + 1;
+            for (int i = 0; i < count; i++)
+            {
+                float x = (-width * 0.5f) + (i * tileWidth) + (tileWidth * 0.5f);
+                if (x > (width * 0.5f) + (tileWidth * 0.5f)) continue;
+
+                GameObject tile = new GameObject($"Tile_{i}");
+                tile.transform.SetParent(gObj.transform, false);
+                tile.transform.localPosition = new Vector3(x, -1f, 0f);
+
+                SpriteRenderer sr = tile.AddComponent<SpriteRenderer>();
+                sr.sprite = groundSprite;
+                sr.sortingLayerName = "Gameplay";
+                sr.sortingOrder = 0;
+            }
+        }
+    }
 }
+
