@@ -59,6 +59,7 @@ public class Checkpoint : MonoBehaviour
     {
         unlitSprite = unlit;
         litFrames = lit;
+        if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer != null && !isActivated)
         {
             spriteRenderer.sprite = unlitSprite;
@@ -127,7 +128,8 @@ public class Checkpoint : MonoBehaviour
         {
             if (litFrames != null && litFrames.Length > 0)
             {
-                spriteRenderer.sprite = litFrames[frameIndex];
+                if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
+                if (spriteRenderer != null) spriteRenderer.sprite = litFrames[frameIndex];
                 frameIndex = (frameIndex + 1) % litFrames.Length;
             }
 

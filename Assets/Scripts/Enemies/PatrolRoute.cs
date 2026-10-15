@@ -424,7 +424,8 @@ public class PatrolRoute : MonoBehaviour
         patrolDirection = 1;
         waitTimer = 0f;
         currentState = PatrolState.Patrolling;
-        rb.linearVelocity = Vector2.zero;
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
+        if (rb != null) rb.linearVelocity = Vector2.zero;
 
         if (enemySight != null)
         {
