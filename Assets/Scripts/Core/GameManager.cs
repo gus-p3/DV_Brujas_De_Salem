@@ -18,7 +18,17 @@ public class GameManager : MonoBehaviour
     public event Action<GameState> OnStateChanged;
 
     [Header("Player Stats")]
-    public int Lives = 3;
+    [SerializeField] private int maxHearts = 3;
+    private int currentHearts = 3;
+
+    public int MaxHearts => maxHearts;
+    public int CurrentHearts => currentHearts;
+
+    public int Lives
+    {
+        get => currentHearts;
+        set => currentHearts = Mathf.Clamp(value, 0, maxHearts);
+    }
     public int Score = 0;
     public float TimeElapsed = 0f;
 
@@ -27,8 +37,11 @@ public class GameManager : MonoBehaviour
     public int HypnotizeCharges = 0;
     public int SleepCharges = 0;
 
-    // Eventos para el HUD
+    // Eventos para el HUD y el sistema de corazones
     public event Action OnStatsUpdated;
+    public event Action<int, int> OnHeartsChanged; // (actual, maximo)
+    public event Action OnHeartLost;
+    public event Action OnHeartGained;
 
     private void Awake()
     {
@@ -86,7 +99,7 @@ public class GameManager : MonoBehaviour
         {
             TimeElapsed += Time.deltaTime;
             
-            // Alternar pausa con Escape
+            // Alternar pausa con Escape (ignorado si un cuadro de tutorial está abierto)
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 PauseGame();
@@ -126,14 +139,53 @@ public class GameManager : MonoBehaviour
         OnStatsUpdated?.Invoke();
     }
 
-    public void TakeDamage(int amount = 1)
+    public bool LoseHeart(int amount = 1, string source = "")
     {
-        Lives = Mathf.Max(0, Lives - amount);
+        if (CurrentState != GameState.Playing) return false;
+
+        PlayerInvulnerability inv = UnityEngine.Object.FindFirstObjectByType<PlayerInvulnerability>();
+        if (inv != null && inv.IsInvulnerable)
+        {
+            Debug.Log($"[GameManager] LoseHeart ignorado por invulnerabilidad activa (Fuente: {source}).");
+            return false;
+        }
+
+        currentHearts = Mathf.Max(0, currentHearts - amount);
+        Debug.Log($"[GameManager] Corazón perdido ({source}). Corazones restantes: {currentHearts}/{maxHearts}");
+
+        OnHeartsChanged?.Invoke(currentHearts, maxHearts);
+        OnHeartLost?.Invoke();
         OnStatsUpdated?.Invoke();
-        if (Lives <= 0)
+
+        if (inv != null && currentHearts > 0)
+        {
+            inv.TriggerInvulnerability();
+        }
+
+        if (currentHearts <= 0)
         {
             TriggerGameOver();
         }
+
+        return true;
+    }
+
+    public bool GainHeart(int amount = 1)
+    {
+        if (currentHearts >= maxHearts) return false;
+
+        currentHearts = Mathf.Min(maxHearts, currentHearts + amount);
+        Debug.Log($"[GameManager] Corazón recuperado. Corazones actuales: {currentHearts}/{maxHearts}");
+
+        OnHeartsChanged?.Invoke(currentHearts, maxHearts);
+        OnHeartGained?.Invoke();
+        OnStatsUpdated?.Invoke();
+        return true;
+    }
+
+    public void TakeDamage(int amount = 1)
+    {
+        LoseHeart(amount, "Daño");
     }
 
     public void AddSpellCharges(int blind, int hypnotize, int sleep)
@@ -158,10 +210,11 @@ public class GameManager : MonoBehaviour
 
     public void StartLevel()
     {
-        Lives = 3;
+        currentHearts = maxHearts;
         Score = 0;
         TimeElapsed = 0f;
         SetState(GameState.Playing);
+        OnHeartsChanged?.Invoke(currentHearts, maxHearts);
         OnStatsUpdated?.Invoke();
 
         if (AudioManager.Instance != null && AudioManager.Instance.levelMusicClip != null)
@@ -172,6 +225,12 @@ public class GameManager : MonoBehaviour
 
     public void PauseGame()
     {
+        // Ignorar si un tutorial contextual está desplegado
+        if (TutorialManager.Instance != null && TutorialManager.Instance.IsOpen)
+        {
+            return;
+        }
+
         if (CurrentState == GameState.Playing)
             SetState(GameState.Paused);
     }

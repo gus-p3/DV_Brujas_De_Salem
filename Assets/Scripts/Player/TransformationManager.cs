@@ -154,6 +154,38 @@ public class TransformationManager : MonoBehaviour
         OnTransformed?.Invoke(false);
     }
 
+    /// <summary>
+    /// Fuerza el retorno inmediato a forma humana (utilizado al reaparecer en checkpoint).
+    /// </summary>
+    public void ResetToHumanForm()
+    {
+        EnsureComponents();
+        if (!IsCatForm) return;
+
+        IsCatForm = false;
+        cooldownTimer = 0f;
+
+        if (humanController != null && anim != null)
+        {
+            anim.runtimeAnimatorController = humanController;
+            anim.Rebind();
+            anim.Update(0f);
+        }
+
+        if (boxCol != null)
+        {
+            boxCol.size = humanColliderSize;
+            boxCol.offset = humanColliderOffset;
+        }
+
+        if (moveSpeedField != null && pc != null)
+        {
+            moveSpeedField.SetValue(pc, originalMoveSpeed);
+        }
+
+        OnTransformed?.Invoke(false);
+    }
+
     private void PlaySmoke()
     {
         if (smokeEffect != null) smokeEffect.Play();

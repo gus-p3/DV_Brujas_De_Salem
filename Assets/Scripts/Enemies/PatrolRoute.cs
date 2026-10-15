@@ -28,7 +28,7 @@ public enum PatrolState
 /// la animación y previene caídas al borde de plataformas con detección por Raycast.
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
-public class PatrolRoute : MonoBehaviour
+public class PatrolRoute : MonoBehaviour, ISpellTarget
 {
     [Header("Ruta de patrulla")]
     [Tooltip("Puntos de patrulla. Solo se utiliza la coordenada X para el movimiento en plano.")]
@@ -64,6 +64,22 @@ public class PatrolRoute : MonoBehaviour
     [Tooltip("Transform visual que se escala en X para voltear.")]
     [SerializeField] private Transform visualTransform;
 
+    [Header("Efectos de Pociones (ISpellTarget)")]
+    [Tooltip("Duración por defecto del efecto Cegar (s).")]
+    [SerializeField] private float blindDefaultDuration = 5f;
+    [Tooltip("Duración por defecto del efecto Hipnotizar (s).")]
+    [SerializeField] private float hypnotizeDefaultDuration = 4f;
+    [Tooltip("Duración por defecto del efecto Dormir (s).")]
+    [SerializeField] private float sleepDefaultDuration = 6f;
+    [Tooltip("Renderer para mostrar iconos de estado sobre la cabeza.")]
+    [SerializeField] private SpriteRenderer statusIconRenderer;
+    [Tooltip("Sprite de icono para el efecto Cegar (ojos tapados).")]
+    [SerializeField] private Sprite blindIconSprite;
+    [Tooltip("Sprite de icono para el efecto Hipnotizar (espiral).")]
+    [SerializeField] private Sprite hypnotizeIconSprite;
+    [Tooltip("Sprite de icono para el efecto Dormir (Zzz).")]
+    [SerializeField] private Sprite sleepIconSprite;
+
     [Header("Depuración")]
     [Tooltip("Habilita registros de depuración en consola.")]
     [SerializeField] private bool debugLogs = false;
@@ -71,6 +87,8 @@ public class PatrolRoute : MonoBehaviour
     // Hashes de parámetros del Animator
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
     private static readonly int IsAlertHash = Animator.StringToHash("IsAlert");
+
+    private enum SpellEffectType { None, Blind, Hypnotize, Sleep }
 
     private Rigidbody2D rb;
     private PatrolState currentState = PatrolState.Patrolling;
@@ -80,6 +98,12 @@ public class PatrolRoute : MonoBehaviour
     private Transform playerTarget;
     private bool facingRight = true;
 
+    private Coroutine activeSpellCoroutine;
+    private SpellEffectType activeSpellType = SpellEffectType.None;
+    private float blindWaitTimer = 0f;
+    private int hypnotizeDirection = 1;
+
+    public bool IsAffectedBySpell => activeSpellType != SpellEffectType.None;
     public PatrolState CurrentState => currentState;
     public Transform[] Waypoints => waypoints;
 
@@ -89,6 +113,25 @@ public class PatrolRoute : MonoBehaviour
         if (enemySight == null) enemySight = GetComponent<EnemySight>();
         if (animator == null) animator = GetComponentInChildren<Animator>();
         if (visualTransform == null) visualTransform = transform;
+
+        if (statusIconRenderer == null)
+        {
+            Transform existingIcon = transform.Find("StatusIcon");
+            if (existingIcon != null)
+            {
+                statusIconRenderer = existingIcon.GetComponent<SpriteRenderer>();
+            }
+            else
+            {
+                GameObject iconGo = new GameObject("StatusIcon");
+                iconGo.transform.SetParent(transform);
+                iconGo.transform.localPosition = new Vector3(0f, 2.2f, 0f);
+                statusIconRenderer = iconGo.AddComponent<SpriteRenderer>();
+                statusIconRenderer.sortingLayerName = "Default";
+                statusIconRenderer.sortingOrder = 10;
+                statusIconRenderer.enabled = false;
+            }
+        }
 
         // Capa Ground por defecto si no se asignó
         if (groundMask.value == 0)
@@ -121,8 +164,17 @@ public class PatrolRoute : MonoBehaviour
 
     private void OnDisable()
     {
+        if (activeSpellCoroutine != null)
+        {
+            StopCoroutine(activeSpellCoroutine);
+            activeSpellCoroutine = null;
+        }
+        activeSpellType = SpellEffectType.None;
+        if (statusIconRenderer != null) statusIconRenderer.enabled = false;
+
         if (enemySight != null)
         {
+            enemySight.SetVisionSuppressed(false);
             enemySight.OnAlertStateChanged -= HandleAlertStateChanged;
             enemySight.OnTargetCaptured -= HandleTargetCaptured;
         }
@@ -138,6 +190,12 @@ public class PatrolRoute : MonoBehaviour
         if (currentState == PatrolState.Disabled)
         {
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            return;
+        }
+
+        if (IsAffectedBySpell)
+        {
+            HandleSpellMovement();
             return;
         }
 
@@ -157,6 +215,45 @@ public class PatrolRoute : MonoBehaviour
 
             case PatrolState.Returning:
                 HandleReturning();
+                break;
+        }
+    }
+
+    private void HandleSpellMovement()
+    {
+        switch (activeSpellType)
+        {
+            case SpellEffectType.Sleep:
+                rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+                break;
+
+            case SpellEffectType.Blind:
+                if (blindWaitTimer > 0f)
+                {
+                    blindWaitTimer -= Time.fixedDeltaTime;
+                    rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+                }
+                else
+                {
+                    float dir = facingRight ? 1f : -1f;
+                    if (!HasGroundAhead(dir))
+                    {
+                        FaceDirection(-dir);
+                        dir = -dir;
+                    }
+                    MoveHorizontal(dir, walkSpeed * 0.45f);
+                }
+                break;
+
+            case SpellEffectType.Hypnotize:
+                if (!HasGroundAhead(hypnotizeDirection))
+                {
+                    rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+                }
+                else
+                {
+                    MoveHorizontal(hypnotizeDirection, walkSpeed * 0.9f);
+                }
                 break;
         }
     }
@@ -366,6 +463,8 @@ public class PatrolRoute : MonoBehaviour
 
     private void HandleAlertStateChanged(AlertState state)
     {
+        if (IsAffectedBySpell) return;
+
         switch (state)
         {
             case AlertState.Suspicion:
@@ -396,21 +495,62 @@ public class PatrolRoute : MonoBehaviour
 
     private void HandleTargetCaptured()
     {
+        if (IsAffectedBySpell) return;
         TriggerCapture();
     }
 
     private void TriggerCapture()
     {
+        if (IsAffectedBySpell) return;
+
         currentState = PatrolState.Disabled;
         rb.linearVelocity = Vector2.zero;
-
-        if (GameManager.Instance != null)
+        if (debugLogs)
         {
-            GameManager.Instance.TriggerGameOver();
+            Debug.Log($"[PatrolRoute] {name}: ¡Objetivo capturado! Delegando resolución al sistema de captura.", this);
         }
-        else
+    }
+
+    /// <summary>
+    /// Restablece la posición del guardia al primer waypoint y reinicia su estado de patrulla a Calma.
+    /// </summary>
+    public void ResetToFirstWaypoint()
+    {
+        if (activeSpellCoroutine != null)
         {
-            Debug.Log($"[PatrolRoute] {name}: ¡Objetivo capturado! (Sin GameManager en escena)", this);
+            StopCoroutine(activeSpellCoroutine);
+            activeSpellCoroutine = null;
+        }
+        activeSpellType = SpellEffectType.None;
+
+        if (statusIconRenderer != null)
+        {
+            statusIconRenderer.enabled = false;
+        }
+
+        if (waypoints != null && waypoints.Length > 0 && waypoints[0] != null)
+        {
+            Vector3 startPos = waypoints[0].position;
+            transform.position = new Vector3(startPos.x, transform.position.y, transform.position.z);
+        }
+
+        currentWaypointIndex = 0;
+        patrolDirection = 1;
+        waitTimer = 0f;
+        currentState = PatrolState.Patrolling;
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+
+        if (enemySight != null)
+        {
+            enemySight.SetVisionSuppressed(false);
+            enemySight.ResetState();
+        }
+
+        UpdateAnimator();
+        if (debugLogs)
+        {
+            Debug.Log($"[PatrolRoute] {name}: reiniciado al primer waypoint.", this);
         }
     }
 
@@ -425,31 +565,144 @@ public class PatrolRoute : MonoBehaviour
         animator.SetBool(IsAlertHash, isAlert);
     }
 
-    // ----------------------------------------------------------------- Hechizos Futuros
+    // ----------------------------------------------------------------- Hechizos (ISpellTarget)
 
     /// <summary>
-    /// Deshabilita temporalmente la visión y movimiento del guardia.
+    /// Aplica ceguera al guardia: el cono se apaga a gris, no detecta, se detiene brevemente y camina lento.
     /// </summary>
-    public void Blind(float seconds)
+    public void ApplyBlind(float seconds)
     {
-        if (debugLogs) Debug.Log($"[PatrolRoute] {name}: Blind({seconds}) recibido.", this);
+        float dur = seconds > 0f ? seconds : blindDefaultDuration;
+        StartSpell(SpellEffectType.Blind, dur, 0);
     }
 
     /// <summary>
-    /// Obliga al guardia a desplazarse temporalmente en una dirección indicada.
+    /// Aplica hipnosis al guardia: camina en una dirección fija (-1 o +1) sin detectar.
     /// </summary>
-    public void Hypnotize(float seconds, int direction)
+    public void ApplyHypnotize(float seconds, int direction)
     {
-        if (debugLogs) Debug.Log($"[PatrolRoute] {name}: Hypnotize({seconds}, dir: {direction}) recibido.", this);
+        float dur = seconds > 0f ? seconds : hypnotizeDefaultDuration;
+        int dir = direction != 0 ? (int)Mathf.Sign(direction) : (facingRight ? 1 : -1);
+        StartSpell(SpellEffectType.Hypnotize, dur, dir);
     }
 
     /// <summary>
-    /// Duerme al guardia durante un intervalo temporal.
+    /// Aplica sueño al guardia: se detiene por completo con icono Zzz y cono apagado.
     /// </summary>
-    public void Sleep(float seconds)
+    public void ApplySleep(float seconds)
     {
-        if (debugLogs) Debug.Log($"[PatrolRoute] {name}: Sleep({seconds}) recibido.", this);
+        float dur = seconds > 0f ? seconds : sleepDefaultDuration;
+        StartSpell(SpellEffectType.Sleep, dur, 0);
     }
+
+    // Métodos previos conservados para compatibilidad
+    public void Blind(float seconds) => ApplyBlind(seconds);
+    public void Hypnotize(float seconds, int direction) => ApplyHypnotize(seconds, direction);
+    public void Sleep(float seconds) => ApplySleep(seconds);
+
+    private void StartSpell(SpellEffectType type, float duration, int dir)
+    {
+#if UNITY_EDITOR
+        AutoAssignSprites();
+#endif
+        if (activeSpellCoroutine != null)
+        {
+            StopCoroutine(activeSpellCoroutine);
+            activeSpellCoroutine = null;
+        }
+
+        activeSpellType = type;
+        hypnotizeDirection = dir;
+
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
+
+        if (enemySight != null)
+        {
+            switch (type)
+            {
+                case SpellEffectType.Blind:
+                    blindWaitTimer = 0.8f;
+                    enemySight.SetVisionSuppressed(true, new Color(0.55f, 0.55f, 0.55f, 0.45f));
+                    SetStatusIcon(blindIconSprite);
+                    break;
+
+                case SpellEffectType.Hypnotize:
+                    FaceDirection(dir);
+                    enemySight.SetVisionSuppressed(true, new Color(0.7f, 0.35f, 0.95f, 0.45f));
+                    SetStatusIcon(hypnotizeIconSprite);
+                    break;
+
+                case SpellEffectType.Sleep:
+                    if (rb != null) rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+                    enemySight.SetVisionSuppressed(true, null);
+                    SetStatusIcon(sleepIconSprite);
+                    break;
+            }
+        }
+
+        if (Application.isPlaying)
+        {
+            activeSpellCoroutine = StartCoroutine(SpellDurationRoutine(duration));
+        }
+        if (debugLogs) Debug.Log($"[PatrolRoute] {name}: Hechizo {type} aplicado por {duration} s.", this);
+    }
+
+    private System.Collections.IEnumerator SpellDurationRoutine(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        EndSpellEffect();
+    }
+
+    private void EndSpellEffect()
+    {
+        activeSpellType = SpellEffectType.None;
+        activeSpellCoroutine = null;
+
+        if (statusIconRenderer != null)
+        {
+            statusIconRenderer.enabled = false;
+        }
+
+        if (enemySight != null)
+        {
+            enemySight.SetVisionSuppressed(false);
+            enemySight.ResetToCalm();
+        }
+
+        currentState = PatrolState.Patrolling;
+        ReturnToPatrol();
+    }
+
+    private void SetStatusIcon(Sprite icon)
+    {
+        if (statusIconRenderer == null) return;
+        if (icon != null)
+        {
+            statusIconRenderer.sprite = icon;
+            statusIconRenderer.enabled = true;
+        }
+        else
+        {
+            statusIconRenderer.enabled = false;
+        }
+    }
+
+#if UNITY_EDITOR
+    private void Reset()
+    {
+        AutoAssignSprites();
+    }
+
+    private void AutoAssignSprites()
+    {
+        if (blindIconSprite == null)
+            blindIconSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Effects/Icon_Blinded.png");
+        if (hypnotizeIconSprite == null)
+            hypnotizeIconSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Effects/Icon_Spiral.png");
+        if (sleepIconSprite == null)
+            sleepIconSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Effects/Icon_Zzz.png");
+    }
+#endif
 
     // ----------------------------------------------------------------- Gizmos
 

@@ -132,6 +132,12 @@ public class PlayerController : MonoBehaviour, IDetectable
     /// <summary>Se dispara cuando cambia la energía de vuelo, normalizada de 0 a 1.</summary>
     public event Action<float> OnFlightEnergyChanged;
 
+    /// <summary>Indica hacia dónde está orientada la bruja (true = derecha, false = izquierda).</summary>
+    public bool FacingRight => facingRight;
+
+    /// <summary>Dirección horizontal unitaria hacia donde mira la bruja (+1 o -1).</summary>
+    public int FacingDirection => facingRight ? 1 : -1;
+
     /// <summary>Permite volar. Se habilita al reunir las 3 partes de la escoba.</summary>
     public bool CanFly
     {
@@ -442,6 +448,28 @@ public class PlayerController : MonoBehaviour, IDetectable
         velocity.y *= flightExitVerticalDamping;
         rb.linearVelocity = velocity;
         OnFlightChanged?.Invoke(false);
+    }
+
+    /// <summary>Cancela el vuelo inmediatamente y restaura la gravedad base.</summary>
+    public void CancelFlight()
+    {
+        if (isFlying)
+        {
+            StopFlight();
+        }
+        if (rb != null)
+        {
+            rb.gravityScale = baseGravityScale;
+        }
+    }
+
+    /// <summary>Restablece la velocidad y las fuerzas físicas del jugador.</summary>
+    public void ResetPhysics(Vector2 newVelocity)
+    {
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
+        rb.linearVelocity = newVelocity;
+        rb.angularVelocity = 0f;
+        CancelFlight();
     }
 
     private void HandleFlight()

@@ -54,6 +54,19 @@ public class CameraFollow : MonoBehaviour
         transform.position = Vector3.SmoothDamp(transform.position, desired, ref velocity, smoothTime, maxSpeed);
     }
 
+    public Vector2 MinLimit => minLimit;
+    public Vector2 MaxLimit => maxLimit;
+
+    /// <summary>Centra la cámara de inmediato en el objetivo sin suavizado (para reapariciones).</summary>
+    public void SnapToTarget()
+    {
+        if (target != null)
+        {
+            velocity = Vector3.zero;
+            transform.position = ClampToLimits(target.position + offset);
+        }
+    }
+
     /// <summary>Asigna el objetivo desde código (por ejemplo al instanciar a la bruja).</summary>
     public void SetTarget(Transform newTarget)
     {

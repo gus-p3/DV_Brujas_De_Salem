@@ -22,6 +22,9 @@ public class AudioManager : MonoBehaviour
     public AudioClip jumpClip;
     public AudioClip transformClip;
     public AudioClip captureClip;
+    public AudioClip heartBreakClip;
+    public AudioClip heartHealClip;
+    public AudioClip checkpointClip;
 
     private Coroutine musicFadeCoroutine;
     private float targetMusicVolume = 1f;
@@ -190,6 +193,15 @@ public class AudioManager : MonoBehaviour
 
         if (levelMusicClip == null)
             levelMusicClip = GenerateToneClip("Provisional_LevelMusic", 2f, 260f, 260f, true);
+
+        if (heartBreakClip == null)
+            heartBreakClip = GenerateToneClip("Provisional_HeartBreak", 0.25f, 520f, 160f);
+
+        if (heartHealClip == null)
+            heartHealClip = GenerateToneClip("Provisional_HeartHeal", 0.3f, 440f, 880f);
+
+        if (checkpointClip == null)
+            checkpointClip = GenerateToneClip("Provisional_Checkpoint", 0.35f, 523f, 659f);
     }
 
     private AudioClip GenerateToneClip(string clipName, float duration, float startFreq, float endFreq, bool isAmbient = false)
