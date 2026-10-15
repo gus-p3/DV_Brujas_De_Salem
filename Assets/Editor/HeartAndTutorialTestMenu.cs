@@ -254,7 +254,14 @@ public static class HeartAndTutorialTestMenu
     {
         Level1TutorialRedesign.SetupAllTutorials();
     }
+
+    [MenuItem("Brujas/Tutorial Largo/Ejecutar Verificacion 15 Hitos")]
+    public static void MenuRunFullVerification()
+    {
+        Level1PlayModeVerificationSuite.RunFullVerification();
+    }
 }
+
 
 
 
