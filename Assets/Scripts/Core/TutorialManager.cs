@@ -61,8 +61,13 @@ public class TutorialManager : MonoBehaviour
         VillagerAI.OnWitchApproaching -= HandleWitchApproachingVillager;
         VillagerAI.OnWitchApproaching += HandleWitchApproachingVillager;
 
+        FrenzyController.OnFrenzyStarted -= HandleFrenzyStarted;
+        FrenzyController.OnFrenzyStarted += HandleFrenzyStarted;
+
         PotionPickup.OnCollected -= HandlePotionCollected;
         PotionPickup.OnCollected += HandlePotionCollected;
+
+        InitializePredefinedTips();
     }
 
     private void OnDestroy()
@@ -73,34 +78,57 @@ public class TutorialManager : MonoBehaviour
         }
 
         VillagerAI.OnWitchApproaching -= HandleWitchApproachingVillager;
+        FrenzyController.OnFrenzyStarted -= HandleFrenzyStarted;
         PotionPickup.OnCollected -= HandlePotionCollected;
+    }
+
+    private void InitializePredefinedTips()
+    {
+        AddPredefinedTip("tip_mover", "Movimiento y Salto", "Muévete con {Mover} y salta con {Saltar}.");
+        AddPredefinedTip("tip_guardia", "Guardias de Salem", "¡Cuidado con los guardias! Si entras en su cono de visión, te capturarán. Busca rutas alternativas o escóndete.");
+        AddPredefinedTip("tip_gato_maizal", "Sigilo Felino", "Usa {Transformar} para convertirte en gato. En forma felina puedes ocultarte en el maizal y los guardias no te verán.");
+        AddPredefinedTip("tip_poción_recogida", "Pociones Mágicas", "Has recogido una poción. Elige el tipo con {ElegirPoción} y lánzala con {LanzarPoción}.");
+        AddPredefinedTip("tip_pocion_recogida", "Pociones Mágicas", "Has recogido una poción. Elige el tipo con {ElegirPoción} y lánzala con {LanzarPoción}.");
+        AddPredefinedTip("tip_guardia_bloqueo", "Guardia Bloqueando", "Este guardia no deja pasar. Lánzale una poción de dormir o cegar para neutralizarlo y cruzar.");
+        AddPredefinedTip("tip_aldeano", "Aldeanos", "Los aldeanos caminan de forma errática. Si te ven en forma humana, gritarán y entrarán en frenesí para atacarte.");
+        AddPredefinedTip("tip_frenesí", "Frenesí de Aldeano", "¡El aldeano está en frenesí! Transfórmate en gato para calmarlo o apártate de su camino antes de que te golpee.");
+        AddPredefinedTip("tip_frenesi", "Frenesí de Aldeano", "¡El aldeano está en frenesí! Transfórmate en gato para calmarlo o apártate de su camino antes de que te golpee.");
+        AddPredefinedTip("tip_gato_túnel", "Pasaje Estrecho", "Este pasaje es demasiado estrecho para una bruja. Usa {Transformar} para cruzarlo en forma de gato.");
+        AddPredefinedTip("tip_gato_tunel", "Pasaje Estrecho", "Este pasaje es demasiado estrecho para una bruja. Usa {Transformar} para cruzarlo en forma de gato.");
+        AddPredefinedTip("tip_escoba_completa", "Escoba Completa", "¡Escoba completada! Mantén {Volar} para volar y usa {VolarSubirBajar} para cambiar de altura. ¡La energía es limitada!");
+        AddPredefinedTip("tip_vuelo_brecha", "Vuelo sobre el Abismo", "Esta brecha es demasiado ancha para saltar. Mantén {Volar} para cruzarla volando.");
+        AddPredefinedTip("tip_corazones", "Corazones", "Un guardia o una caída te quitan un corazón. Si pierdes los tres, el nivel se reinicia. Busca corazones por el camino para recuperarlos.");
+    }
+
+    private void AddPredefinedTip(string id, string title, string body)
+    {
+        if (!predefinedTips.Exists(t => t.id == id))
+        {
+            predefinedTips.Add(new TutorialTip(id, title, body, null, true));
+        }
     }
 
     private void HandleWitchApproachingVillager()
     {
         if (!HasSeen("tip_aldeano"))
         {
-            ShowTip(new TutorialTip(
-                "tip_aldeano",
-                "Aldeanos",
-                "Los aldeanos no te persiguen de inmediato, pero si te ven en forma humana gritarán y alertarán a los guardias, desatando una turba frenética. ¡Conviértete en gato o escóndete en los maizales!",
-                null,
-                true
-            ));
+            ShowTipById("tip_aldeano");
+        }
+    }
+
+    private void HandleFrenzyStarted()
+    {
+        if (!HasSeen("tip_frenesí") && !HasSeen("tip_frenesi"))
+        {
+            ShowTipById("tip_frenesí");
         }
     }
 
     private void HandlePotionCollected(PotionType type)
     {
-        if (!HasSeen("tip_pocion_recogida"))
+        if (!HasSeen("tip_poción_recogida") && !HasSeen("tip_pocion_recogida"))
         {
-            ShowTip(new TutorialTip(
-                "tip_pocion_recogida",
-                "Pociones Mágicas",
-                "Has obtenido una poción mágica. Selecciona con las teclas 1, 2 o 3 y arrójala con la tecla E o clic izquierdo hacia los guardias o aldeanos para neutralizarlos.",
-                null,
-                true
-            ));
+            ShowTipById("tip_poción_recogida");
         }
     }
 
@@ -108,13 +136,7 @@ public class TutorialManager : MonoBehaviour
     {
         if (!HasSeen("tip_corazones"))
         {
-            ShowTip(new TutorialTip(
-                "tip_corazones",
-                "Corazones",
-                "Un guardia o una caída te quitan un corazón. Si pierdes los tres, el nivel se reinicia. Busca corazones por el camino para recuperarlos.",
-                null,
-                true
-            ));
+            ShowTipById("tip_corazones");
         }
     }
 

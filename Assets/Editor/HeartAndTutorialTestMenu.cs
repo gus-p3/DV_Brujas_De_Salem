@@ -248,6 +248,13 @@ public static class HeartAndTutorialTestMenu
     {
         Level1TutorialRedesign.BuildZones6To9();
     }
+
+    [MenuItem("Brujas/Tutorial Largo/Configurar Cuadros de Tutorial")]
+    public static void MenuSetupAllTutorials()
+    {
+        Level1TutorialRedesign.SetupAllTutorials();
+    }
 }
+
 
 

@@ -797,5 +797,94 @@ public static class Level1TutorialRedesign
             }
         }
     }
+
+    [MenuItem("Brujas/Tutorial Largo/4. Configurar Cuadros de Tutorial (Commit 5)")]
+    public static void SetupAllTutorials()
+    {
+        EnsureSceneAndBackup();
+        Scene scene = SceneManager.GetActiveScene();
+
+        // 1. Asegurar TutorialManager
+        TutorialManager tm = Object.FindFirstObjectByType<TutorialManager>();
+        if (tm == null)
+        {
+            GameObject tmObj = new GameObject("TutorialManager");
+            tm = tmObj.AddComponent<TutorialManager>();
+        }
+
+        // 2. Limpiar triggers viejos
+        TutorialTrigger[] oldTriggers = Object.FindObjectsByType<TutorialTrigger>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var t in oldTriggers)
+        {
+            Object.DestroyImmediate(t.gameObject);
+        }
+
+        // 3. Crear contenedor de triggers
+        GameObject triggersRoot = GameObject.Find("TutorialTriggers");
+        if (triggersRoot == null) triggersRoot = new GameObject("TutorialTriggers");
+
+        // 4. Instanciar los 7 triggers de mundo
+        CreateTrigger(triggersRoot, "TutorialTrigger_Mover", new Vector3(2.5f, 1.0f, 0f),
+            "tip_mover", "Movimiento y Salto", "Muévete con {Mover} y salta con {Saltar}.");
+
+        CreateTrigger(triggersRoot, "TutorialTrigger_Guardia", new Vector3(26.0f, 1.0f, 0f),
+            "tip_guardia", "Guardias de Salem", "¡Cuidado con los guardias! Si entras en su cono de visión, te capturarán. Busca rutas alternativas o escóndete.");
+
+        CreateTrigger(triggersRoot, "TutorialTrigger_GatoMaizal", new Vector3(49.0f, 1.0f, 0f),
+            "tip_gato_maizal", "Sigilo Felino", "Usa {Transformar} para convertirte en gato. En forma felina puedes ocultarte en el maizal y los guardias no te verán.");
+
+        CreateTrigger(triggersRoot, "TutorialTrigger_GuardiaBloqueo", new Vector3(80.0f, 1.0f, 0f),
+            "tip_guardia_bloqueo", "Guardia Bloqueando", "Este guardia no deja pasar. Lánzale una poción de dormir o cegar para neutralizarlo y cruzar.");
+
+        CreateTrigger(triggersRoot, "TutorialTrigger_Aldeano", new Vector3(100.0f, 1.0f, 0f),
+            "tip_aldeano", "Aldeanos", "Los aldeanos caminan de forma errática. Si te ven en forma humana, gritarán y entrarán en frenesí para atacarte.");
+
+        CreateTrigger(triggersRoot, "TutorialTrigger_GatoTunel", new Vector3(128.0f, 1.0f, 0f),
+            "tip_gato_túnel", "Pasaje Estrecho", "Este pasaje es demasiado estrecho para una bruja. Usa {Transformar} para cruzarlo en forma de gato.");
+
+        CreateTrigger(triggersRoot, "TutorialTrigger_VueloBrecha", new Vector3(162.0f, 1.0f, 0f),
+            "tip_vuelo_brecha", "Vuelo sobre el Abismo", "Esta brecha es demasiado ancha para saltar. Mantén {Volar} para cruzarla volando.");
+
+        // 5. Build Settings
+        UpdateBuildSettings();
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        AssetDatabase.SaveAssets();
+        Debug.Log("[Redesign] Cuadros de tutorial y triggers configurados exitosamente.");
+    }
+
+    private static void CreateTrigger(GameObject parent, string name, Vector3 pos, string id, string title, string body)
+    {
+        GameObject tObj = new GameObject(name);
+        tObj.transform.SetParent(parent.transform, false);
+        tObj.transform.position = pos;
+
+        BoxCollider2D col = tObj.AddComponent<BoxCollider2D>();
+        col.isTrigger = true;
+        col.size = new Vector2(2f, 4f);
+        col.offset = new Vector2(0f, 1f);
+
+        TutorialTrigger trigger = tObj.AddComponent<TutorialTrigger>();
+        var so = new SerializedObject(trigger);
+        so.FindProperty("tipId").stringValue = id;
+        so.FindProperty("tipTitle").stringValue = title;
+        so.FindProperty("tipBody").stringValue = body;
+        so.FindProperty("oneShot").boolValue = true;
+        so.ApplyModifiedProperties();
+    }
+
+    public static void UpdateBuildSettings()
+    {
+        EditorBuildSettingsScene[] scenes = new EditorBuildSettingsScene[]
+        {
+            new EditorBuildSettingsScene("Assets/Scenes/MainMenu.unity", true),
+            new EditorBuildSettingsScene("Assets/Scenes/Level1.unity", true),
+            new EditorBuildSettingsScene("Assets/Scenes/Test_Bruja.unity", true)
+        };
+        EditorBuildSettings.scenes = scenes;
+        Debug.Log("[Redesign] Build Settings confirmadas: MainMenu (0), Level1 (1), Test_Bruja (2).");
+    }
 }
+
 
