@@ -236,4 +236,11 @@ public static class HeartAndTutorialTestMenu
         panelObj.SetActive(false);
         return panelComp;
     }
+
+    [MenuItem("Brujas/Tutorial Largo/Construir Zonas 1 a 5")]
+    public static void MenuBuildZones1To5()
+    {
+        Level1TutorialRedesign.BuildZones1To5();
+    }
 }
+
