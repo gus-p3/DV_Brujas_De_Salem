@@ -29,6 +29,13 @@ public class HUDController : MonoBehaviour
     public LevelCompletePanel levelCompletePanel;
     public GameOverPanel gameOverPanel;
 
+    [Header("Frenzy Alert")]
+    [Tooltip("Viñeta roja en pantalla completa durante el frenesí.")]
+    public Image frenzyVignetteImage;
+    [Tooltip("Icono de alarma parpadeante junto a los corazones.")]
+    public Image frenzyAlarmIcon;
+    private Coroutine frenzyPulseCoroutine;
+
     [Header("Messages")]
     [Tooltip("Texto en pantalla para avisos breves al jugador.")]
     public TextMeshProUGUI messageBannerText;
@@ -266,5 +273,96 @@ public class HUDController : MonoBehaviour
         }
         text.color = originalColor;
         flashCoroutine = null;
+    }
+
+    /// <summary>
+    /// Activa o desactiva la viñeta roja y el icono parpadeante de alarma por frenesí en el HUD.
+    /// </summary>
+    public void SetFrenzyVisuals(bool active)
+    {
+        EnsureFrenzyElements();
+
+        if (frenzyPulseCoroutine != null)
+        {
+            StopCoroutine(frenzyPulseCoroutine);
+            frenzyPulseCoroutine = null;
+        }
+
+        if (active)
+        {
+            frenzyPulseCoroutine = StartCoroutine(FrenzyPulseRoutine());
+        }
+        else
+        {
+            if (frenzyVignetteImage != null) frenzyVignetteImage.gameObject.SetActive(false);
+            if (frenzyAlarmIcon != null) frenzyAlarmIcon.gameObject.SetActive(false);
+        }
+    }
+
+    private void EnsureFrenzyElements()
+    {
+        if (frenzyVignetteImage == null)
+        {
+            Transform t = transform.Find("FrenzyVignette");
+            if (t != null) frenzyVignetteImage = t.GetComponent<Image>();
+            else
+            {
+                GameObject g = new GameObject("FrenzyVignette");
+                g.transform.SetParent(transform, false);
+                g.transform.SetAsFirstSibling();
+                frenzyVignetteImage = g.AddComponent<Image>();
+                frenzyVignetteImage.color = new Color(0.9f, 0.1f, 0.1f, 0.25f);
+                frenzyVignetteImage.raycastTarget = false;
+                RectTransform rt = g.GetComponent<RectTransform>();
+                rt.anchorMin = Vector2.zero;
+                rt.anchorMax = Vector2.one;
+                rt.offsetMin = Vector2.zero;
+                rt.offsetMax = Vector2.zero;
+                g.SetActive(false);
+            }
+        }
+
+        if (frenzyAlarmIcon == null)
+        {
+            Transform t = transform.Find("FrenzyAlarmIcon");
+            if (t != null) frenzyAlarmIcon = t.GetComponent<Image>();
+            else
+            {
+                GameObject g = new GameObject("FrenzyAlarmIcon");
+                g.transform.SetParent(transform, false);
+                frenzyAlarmIcon = g.AddComponent<Image>();
+                frenzyAlarmIcon.color = new Color(1f, 0.2f, 0.2f, 1f);
+                frenzyAlarmIcon.raycastTarget = false;
+                RectTransform rt = g.GetComponent<RectTransform>();
+                rt.anchorMin = new Vector2(0f, 1f);
+                rt.anchorMax = new Vector2(0f, 1f);
+                rt.pivot = new Vector2(0f, 1f);
+                rt.anchoredPosition = new Vector2(170f, -24f);
+                rt.sizeDelta = new Vector2(32f, 32f);
+                g.SetActive(false);
+            }
+        }
+    }
+
+    private System.Collections.IEnumerator FrenzyPulseRoutine()
+    {
+        if (frenzyVignetteImage != null) frenzyVignetteImage.gameObject.SetActive(true);
+        if (frenzyAlarmIcon != null) frenzyAlarmIcon.gameObject.SetActive(true);
+
+        while (true)
+        {
+            float alpha = 0.15f + Mathf.Sin(Time.time * 6f) * 0.15f;
+            if (frenzyVignetteImage != null)
+            {
+                Color c = frenzyVignetteImage.color;
+                c.a = alpha;
+                frenzyVignetteImage.color = c;
+            }
+            if (frenzyAlarmIcon != null)
+            {
+                frenzyAlarmIcon.enabled = (Mathf.FloorToInt(Time.time * 4f) % 2) == 0;
+            }
+            yield return null;
+        }
     }
 }
