@@ -57,6 +57,12 @@ public class TutorialManager : MonoBehaviour
             GameManager.Instance.OnHeartLost -= HandleFirstHeartLost;
             GameManager.Instance.OnHeartLost += HandleFirstHeartLost;
         }
+
+        VillagerAI.OnWitchApproaching -= HandleWitchApproachingVillager;
+        VillagerAI.OnWitchApproaching += HandleWitchApproachingVillager;
+
+        PotionPickup.OnCollected -= HandlePotionCollected;
+        PotionPickup.OnCollected += HandlePotionCollected;
     }
 
     private void OnDestroy()
@@ -64,6 +70,37 @@ public class TutorialManager : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnHeartLost -= HandleFirstHeartLost;
+        }
+
+        VillagerAI.OnWitchApproaching -= HandleWitchApproachingVillager;
+        PotionPickup.OnCollected -= HandlePotionCollected;
+    }
+
+    private void HandleWitchApproachingVillager()
+    {
+        if (!HasSeen("tip_aldeano"))
+        {
+            ShowTip(new TutorialTip(
+                "tip_aldeano",
+                "Aldeanos",
+                "Los aldeanos no te persiguen de inmediato, pero si te ven en forma humana gritarán y alertarán a los guardias, desatando una turba frenética. ¡Conviértete en gato o escóndete en los maizales!",
+                null,
+                true
+            ));
+        }
+    }
+
+    private void HandlePotionCollected(PotionType type)
+    {
+        if (!HasSeen("tip_pocion_recogida"))
+        {
+            ShowTip(new TutorialTip(
+                "tip_pocion_recogida",
+                "Pociones Mágicas",
+                "Has obtenido una poción mágica. Selecciona con las teclas 1, 2 o 3 y arrójala con la tecla E o clic izquierdo hacia los guardias o aldeanos para neutralizarlos.",
+                null,
+                true
+            ));
         }
     }
 

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7077392985564697815}
   - component: {fileID: 7826085608936595811}
   - component: {fileID: 4865942939615097753}
+  - component: {fileID: 1105496561102508527}
   m_Layer: 8
   m_Name: VillagerF
   m_TagString: Untagged
@@ -107,6 +108,41 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.9, y: 2.1}
   m_EdgeRadius: 0
+--- !u!114 &1105496561102508527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3107456910672673953}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a46da984d4164945837185a35b4fa9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VillagerAI
+  walkSpeed: 1.8
+  frenzySpeed: 4.2
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 0
+  edgeCheckOffset: 0.5
+  edgeCheckRayDistance: 1.2
+  viewDistance: 6.5
+  targetMask:
+    serializedVersion: 2
+    m_Bits: 0
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 0
+  noticeDuration: 0.5
+  screamDuration: 2
+  guardAlertRadius: 14
+  cooldownDuration: 5
+  visualTransform: {fileID: 0}
+  animator: {fileID: 0}
+  noticeIconRenderer: {fileID: 0}
+  statusIconRenderer: {fileID: 0}
+  screamSound: {fileID: 0}
 --- !u!1 &3387058357667966555
 GameObject:
   m_ObjectHideFlags: 0
