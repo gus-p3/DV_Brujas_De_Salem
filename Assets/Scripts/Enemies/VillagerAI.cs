@@ -575,7 +575,10 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
             statusIconRenderer.enabled = icon != null;
         }
 
-        activeSpellCoroutine = StartCoroutine(SpellDurationRoutine(duration));
+        if (Application.isPlaying)
+        {
+            activeSpellCoroutine = StartCoroutine(SpellDurationRoutine(duration));
+        }
     }
 
     private IEnumerator SpellDurationRoutine(float duration)

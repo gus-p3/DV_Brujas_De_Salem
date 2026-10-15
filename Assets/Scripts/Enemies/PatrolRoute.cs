@@ -614,6 +614,8 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
         activeSpellType = type;
         hypnotizeDirection = dir;
 
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
+
         if (enemySight != null)
         {
             switch (type)
@@ -631,14 +633,17 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
                     break;
 
                 case SpellEffectType.Sleep:
-                    rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+                    if (rb != null) rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
                     enemySight.SetVisionSuppressed(true, null);
                     SetStatusIcon(sleepIconSprite);
                     break;
             }
         }
 
-        activeSpellCoroutine = StartCoroutine(SpellDurationRoutine(duration));
+        if (Application.isPlaying)
+        {
+            activeSpellCoroutine = StartCoroutine(SpellDurationRoutine(duration));
+        }
         if (debugLogs) Debug.Log($"[PatrolRoute] {name}: Hechizo {type} aplicado por {duration} s.", this);
     }
 
