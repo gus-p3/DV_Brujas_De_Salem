@@ -83,7 +83,7 @@ public class TransformationManager : MonoBehaviour
         }
     }
 
-    private void TransformToCat()
+    public void TransformToCat()
     {
         EnsureComponents();
         IsCatForm = true;
@@ -113,7 +113,7 @@ public class TransformationManager : MonoBehaviour
         OnTransformed?.Invoke(true);
     }
 
-    private void TryTransformToHuman()
+    public void TryTransformToHuman()
     {
         EnsureComponents();
         // Verificar espacio libre sobre la cabeza del gato (entre y = 0.6 y 1.6)

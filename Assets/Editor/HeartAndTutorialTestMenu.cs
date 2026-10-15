@@ -236,4 +236,32 @@ public static class HeartAndTutorialTestMenu
         panelObj.SetActive(false);
         return panelComp;
     }
+
+    [MenuItem("Brujas/Tutorial Largo/Construir Zonas 1 a 5")]
+    public static void MenuBuildZones1To5()
+    {
+        Level1TutorialRedesign.BuildZones1To5();
+    }
+
+    [MenuItem("Brujas/Tutorial Largo/Construir Zonas 6 a 9")]
+    public static void MenuBuildZones6To9()
+    {
+        Level1TutorialRedesign.BuildZones6To9();
+    }
+
+    [MenuItem("Brujas/Tutorial Largo/Configurar Cuadros de Tutorial")]
+    public static void MenuSetupAllTutorials()
+    {
+        Level1TutorialRedesign.SetupAllTutorials();
+    }
+
+    [MenuItem("Brujas/Tutorial Largo/Ejecutar Verificacion 15 Hitos")]
+    public static void MenuRunFullVerification()
+    {
+        Level1PlayModeVerificationSuite.RunFullVerification();
+    }
 }
+
+
+
+

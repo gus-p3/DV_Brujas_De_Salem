@@ -94,6 +94,11 @@ public class BroomInventory : MonoBehaviour
             completionParticles.Play();
         }
 
+        if (TutorialManager.Instance != null)
+        {
+            TutorialManager.Instance.ShowTipById("tip_escoba_completa");
+        }
+
         OnBroomCompleted?.Invoke();
     }
 
