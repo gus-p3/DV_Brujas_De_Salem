@@ -235,7 +235,7 @@ MonoBehaviour:
   groundCheckSkin: 0.02
   groundedMaxUpwardSpeed: 0.1
   noFrictionMaterial: {fileID: 6200000, guid: dc42c7611576a1a4f850722411315baf, type: 2}
-  canFly: 1
+  canFly: 0
   flightKey: 102
   flightAltButton: Fire2
   flySpeed: 5

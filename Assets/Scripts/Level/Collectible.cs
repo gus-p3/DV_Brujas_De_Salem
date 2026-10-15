@@ -124,22 +124,7 @@ public class Collectible : MonoBehaviour
 
         if (pc == null) return;
 
-        if (tm != null && !tm.CanCollect)
-        {
-            // En forma de gato no puede recoger: avisar al jugador
-            if (messageCooldownTimer <= 0f)
-            {
-                messageCooldownTimer = 2.0f;
-                HUDController hud = UnityEngine.Object.FindFirstObjectByType<HUDController>();
-                if (hud != null)
-                {
-                    hud.ShowMessage("Transfórmate de nuevo para recoger", 2.0f);
-                }
-            }
-            return;
-        }
-
-        // Forma humana: recoger
+        // Recoger objeto tanto en forma humana como en forma de gato
         isCollected = true;
 
         if (GameManager.Instance != null)
