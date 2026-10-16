@@ -102,11 +102,19 @@ public class CheckpointManager : MonoBehaviour
             return;
         }
 
-        // 1. Colocar a la bruja en la última posición segura
-        player.transform.position = lastCheckpointPosition;
-
-        // 2. Restablecer físicas: velocidad cero, gravedad normal, vuelo cancelado
+        // 1. Reiniciar velocidad física y referencia de caída antes de mover transform.position
+        Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
+        player.ResetFallReference();
         player.ResetPhysics(Vector2.zero);
+
+        // 2. Colocar a la bruja en la última posición segura y sincronizar físicas
+        player.transform.position = lastCheckpointPosition;
+        Physics2D.SyncTransforms();
 
         // 3. Forzar retorno a forma humana si estaba en forma de gato
         if (transformationManager != null)

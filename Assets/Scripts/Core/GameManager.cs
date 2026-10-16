@@ -146,29 +146,32 @@ public class GameManager : MonoBehaviour
         PlayerInvulnerability inv = UnityEngine.Object.FindFirstObjectByType<PlayerInvulnerability>();
         if (inv != null && inv.IsInvulnerable)
         {
-            Debug.Log($"[GameManager] LoseHeart ignorado por invulnerabilidad activa (Fuente: {source}).");
+            Debug.Log($"[HealthManager] Lesionar ignorado por invulnerabilidad activa (Fuente: {source}).");
             return false;
         }
 
         currentHearts = Mathf.Max(0, currentHearts - amount);
-        Debug.Log($"[GameManager] Corazón perdido ({source}). Corazones restantes: {currentHearts}/{maxHearts}");
+        Debug.Log($"[HealthManager] Lesionar aplicado ({source}). Corazones restantes: {currentHearts}/{maxHearts}");
 
         OnHeartsChanged?.Invoke(currentHearts, maxHearts);
         OnHeartLost?.Invoke();
         OnStatsUpdated?.Invoke();
 
-        if (inv != null && currentHearts > 0)
+        if (currentHearts <= 0)
+        {
+            if (inv != null) inv.CancelInvulnerability();
+            TriggerGameOver();
+        }
+        else if (inv != null)
         {
             inv.TriggerInvulnerability();
         }
 
-        if (currentHearts <= 0)
-        {
-            TriggerGameOver();
-        }
-
         return true;
     }
+
+    /// <summary>Alias de recibir daño para compatibilidad con el sistema de salud.</summary>
+    public bool Lesionar(int amount = 1, string source = "Daño") => LoseHeart(amount, source);
 
     public bool GainHeart(int amount = 1)
     {
@@ -266,6 +269,13 @@ public class GameManager : MonoBehaviour
         }
 
         SetState(GameState.GameOver);
+
+        GameOverPanel goPanel = UnityEngine.Object.FindFirstObjectByType<GameOverPanel>(FindObjectsInactive.Include);
+        if (goPanel != null)
+        {
+            goPanel.gameObject.SetActive(true);
+            goPanel.HandleStateChanged(GameState.GameOver);
+        }
     }
 
     public void LoadMainMenu()

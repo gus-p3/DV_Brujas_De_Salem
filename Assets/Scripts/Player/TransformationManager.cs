@@ -24,7 +24,7 @@ public class TransformationManager : MonoBehaviour
     public bool IsCatForm { get; private set; }
     public bool IsInHideout { get; set; }
 
-    public bool CanCollect => !IsCatForm;
+    public bool CanCollect => true;
     public bool CanCastSpells => !IsCatForm;
 
     public event Action<bool> OnTransformed;
@@ -116,16 +116,43 @@ public class TransformationManager : MonoBehaviour
     public void TryTransformToHuman()
     {
         EnsureComponents();
-        // Verificar espacio libre sobre la cabeza del gato (entre y = 0.6 y 1.6)
-        Vector2 checkCenter = (Vector2)transform.position + new Vector2(0f, 1.1f);
-        Vector2 checkSize = new Vector2(humanColliderSize.x * 0.8f, 0.9f);
+        // Verificar espacio libre para la altura completa de la forma humana
+        Vector2 checkCenter = (Vector2)transform.position + humanColliderOffset;
+        Vector2 checkSize = humanColliderSize * 0.95f;
         
-        LayerMask mask = obstacleMask.value != 0 ? obstacleMask : (LayerMask)(1 << LayerMask.NameToLayer("Ground"));
-        Collider2D hit = Physics2D.OverlapBox(checkCenter, checkSize, 0f, mask);
-        
-        if (hit != null && !hit.isTrigger && hit.transform.root != transform.root)
+        Collider2D[] hits = Physics2D.OverlapBoxAll(checkCenter, checkSize, 0f);
+        bool blocked = false;
+        string blockerName = "";
+
+        foreach (var col in hits)
         {
-            Debug.Log($"No hay espacio para transformarse en humana. Obstáculo: {hit.gameObject.name}");
+            if (col == null || col.transform.root == transform.root) continue;
+
+            // Bloqueo si hay obstáculo sólido
+            if (!col.isTrigger)
+            {
+                blocked = true;
+                blockerName = col.gameObject.name;
+                break;
+            }
+
+            // Bloqueo si se encuentra dentro del área de un pasaje exclusivo para gatos
+            if (col.GetComponent<CatOnlyPassage>() != null || col.GetComponentInParent<CatOnlyPassage>() != null)
+            {
+                blocked = true;
+                blockerName = col.gameObject.name;
+                break;
+            }
+        }
+        
+        if (blocked)
+        {
+            Debug.Log($"[TransformationManager] No hay espacio para transformarse en humana. Bloqueado por: {blockerName}");
+            HUDController hud = UnityEngine.Object.FindFirstObjectByType<HUDController>();
+            if (hud != null)
+            {
+                hud.ShowMessage("Eres muy grande para pasar", 2.0f);
+            }
             return;
         }
 

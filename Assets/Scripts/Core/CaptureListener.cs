@@ -59,7 +59,7 @@ public class CaptureListener : MonoBehaviour
             return;
         }
 
-        // 2. Si aún quedan corazones, reaparecer en checkpoint y restablecer guardia
+        // 2. Si aún quedan corazones, reaparecer en checkpoint y restablecer guardia(s)
         if (GameManager.Instance.CurrentHearts > 0)
         {
             if (CheckpointManager.Instance != null)
@@ -67,14 +67,18 @@ public class CaptureListener : MonoBehaviour
                 CheckpointManager.Instance.RespawnAtCheckpoint();
             }
 
-            if (capturingGuard != null)
+            EnemySight[] enemies = FindObjectsByType<EnemySight>(FindObjectsSortMode.None);
+            foreach (var enemy in enemies)
             {
-                capturingGuard.ResetState();
-
-                PatrolRoute patrol = capturingGuard.GetComponent<PatrolRoute>();
-                if (patrol != null)
+                if (enemy != null && (enemy == capturingGuard || enemy.CurrentState == AlertState.Capture))
                 {
-                    patrol.ResetToFirstWaypoint();
+                    enemy.ResetState();
+
+                    PatrolRoute patrol = enemy.GetComponent<PatrolRoute>();
+                    if (patrol != null)
+                    {
+                        patrol.ResetToFirstWaypoint();
+                    }
                 }
             }
         }

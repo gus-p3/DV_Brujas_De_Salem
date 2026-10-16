@@ -141,7 +141,14 @@ public class PlayerController : MonoBehaviour, IDetectable
     /// <summary>Permite volar. Se habilita al reunir las 3 partes de la escoba.</summary>
     public bool CanFly
     {
-        get => canFly;
+        get
+        {
+            if (BroomInventory.Instance != null)
+            {
+                return BroomInventory.Instance.IsComplete;
+            }
+            return canFly;
+        }
         set
         {
             canFly = value;
@@ -325,9 +332,23 @@ public class PlayerController : MonoBehaviour, IDetectable
         {
             StopFlight();
         }
-        else if (canFly && flightEnergy >= minEnergyToStartFlight)
+        else
         {
-            StartFlight();
+            bool hasBroomMaterials = BroomInventory.Instance != null ? BroomInventory.Instance.IsComplete : canFly;
+            if (!hasBroomMaterials)
+            {
+                HUDController hud = UnityEngine.Object.FindFirstObjectByType<HUDController>();
+                if (hud != null)
+                {
+                    hud.ShowMessage("Aún te falta material para la escoba", 2.0f);
+                }
+                return;
+            }
+
+            if (flightEnergy >= minEnergyToStartFlight)
+            {
+                StartFlight();
+            }
         }
     }
 
@@ -470,6 +491,20 @@ public class PlayerController : MonoBehaviour, IDetectable
         rb.linearVelocity = newVelocity;
         rb.angularVelocity = 0f;
         CancelFlight();
+    }
+
+    /// <summary>
+    /// Reinicia la velocidad del Rigidbody2D y cualquier referencia de altura/caída residual
+    /// para evitar que el traslado al checkpoint se interprete como caída dañina.
+    /// </summary>
+    public void ResetFallReference()
+    {
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
     }
 
     private void HandleFlight()

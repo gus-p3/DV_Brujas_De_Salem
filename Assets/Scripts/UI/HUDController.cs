@@ -77,7 +77,7 @@ public class HUDController : MonoBehaviour
             player.OnFlightEnergyChanged += UpdateFlightEnergy;
             player.OnFlightChanged += HandleFlightChanged;
             UpdateFlightEnergy(player.FlightEnergy01);
-            SetFlightSliderVisible(player.CanFly || player.IsFlying);
+            SetFlightSliderVisible(player.IsFlying);
         }
         else if (flightEnergySlider != null)
         {
@@ -117,10 +117,7 @@ public class HUDController : MonoBehaviour
 
     private void HandleFlightChanged(bool isFlying)
     {
-        if (player != null)
-        {
-            SetFlightSliderVisible(player.CanFly || isFlying);
-        }
+        SetFlightSliderVisible(isFlying);
     }
 
     public void SetFlightSliderVisible(bool visible)
@@ -193,11 +190,18 @@ public class HUDController : MonoBehaviour
 
     /// <summary>
     /// Muestra un mensaje emergente en pantalla durante el tiempo indicado (en tiempo no escalado).
+    /// Limpia cualquier mensaje anterior para evitar superposiciones.
     /// </summary>
-    public void ShowMessage(string message, float duration = 2.5f)
+    public void ShowMessage(string message, float duration = 2.0f)
     {
         if (messageBannerText == null) return;
-        if (messageCoroutine != null) StopCoroutine(messageCoroutine);
+        if (messageCoroutine != null)
+        {
+            StopCoroutine(messageCoroutine);
+            messageBannerText.text = "";
+            messageBannerText.gameObject.SetActive(false);
+            messageCoroutine = null;
+        }
         messageCoroutine = StartCoroutine(ShowMessageRoutine(message, duration));
     }
 
@@ -211,6 +215,7 @@ public class HUDController : MonoBehaviour
             elapsed += Time.unscaledDeltaTime;
             yield return null;
         }
+        messageBannerText.text = "";
         messageBannerText.gameObject.SetActive(false);
         messageCoroutine = null;
     }
@@ -233,12 +238,27 @@ public class HUDController : MonoBehaviour
     {
         if (potionSelectionFrames == null || potionSelectionFrames.Length == 0) return;
 
+        int blindCharges = GameManager.Instance != null ? GameManager.Instance.BlindCharges : 0;
+        int hypCharges = GameManager.Instance != null ? GameManager.Instance.HypnotizeCharges : 0;
+        int sleepCharges = GameManager.Instance != null ? GameManager.Instance.SleepCharges : 0;
+        int[] charges = { blindCharges, hypCharges, sleepCharges };
+
         for (int i = 0; i < potionSelectionFrames.Length; i++)
         {
             if (potionSelectionFrames[i] == null) continue;
             bool isSelected = (i == selectedPotionIndex);
-            potionSelectionFrames[i].enabled = isSelected;
-            potionSelectionFrames[i].color = isSelected ? selectedFrameColor : unselectedFrameColor;
+            bool hasCharges = i < charges.Length && charges[i] > 0;
+
+            // Desactivar Image cuando la ranura no tiene sprite asignado o está vacía para evitar el recuadro amarillo sólido
+            if (potionSelectionFrames[i].sprite == null || !hasCharges)
+            {
+                potionSelectionFrames[i].enabled = false;
+            }
+            else
+            {
+                potionSelectionFrames[i].enabled = isSelected;
+                potionSelectionFrames[i].color = isSelected ? selectedFrameColor : unselectedFrameColor;
+            }
         }
     }
 
