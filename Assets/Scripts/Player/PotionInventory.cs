@@ -43,6 +43,11 @@ public class PotionInventory : MonoBehaviour
     /// </summary>
     public event Action<PotionType> OnPotionSelected;
 
+    /// <summary>
+    /// Evento disparado al lanzar una poción (lo usa el rig animado para la animación de hechizo).
+    /// </summary>
+    public event Action OnPotionThrown;
+
     public PotionType SelectedPotion => selectedPotion;
 
     private void Awake()
@@ -182,6 +187,7 @@ public class PotionInventory : MonoBehaviour
         // Lanzar proyectil
         lastThrowTime = Time.time;
         SpawnAndLaunchProjectile();
+        OnPotionThrown?.Invoke();
 
         // Si se agotaron las cargas de esta poción y hay otra disponible, cambiar selección automáticamente
         if (GetChargesForType(selectedPotion) <= 0)

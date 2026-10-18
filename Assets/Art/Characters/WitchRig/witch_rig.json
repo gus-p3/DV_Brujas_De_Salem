@@ -1,0 +1,39 @@
+{
+  "character": "Witch",
+  "spriteDir": "parts",
+  "ppu": 650,
+  "extraSprites": [
+    {"name": "eye_half", "pivot": [47, 65]},
+    {"name": "eye_closed", "pivot": [50, 65]},
+    {"name": "mouth_o", "pivot": [32, 26]}
+  ],
+  "bones": [
+    {"name": "root", "parent": null, "pos": [0, 0]},
+    {"name": "hips", "parent": "root", "pos": [0, -444]},
+
+    {"name": "leg_upper_back", "parent": "hips", "pos": [-16, -444], "sprite": "leg_upper_back", "pivot": [52, 24], "order": 3},
+    {"name": "leg_lower_back", "parent": "leg_upper_back", "pos": [-16, -253], "sprite": "leg_lower_back", "pivot": [42, 24], "tip": [70, 284], "order": 2},
+    {"name": "leg_upper_front", "parent": "hips", "pos": [10, -444], "sprite": "leg_upper_front", "pivot": [52, 24], "order": 7},
+    {"name": "leg_lower_front", "parent": "leg_upper_front", "pos": [10, -258], "sprite": "leg_lower_front", "pivot": [42, 24], "tip": [68, 278], "order": 6},
+
+    {"name": "robe_skirt", "parent": "hips", "pos": [0, -560], "sprite": "robe_skirt", "pivot": [150, 12], "order": 8},
+    {"name": "torso", "parent": "hips", "pos": [-5, -444], "sprite": "torso", "pivot": [105, 220], "order": 9},
+
+    {"name": "arm_upper_back", "parent": "torso", "pos": [-54, -588], "sprite": "arm_upper_back", "pivot": [50, 28], "order": 1, "scale": 0.74, "rot": -4},
+    {"name": "arm_lower_back", "parent": "arm_upper_back", "pos": [-66, -472], "sprite": "arm_lower_back", "pivot": [40, 22], "order": 0},
+
+    {"name": "neck", "parent": "torso", "pos": [2, -644]},
+    {"name": "scarf_tail", "parent": "neck", "pos": [-40, -630], "sprite": "scarf_tail", "pivot": [60, 15], "order": 5, "scale": 0.8, "rot": -8},
+    {"name": "scarf", "parent": "neck", "pos": [4, -640], "sprite": "scarf", "pivot": [85, 40], "order": 10, "scale": 0.85},
+
+    {"name": "head", "parent": "neck", "pos": [2, -650], "sprite": "head", "pivot": [120, 220], "order": 12},
+    {"name": "hood_inner", "parent": "head", "pos": [10, -660], "sprite": "hood_inner", "pivot": [175, 250], "order": 11},
+    {"name": "hair_tail", "parent": "head", "pos": [-75, -720], "sprite": "hair_tail", "pivot": [150, 25], "order": 4},
+    {"name": "eye", "parent": "head", "pos": [36, -743], "sprite": "eye_open", "pivot": [50, 65], "order": 13},
+    {"name": "mouth", "parent": "head", "pos": [44, -695], "sprite": "mouth_smile", "pivot": [44, 28], "order": 13, "scale": 0.7},
+    {"name": "hood", "parent": "head", "pos": [10, -660], "sprite": "hood", "pivot": [175, 250], "order": 14},
+
+    {"name": "arm_upper_front", "parent": "torso", "pos": [-60, -592], "sprite": "arm_upper_front", "pivot": [68, 30], "order": 15, "scale": 0.74, "rot": 4},
+    {"name": "arm_lower_front", "parent": "arm_upper_front", "pos": [-64, -476], "sprite": "arm_lower_front", "pivot": [42, 22], "order": 16}
+  ]
+}

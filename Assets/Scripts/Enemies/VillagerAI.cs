@@ -102,7 +102,7 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
     private int lookAroundStep = 0;
 
     // Control de Hechizos
-    private enum VillagerSpellType { None, Blind, Hypnotize, Sleep }
+    public enum VillagerSpellType { None, Blind, Hypnotize, Sleep }
     private VillagerSpellType activeSpellType = VillagerSpellType.None;
     private Coroutine activeSpellCoroutine;
     private Coroutine detectionCoroutine;
@@ -115,6 +115,8 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
 
     public bool IsAffectedBySpell => activeSpellType != VillagerSpellType.None;
     public VillagerState CurrentState => currentState;
+    public VillagerSpellType ActiveSpell => activeSpellType;
+    public float WalkSpeed => walkSpeed;
 
     private void Awake()
     {
@@ -132,8 +134,9 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
             animator = GetComponentInChildren<Animator>();
         }
 
-        // Ajustar proporción de Aldeanos (100%-108% de la Bruja) y eliminar el padding inferior (19px) para que pisen el suelo
-        if (visualTransform != transform)
+        // Ajustar proporción de Aldeanos (100%-108% de la Bruja) y eliminar el padding inferior (19px) para que pisen el suelo.
+        // Los aldeanos con VillagerSpriteAnimator ya traen sus fotogramas a escala con los pies en el pivote.
+        if (visualTransform != transform && visualTransform.GetComponent<VillagerSpriteAnimator>() == null)
         {
             SpriteRenderer sr = visualTransform.GetComponent<SpriteRenderer>();
             bool isFemale = sr != null && sr.sprite != null && sr.sprite.name.Contains("VillagerF");

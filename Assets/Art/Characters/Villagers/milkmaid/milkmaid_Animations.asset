@@ -1,0 +1,106 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6f8903ed65cfc84abebbee5acfa4116, type: 3}
+  m_Name: milkmaid_Animations
+  m_EditorClassIdentifier: Assembly-CSharp::VillagerAnimationSet
+  idle:
+    frames:
+    - {fileID: 21300000, guid: ebf2da879adb2874ba8a1f4c309235c3, type: 3}
+    - {fileID: 21300000, guid: e31348cee8c3b4a479a0bb5aac1a04e7, type: 3}
+    - {fileID: 21300000, guid: d14d53564636a10489e42e5a7aad9026, type: 3}
+    - {fileID: 21300000, guid: cee31a4829e66f44186be8cbca53b41b, type: 3}
+    - {fileID: 21300000, guid: 75d2d1bd0ca87404ba9c1db52dd1e368, type: 3}
+    - {fileID: 21300000, guid: 0e320404d1ef80240a5589e84073146e, type: 3}
+    - {fileID: 21300000, guid: 734da938b3295f54491e06cabbf69ab1, type: 3}
+    - {fileID: 21300000, guid: 66959163617f0b44ea2dc3fc62bb5bbb, type: 3}
+    - {fileID: 21300000, guid: d9ef23e90af25274b9706a471417ec40, type: 3}
+    - {fileID: 21300000, guid: 3d850c8682c440f40810e7456db206fb, type: 3}
+    - {fileID: 21300000, guid: 88414d68180d3704e8cd93661598dd46, type: 3}
+    fps: 8
+    loop: 1
+  walk:
+    frames:
+    - {fileID: 21300000, guid: ed8d2b0f8da708047895a598547311e3, type: 3}
+    - {fileID: 21300000, guid: a6e20dafc15b2fe428a5fb52a878ab24, type: 3}
+    - {fileID: 21300000, guid: ce0334b1b4a4aff40be0a4fb5e8c2b76, type: 3}
+    - {fileID: 21300000, guid: 211b5ec15c663b144b783b5cc0df609a, type: 3}
+    - {fileID: 21300000, guid: 9981825a1fd6ea3499b09cca3981d007, type: 3}
+    - {fileID: 21300000, guid: d1681237d4d854148add761683d216b6, type: 3}
+    - {fileID: 21300000, guid: 4ee346e17801b124f9f034519ad8179f, type: 3}
+    - {fileID: 21300000, guid: 177f35e200b83d64ebcc1925da528e40, type: 3}
+    - {fileID: 21300000, guid: 8dd042d3cfe4c6645bbc97152529d759, type: 3}
+    - {fileID: 21300000, guid: b28cbef1be495d44089791e3d545557a, type: 3}
+    - {fileID: 21300000, guid: 7b1a0dfd38cd6c04a9b1c32a1159ddbc, type: 3}
+    - {fileID: 21300000, guid: 107e0d00b77c5824fa50c50495a83e34, type: 3}
+    fps: 12
+    loop: 1
+  run:
+    frames:
+    - {fileID: 21300000, guid: 8b31453811c95384c92e4d82da4fbcf0, type: 3}
+    - {fileID: 21300000, guid: de9c2035cfdfc2b4d977b460368298d1, type: 3}
+    - {fileID: 21300000, guid: deda605538975764a974523bcc5e2227, type: 3}
+    - {fileID: 21300000, guid: 4cece2c3bd0e176448499b75f4ef9e07, type: 3}
+    - {fileID: 21300000, guid: b56b5d9673bd46342bf57811fe973f6c, type: 3}
+    - {fileID: 21300000, guid: 64e361c4fc34dde43881b252175e8f68, type: 3}
+    - {fileID: 21300000, guid: 0a9dc31df5e993e42ab9cfc1c4eea5a3, type: 3}
+    - {fileID: 21300000, guid: b49e33c1c2b2b4848bcc3b1c01fed090, type: 3}
+    - {fileID: 21300000, guid: 72ba2fc23531ce3439f98e455dd549ac, type: 3}
+    - {fileID: 21300000, guid: dc8b27d4152955345bf105a70ce57165, type: 3}
+    - {fileID: 21300000, guid: e5aeffa15f3a1ea45a16a180d84189a8, type: 3}
+    - {fileID: 21300000, guid: dbb09ae74c5b0f34dbebdb771f259256, type: 3}
+    fps: 14
+    loop: 1
+  notice:
+    frames:
+    - {fileID: 21300000, guid: bcff128abfc848e4390eb2be848cb918, type: 3}
+    fps: 10
+    loop: 0
+  scream:
+    frames:
+    - {fileID: 21300000, guid: 47c63919e64e04143884381183d59606, type: 3}
+    - {fileID: 21300000, guid: 90c4a7ce561e2d64db30ae7d0dc8fc03, type: 3}
+    - {fileID: 21300000, guid: 3a2642bbc1448c74ea58515378e43f8d, type: 3}
+    - {fileID: 21300000, guid: 219cc4624d061544e80007b5b39be931, type: 3}
+    - {fileID: 21300000, guid: 0d97b64669b169642a768638a40950d2, type: 3}
+    fps: 10
+    loop: 1
+  blind:
+    frames:
+    - {fileID: 21300000, guid: 327881cec53b0e04394977df57e812b7, type: 3}
+    - {fileID: 21300000, guid: 3b4525192ff9dc64ebca1177b01730dc, type: 3}
+    - {fileID: 21300000, guid: 586c96c4278c6dd47a3c8439b1e1963f, type: 3}
+    fps: 6
+    loop: 1
+  hypnotize:
+    frames:
+    - {fileID: 21300000, guid: 7be06e2d786434340b8ed90643971e8b, type: 3}
+    - {fileID: 21300000, guid: f818900ac1f08284599076a1fa60afdd, type: 3}
+    - {fileID: 21300000, guid: 2860bfe4de9c0734186fbcb59d89fe09, type: 3}
+    fps: 5
+    loop: 1
+  sleep:
+    frames:
+    - {fileID: 21300000, guid: d9d672aa7c6665c4ea69d2b1564d88d3, type: 3}
+    - {fileID: 21300000, guid: cdfd86dbc674cd24494ae892ee0fb1b3, type: 3}
+    fps: 2
+    loop: 1
+  action:
+    frames:
+    - {fileID: 21300000, guid: 95af5cdd8e118104cb0246f87fcc9615, type: 3}
+    - {fileID: 21300000, guid: 7358cf6e2eb3c4840872d436566f9fe2, type: 3}
+    - {fileID: 21300000, guid: ab3ff06b7bd6050489b49b48a03cd2df, type: 3}
+    - {fileID: 21300000, guid: 92618197830e21b4f91fca9ba8fbcffd, type: 3}
+    - {fileID: 21300000, guid: 17f847b39d6ec6c45a5404724fa2a39e, type: 3}
+    - {fileID: 21300000, guid: 0514a34c85940e649976ed78207111a5, type: 3}
+    fps: 8
+    loop: 0
+  iconHeight: 2.1

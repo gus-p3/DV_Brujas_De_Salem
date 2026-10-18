@@ -46,3 +46,11 @@ desktop.ini
 /Tools/_tmp/
 
 .vsconfig
+
+# Copias de recuperación que crea Unity tras un cierre inesperado
+[Aa]ssets/_Recovery/
+[Aa]ssets/_Recovery.meta
+
+# Recortes intermedios de arte (se regeneran con ArtSource/Villagers/slice_sheet.py)
+ArtSource/Villagers/frames/
+ArtSource/Villagers/cut/

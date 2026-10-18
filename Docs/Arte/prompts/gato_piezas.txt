@@ -1,0 +1,25 @@
+Create a CHARACTER PARTS SHEET for 2D cutout/skeletal animation of a small black cat, the witch's companion.
+
+Two reference images are attached:
+- Image 1 (witch parts sheet) = the ART STYLE to match exactly: polished cartoon illustration, dark outline #1D0F0C about 4 px thick, flat fills with exactly one soft shadow tone and one highlight tone, light from the TOP-LEFT (shadows bottom-right, highlights on top-left edges). Same line weight and level of detail as the witch.
+- Image 2 (current cat) = the CHARACTER IDENTITY to keep: a round, chubby black cat with very big round amber eyes, small pink nose, big triangular ears, short legs and a long tail. Make it more expressive and appealing, but clearly the same cat.
+
+Palette: fur #14111A base, #2A2433 highlight (subtle blue-violet rim light), inner ears #5A3A4A, eyes #E8A93A with #F2C46B highlight and a dark slit pupil, nose #C97A8A.
+
+View: side 3/4 profile facing RIGHT, standing.
+
+Draw every part SEPARATED from the others with generous empty space between them (at least 40 px), arranged in a neat grid, nothing overlapping, nothing cropped at the image edges. Each part must be complete and fully drawn (no missing areas hidden behind other parts), with extra overlap material and rounded ends at every joint so the pieces can rotate without gaps.
+
+Parts to draw (one of each):
+1. head (round, with cheeks and muzzle, nose and mouth drawn, but NO eyes and NO ears)
+2. eye open, 3. eye half-closed, 4. eye closed (each eye drawn on a small patch of fur so it can be swapped over the head)
+5. front ear, 6. back ear (slightly darker, it is behind the head)
+7. whiskers (a few thin white-grey whisker lines as one separate piece)
+8. body (round torso, no legs, no tail)
+9. tail base, 10. tail middle, 11. tail tip (the tail split into 3 segments that connect end to end, each with rounded joint ends)
+12. front leg - upper, 13. front leg - lower with paw
+14. back-side front leg - upper, 15. back-side front leg - lower with paw (slightly darker)
+16. hind leg - thigh, 17. hind leg - lower with paw
+18. back-side hind leg - thigh, 19. back-side hind leg - lower with paw (slightly darker)
+
+Background: perfectly flat solid magenta #FF00FF everywhere, no gradients, no floor shadows, no text, no labels, no numbers.
