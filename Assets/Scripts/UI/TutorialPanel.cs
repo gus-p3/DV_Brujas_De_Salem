@@ -37,14 +37,84 @@ public class TutorialPanel : MonoBehaviour
     [Tooltip("Duración de la animación de aparición (s).")]
     [SerializeField] private float popInDuration = 0.2f;
 
+    [Tooltip("Tiempo de cierre automático (s) para no interrumpir la acción.")]
+    [SerializeField] private float autoCloseDelay = 4.5f;
+
     private Action onCloseCallback;
     private bool canClose = false;
+    private float openElapsed = 0f;
     private Coroutine activeAnimationRoutine;
 
     private void Awake()
     {
         if (canvasGroup == null) canvasGroup = GetComponent<CanvasGroup>();
-        if (contentContainer == null) contentContainer = GetComponent<RectTransform>();
+        if (contentContainer == null)
+        {
+            Transform db = transform.Find("DialogBox");
+            contentContainer = db != null ? db.GetComponent<RectTransform>() : GetComponent<RectTransform>();
+        }
+        ApplyCleanBannerLayout();
+    }
+
+    private void ApplyCleanBannerLayout()
+    {
+        // Desactivar cualquier fondo modal de pantalla completa para no tapar el juego
+        Image rootImg = GetComponent<Image>();
+        if (rootImg != null && contentContainer != null && contentContainer.gameObject != gameObject)
+        {
+            rootImg.color = new Color(0f, 0f, 0f, 0f);
+            rootImg.raycastTarget = false;
+        }
+
+        if (contentContainer != null && contentContainer.gameObject != gameObject)
+        {
+            contentContainer.anchorMin = new Vector2(0.5f, 1f);
+            contentContainer.anchorMax = new Vector2(0.5f, 1f);
+            contentContainer.pivot = new Vector2(0.5f, 1f);
+            contentContainer.anchoredPosition = new Vector2(0f, -86f);
+            contentContainer.sizeDelta = new Vector2(720f, 145f);
+
+            Image boxImg = contentContainer.GetComponent<Image>();
+            if (boxImg != null)
+            {
+                boxImg.color = new Color(0.11f, 0.08f, 0.06f, 0.90f);
+                boxImg.raycastTarget = false;
+            }
+        }
+
+        if (titleText != null)
+        {
+            titleText.fontSize = 24f;
+            titleText.color = new Color(0.96f, 0.82f, 0.42f, 1f);
+            titleText.alignment = TextAlignmentOptions.Top;
+            RectTransform rt = titleText.rectTransform;
+            rt.anchorMin = new Vector2(0.05f, 0.64f);
+            rt.anchorMax = new Vector2(0.95f, 0.94f);
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+        }
+        if (bodyText != null)
+        {
+            bodyText.fontSize = 19f;
+            bodyText.color = new Color(0.95f, 0.93f, 0.88f, 1f);
+            bodyText.alignment = TextAlignmentOptions.Center;
+            RectTransform rt = bodyText.rectTransform;
+            rt.anchorMin = new Vector2(0.05f, 0.22f);
+            rt.anchorMax = new Vector2(0.95f, 0.64f);
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+        }
+        if (continuePromptText != null)
+        {
+            continuePromptText.fontSize = 14f;
+            continuePromptText.color = new Color(0.75f, 0.70f, 0.58f, 0.85f);
+            continuePromptText.alignment = TextAlignmentOptions.Bottom;
+            RectTransform rt = continuePromptText.rectTransform;
+            rt.anchorMin = new Vector2(0.05f, 0.04f);
+            rt.anchorMax = new Vector2(0.95f, 0.22f);
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+        }
     }
 
     /// <summary>
@@ -54,6 +124,8 @@ public class TutorialPanel : MonoBehaviour
     {
         onCloseCallback = onClosed;
         canClose = false;
+        openElapsed = 0f;
+        ApplyCleanBannerLayout();
 
         if (titleText != null)
         {
@@ -80,7 +152,7 @@ public class TutorialPanel : MonoBehaviour
 
         if (continuePromptText != null)
         {
-            continuePromptText.text = "Continuar: Enter o clic";
+            continuePromptText.text = "[Enter] Cerrar";
         }
 
         gameObject.SetActive(true);
@@ -92,7 +164,7 @@ public class TutorialPanel : MonoBehaviour
     private IEnumerator ShowAnimationRoutine()
     {
         float elapsed = 0f;
-        Vector3 initialScale = Vector3.one * 0.9f;
+        Vector3 initialScale = Vector3.one * 0.94f;
 
         if (canvasGroup != null) canvasGroup.alpha = 0f;
         if (contentContainer != null) contentContainer.localScale = initialScale;
@@ -111,7 +183,6 @@ public class TutorialPanel : MonoBehaviour
         if (canvasGroup != null) canvasGroup.alpha = 1f;
         if (contentContainer != null) contentContainer.localScale = Vector3.one;
 
-        // Esperar el bloqueo de entrada de 0.3 segundos sin escalar
         float blockTimer = 0f;
         while (blockTimer < inputBlockDuration)
         {
@@ -126,17 +197,18 @@ public class TutorialPanel : MonoBehaviour
     {
         if (!canClose) return;
 
-        // Efecto de parpadeo suave del texto de continuar
+        openElapsed += Time.unscaledDeltaTime;
+
         if (continuePromptText != null)
         {
-            float alpha = 0.6f + 0.4f * Mathf.Sin(Time.unscaledTime * 4.0f);
+            float alpha = 0.6f + 0.35f * Mathf.Sin(Time.unscaledTime * 4.0f);
             Color c = continuePromptText.color;
             c.a = alpha;
             continuePromptText.color = c;
         }
 
-        // Cierre con Enter o Clic izquierdo
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetMouseButtonDown(0))
+        // Cierre con Enter, Clic o automáticamente tras autoCloseDelay segundos
+        if (openElapsed >= autoCloseDelay || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetMouseButtonDown(0))
         {
             Close();
         }

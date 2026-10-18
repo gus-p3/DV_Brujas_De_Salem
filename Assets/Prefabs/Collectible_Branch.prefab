@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.55, y: 0.55, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -79,9 +79,9 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 632417
+  m_SortingLayerID: -1652816201
   m_SortingLayer: 3
-  m_SortingOrder: 3
+  m_SortingOrder: 10
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 8db07a4718b38a7499579de4afb55e5f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -155,5 +155,5 @@ MonoBehaviour:
   scoreValue: 100
   pickupSfx: {fileID: 0}
   pickupVfx: {fileID: 0}
-  bobAmplitude: 0.15
+  bobAmplitude: 0.04
   bobSpeed: 3.5

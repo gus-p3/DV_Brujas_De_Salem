@@ -19,9 +19,9 @@ public class PotionPickup : MonoBehaviour
 
     [Header("Animación de Flotación")]
     [Tooltip("Amplitud de la oscilación vertical (u).")]
-    [SerializeField] private float bobbingAmplitude = 0.12f;
+    [SerializeField] private float bobbingAmplitude = 0.04f;
     [Tooltip("Frecuencia de la oscilación vertical (ciclos/s).")]
-    [SerializeField] private float bobbingFrequency = 3f;
+    [SerializeField] private float bobbingFrequency = 2.5f;
 
     [Header("Audio")]
     [Tooltip("Clip de sonido al recolectar.")]
@@ -42,12 +42,28 @@ public class PotionPickup : MonoBehaviour
     {
         triggerCollider = GetComponent<Collider2D>();
         triggerCollider.isTrigger = true;
+
+        if (bobbingAmplitude > 0.05f) bobbingAmplitude = 0.04f;
+
+        SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.sortingLayerName = "Foreground";
+            sr.sortingOrder = 10;
+        }
+
+        Vector3 pos = transform.position;
+        if (pos.y > 0.35f && pos.y < 1.25f)
+        {
+            pos.y = 0.42f;
+            transform.position = pos;
+        }
         initialPosition = transform.position;
     }
 
     private void Update()
     {
-        // Movimiento de flotación vertical continuo
+        // Movimiento de flotación vertical sutil asentado sobre el suelo
         float newY = initialPosition.y + Mathf.Sin(Time.time * bobbingFrequency) * bobbingAmplitude;
         transform.position = new Vector3(initialPosition.x, newY, initialPosition.z);
     }

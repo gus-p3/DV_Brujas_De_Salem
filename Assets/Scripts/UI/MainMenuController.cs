@@ -26,8 +26,12 @@ public class MainMenuController : MonoBehaviour
     public Slider sfxSlider;
     public TMP_Dropdown qualityDropdown;
 
+    private GameObject titleObject;
+
     private void Start()
     {
+        ApplyCleanMenuLayout();
+
         // Setup initial panels
         ShowMainPanel();
 
@@ -104,7 +108,7 @@ public class MainMenuController : MonoBehaviour
         // Options Setup
         if (musicSlider != null)
         {
-            musicSlider.value = PlayerPrefs.GetFloat("MusicVolume", 0.75f);
+            musicSlider.value = PlayerPrefs.GetFloat("MusicVolume", 1.0f);
             musicSlider.onValueChanged.RemoveAllListeners();
             musicSlider.onValueChanged.AddListener(v => {
                 if (AudioManager.Instance != null) AudioManager.Instance.SetMusicVolume(v);
@@ -112,7 +116,7 @@ public class MainMenuController : MonoBehaviour
         }
         if (sfxSlider != null)
         {
-            sfxSlider.value = PlayerPrefs.GetFloat("SFXVolume", 0.75f);
+            sfxSlider.value = PlayerPrefs.GetFloat("SFXVolume", 0.85f);
             sfxSlider.onValueChanged.RemoveAllListeners();
             sfxSlider.onValueChanged.AddListener(v => {
                 if (AudioManager.Instance != null) AudioManager.Instance.SetSFXVolume(v);
@@ -128,6 +132,80 @@ public class MainMenuController : MonoBehaviour
         if (AudioManager.Instance != null && AudioManager.Instance.menuMusicClip != null)
         {
             AudioManager.Instance.PlayMusic(AudioManager.Instance.menuMusicClip);
+        }
+    }
+
+    private void ApplyCleanMenuLayout()
+    {
+        Transform tTitle = transform.Find("TitleText");
+        if (tTitle != null)
+        {
+            titleObject = tTitle.gameObject;
+            RectTransform rt = tTitle.GetComponent<RectTransform>();
+            if (rt != null)
+            {
+                rt.anchorMin = new Vector2(0.5f, 1f);
+                rt.anchorMax = new Vector2(0.5f, 1f);
+                rt.pivot = new Vector2(0.5f, 1f);
+                rt.anchoredPosition = new Vector2(0f, -48f);
+                rt.sizeDelta = new Vector2(1200f, 120f);
+            }
+            TextMeshProUGUI tmp = tTitle.GetComponent<TextMeshProUGUI>();
+            if (tmp != null)
+            {
+                tmp.fontSize = 92f;
+                tmp.alignment = TextAlignmentOptions.Center;
+            }
+        }
+
+        // Si existen subtítulos o textos extra debajo de TitleText, espaciarlos sin chocar con Jugar
+        int extraIdx = 0;
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            Transform ch = transform.GetChild(i);
+            if (ch == tTitle || ch.name == "Background" || ch.name == "MainPanel" || ch.name == "OptionsPanel" || ch.name == "CreditsPanel")
+                continue;
+            TextMeshProUGUI subTmp = ch.GetComponent<TextMeshProUGUI>();
+            if (subTmp != null)
+            {
+                RectTransform srt = ch.GetComponent<RectTransform>();
+                srt.anchorMin = new Vector2(0.5f, 1f);
+                srt.anchorMax = new Vector2(0.5f, 1f);
+                srt.pivot = new Vector2(0.5f, 1f);
+                srt.anchoredPosition = new Vector2(0f, -172f - (extraIdx * 42f));
+                srt.sizeDelta = new Vector2(900f, 40f);
+                subTmp.fontSize = Mathf.Min(subTmp.fontSize, 28f);
+                extraIdx++;
+            }
+        }
+
+        if (mainPanel != null)
+        {
+            RectTransform mpRect = mainPanel.GetComponent<RectTransform>();
+            if (mpRect != null)
+            {
+                mpRect.anchorMin = new Vector2(0.5f, 0.5f);
+                mpRect.anchorMax = new Vector2(0.5f, 0.5f);
+                mpRect.pivot = new Vector2(0.5f, 0.5f);
+                mpRect.anchoredPosition = new Vector2(0f, -90f);
+                mpRect.sizeDelta = new Vector2(420f, 520f);
+            }
+
+            Button[] buttons = { playButton, continueButton, optionsButton, creditsButton, exitButton };
+            float[] yPositions = { 160f, 70f, -20f, -110f, -200f };
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                if (buttons[i] == null) continue;
+                RectTransform brt = buttons[i].GetComponent<RectTransform>();
+                if (brt != null)
+                {
+                    brt.anchorMin = new Vector2(0.5f, 0.5f);
+                    brt.anchorMax = new Vector2(0.5f, 0.5f);
+                    brt.pivot = new Vector2(0.5f, 0.5f);
+                    brt.anchoredPosition = new Vector2(0f, yPositions[i]);
+                    brt.sizeDelta = new Vector2(290f, 66f);
+                }
+            }
         }
     }
 
@@ -147,6 +225,7 @@ public class MainMenuController : MonoBehaviour
 
     public void ShowMainPanel()
     {
+        if (titleObject != null) titleObject.SetActive(true);
         if (mainPanel != null) mainPanel.SetActive(true);
         if (optionsPanel != null) optionsPanel.SetActive(false);
         if (creditsPanel != null) creditsPanel.SetActive(false);
@@ -154,6 +233,7 @@ public class MainMenuController : MonoBehaviour
 
     public void ShowOptions()
     {
+        if (titleObject != null) titleObject.SetActive(false);
         if (mainPanel != null) mainPanel.SetActive(false);
         if (optionsPanel != null) optionsPanel.SetActive(true);
         if (creditsPanel != null) creditsPanel.SetActive(false);
@@ -161,6 +241,7 @@ public class MainMenuController : MonoBehaviour
 
     public void ShowCredits()
     {
+        if (titleObject != null) titleObject.SetActive(false);
         if (mainPanel != null) mainPanel.SetActive(false);
         if (optionsPanel != null) optionsPanel.SetActive(false);
         if (creditsPanel != null) creditsPanel.SetActive(true);

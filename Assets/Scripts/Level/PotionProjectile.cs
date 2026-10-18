@@ -35,6 +35,10 @@ public class PotionProjectile : MonoBehaviour
     [SerializeField] private float rotationSpeed = 360f;
 
     [Header("Efectos Visuales")]
+    [Tooltip("Sprite visual del frasco proyectil en vuelo.")]
+    [SerializeField] private Sprite projectileSprite;
+    [Tooltip("Fotogramas de la animación de salpicadura al impactar.")]
+    [SerializeField] private Sprite[] splashSprites;
     [Tooltip("Prefab del efecto visual de salpicadura.")]
     [SerializeField] private GameObject splashPrefab;
     [Tooltip("Color de la salpicadura en caso de dibujado de partículas o gizmos.")]
@@ -47,8 +51,32 @@ public class PotionProjectile : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        rb.gravityScale = 2.2f;
+        rb.gravityScale = 2.0f;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            if (sr.sprite == null && projectileSprite != null)
+            {
+                sr.sprite = projectileSprite;
+            }
+            sr.sortingLayerName = "Foreground";
+            sr.sortingOrder = Mathf.Max(sr.sortingOrder, 14);
+        }
+
+        if (splashRadius < 2.2f)
+        {
+            splashRadius = 2.2f;
+        }
+    }
+
+    private void Start()
+    {
+        if (Application.isPlaying)
+        {
+            Destroy(gameObject, 5f);
+        }
     }
 
     /// <summary>
@@ -65,13 +93,28 @@ public class PotionProjectile : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        if (collision.collider != null && ShouldIgnoreCollider(collision.collider))
+        {
+            Physics2D.IgnoreCollision(GetComponent<Collider2D>(), collision.collider, true);
+            return;
+        }
+
         HandleImpact(collision.contacts.Length > 0 ? collision.contacts[0].point : (Vector2)transform.position);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.isTrigger) return;
+        if (other == null || ShouldIgnoreCollider(other)) return;
+        if (other.isTrigger && other.GetComponentInParent<ISpellTarget>() == null) return;
         HandleImpact(transform.position);
+    }
+
+    private bool ShouldIgnoreCollider(Collider2D col)
+    {
+        if (col.GetComponentInParent<PlayerController>() != null) return true;
+        if (col.GetComponentInParent<PotionProjectile>() != null) return true;
+        if (col.GetComponentInParent<PotionPickup>() != null) return true;
+        return false;
     }
 
     private void HandleImpact(Vector2 impactPoint)
@@ -97,8 +140,15 @@ public class PotionProjectile : MonoBehaviour
         GameObject splashObj = new GameObject("SplashEffect_" + potionType);
         splashObj.transform.position = position;
         SpriteRenderer sr = splashObj.AddComponent<SpriteRenderer>();
-        sr.sortingLayerName = "Default";
+        sr.sortingLayerName = "Foreground";
         sr.sortingOrder = 15;
+
+        if (splashSprites != null && splashSprites.Length > 0)
+        {
+            SplashAnimator anim = splashObj.AddComponent<SplashAnimator>();
+            anim.Initialize(splashSprites, 12f);
+            return;
+        }
 
         // Cargar los 4 frames de la salpicadura
         string spriteName = potionType switch

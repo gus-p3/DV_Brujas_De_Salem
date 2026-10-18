@@ -1,0 +1,24 @@
+PASO 1 — HOJA DE MODELO (una sola vez)
+Adjunta: ArtSource/Cat/cat_parts_chatgpt.png (diseño de cabeza, ojos y orejas) y ArtSource/Cat/ref_estilo_bruja.png (estilo).
+
+Draw a single character model of this black cat for a 2D game: full body, side view facing RIGHT, standing on all four paws. Keep exactly the head, big amber eyes, pink nose, ears and colors from the attached cat parts sheet, assembled into one natural, appealing, chubby cat with a long curved tail. Style: same as the attached witch sheet: polished cartoon illustration, dark outline #1D0F0C about 4 px, flat fills with one soft shadow and one highlight, light from the top-left. Fur #14111A with subtle blue-violet highlight #2A2433. Flat solid magenta #FF00FF background, no floor shadow, no text.
+
+Guarda el resultado como ArtSource/Cat/cat_model.png. A partir de aquí, adjunta SIEMPRE esa imagen.
+
+------------------------------------------------------------
+PASO 2 — UNA IMAGEN POR ANIMACIÓN
+Adjunta cat_model.png y pega el bloque COMÚN más la línea de la animación.
+
+COMÚN:
+Create a sprite sheet animation of the EXACT same cat from the attached model sheet (same design, colors, outline and proportions). Image 1536x1024, a grid of 4 columns x 2 rows = 8 frames, read left to right, top to bottom. The cat must be EXACTLY the same size in every frame, side view facing RIGHT, horizontally centered in its cell, with its paws resting on the same invisible ground line near the bottom of every cell (except when airborne). No camera movement, no zoom, nothing cropped, nothing crossing into other cells. Smooth in-between poses so the frames loop fluidly, with squash and stretch, anticipation and follow-through on the tail and ears. Flat solid magenta #FF00FF background, no grid lines, no floor shadow, no text, no numbers.
+
+Animación (elige una por imagen):
+- IDLE: idle loop: subtle breathing (body rises and falls), a slow blink in frames 5-6, ears twitching once, tail swaying in a soft S-curve.
+- WALK: walk cycle loop: diagonal gait (front-near paw moves with back-far paw), gentle body bob, head steady, tail held up in a relaxed curve and swaying.
+- SNEAK: stealth walk loop: body low to the ground, ears flattened back, half-closed focused eyes, slow careful paw steps, tail low and straight with only the tip flicking.
+- JUMP: jump sequence (not a loop): 1 crouch anticipation, 2 push-off stretch, 3 rising with front paws tucked, 4 apex, 5 falling with paws reaching down, 6 landing squash, 7 recovery, 8 back to standing.
+- SIT: sit down sequence: frames 1-5 go from standing to sitting upright with the tail wrapped around the front paws; frames 6-8 sitting idle loop (breathing, blink).
+- STRETCH: stretch sequence: front paws extend far forward with chest low and rear raised, eyes closed, tail up, then return to standing.
+- REACT: happy reaction when it sees the witch: small hop, ears perk forward, eyes wide, tail shoots straight up with the tip curling, then settles.
+
+Guarda cada una como ArtSource/Cat/sheets/cat_<animación>.png (por ejemplo cat_walk.png).

@@ -52,6 +52,11 @@ public class FrenzyController : MonoBehaviour
     private void Start()
     {
         FindWitch();
+        HUDController hud = UnityEngine.Object.FindFirstObjectByType<HUDController>();
+        if (hud != null)
+        {
+            hud.SetFrenzyVisuals(false);
+        }
     }
 
     private void FindWitch()
@@ -80,6 +85,13 @@ public class FrenzyController : MonoBehaviour
 
         // Condición de finalización 2: La bruja se transformó en gato o se escondió en maizal
         if (witchDetectable != null && !witchDetectable.IsDetectable)
+        {
+            StopFrenzy();
+            return;
+        }
+
+        TransformationManager tm = targetWitch.GetComponent<TransformationManager>();
+        if (tm != null && (tm.IsCatForm || tm.IsInHideout))
         {
             StopFrenzy();
             return;
@@ -140,8 +152,13 @@ public class FrenzyController : MonoBehaviour
     /// </summary>
     public void TriggerFrenzy(Transform witch)
     {
+        if (witch == null) return;
         targetWitch = witch;
-        if (witch != null) witchDetectable = witch.GetComponent<IDetectable>();
+        witchDetectable = witch.GetComponent<IDetectable>();
+        if (witchDetectable != null && !witchDetectable.IsDetectable) return;
+
+        TransformationManager tm = witch.GetComponent<TransformationManager>();
+        if (tm != null && (tm.IsCatForm || tm.IsInHideout)) return;
 
         if (isFrenzyActive)
         {
@@ -157,10 +174,10 @@ public class FrenzyController : MonoBehaviour
         int count = 0;
         foreach (VillagerAI v in allVillagers)
         {
-            if (v == null || v.IsAffectedBySpell || v.CurrentState == VillagerState.Disabled) continue;
+            if (v == null || !v.gameObject.activeInHierarchy || v.IsAffectedBySpell || v.CurrentState == VillagerState.Disabled) continue;
 
             float dist = Vector2.Distance(v.transform.position, targetWitch.position);
-            if (dist <= recruitmentRadius)
+            if (dist <= recruitmentRadius && Mathf.Abs(v.transform.position.y - targetWitch.position.y) <= 3.0f)
             {
                 v.EnterFrenzy();
                 activeFrenzyVillagers.Add(v);

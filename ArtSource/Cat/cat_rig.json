@@ -1,0 +1,34 @@
+{
+  "character": "Cat",
+  "spriteDir": "parts",
+  "ppu": 650,
+  "extraSprites": [
+    {"name": "eye_half", "pivot": [52, 57]},
+    {"name": "eye_closed", "pivot": [53, 55]}
+  ],
+  "bones": [
+    {"name": "root", "parent": null, "pos": [0, 0]},
+    {"name": "body", "parent": "root", "pos": [0, -290], "sprite": "body", "pivot": [182, 170], "order": 5},
+
+    {"name": "tail_base", "parent": "body", "pos": [-160, -330], "sprite": "tail_base", "pivot": [122, 42], "order": 2, "scale": 0.7},
+    {"name": "tail_mid", "parent": "tail_base", "pos": [-224, -330], "sprite": "tail_mid", "pivot": [205, 82], "order": 1},
+    {"name": "tail_tip", "parent": "tail_mid", "pos": [-342, -366], "sprite": "tail_tip", "pivot": [110, 45], "order": 0},
+
+    {"name": "hleg_upper_back", "parent": "body", "pos": [-85, -264], "sprite": "hleg_upper_back", "pivot": [80, 30], "order": 2, "scale": 0.8},
+    {"name": "hleg_lower_back", "parent": "hleg_upper_back", "pos": [-93, -128], "sprite": "hleg_lower_back", "pivot": [45, 22], "tip": [80, 162], "order": 1},
+    {"name": "fleg_upper_back", "parent": "body", "pos": [90, -280], "sprite": "fleg_upper_back", "pivot": [55, 28], "order": 2, "scale": 0.8},
+    {"name": "fleg_lower_back", "parent": "fleg_upper_back", "pos": [88, -142], "sprite": "fleg_lower_back", "pivot": [42, 22], "tip": [70, 200], "order": 1},
+
+    {"name": "hleg_upper_front", "parent": "body", "pos": [-115, -264], "sprite": "hleg_upper_front", "pivot": [80, 30], "order": 7, "scale": 0.8},
+    {"name": "hleg_lower_front", "parent": "hleg_upper_front", "pos": [-123, -128], "sprite": "hleg_lower_front", "pivot": [45, 22], "tip": [85, 182], "order": 6},
+    {"name": "fleg_upper_front", "parent": "body", "pos": [118, -269], "sprite": "fleg_upper_front", "pivot": [50, 28], "order": 7, "scale": 0.8},
+    {"name": "fleg_lower_front", "parent": "fleg_upper_front", "pos": [118, -127], "sprite": "fleg_lower_front", "pivot": [45, 22], "tip": [85, 181], "order": 6},
+
+    {"name": "neck", "parent": "body", "pos": [110, -405]},
+    {"name": "head", "parent": "neck", "pos": [110, -405], "sprite": "head", "pivot": [60, 170], "order": 10},
+    {"name": "ear_back", "parent": "head", "pos": [150, -535], "sprite": "ear_back", "pivot": [70, 165], "order": 8},
+    {"name": "ear_front", "parent": "head", "pos": [210, -530], "sprite": "ear_front", "pivot": [75, 165], "order": 9},
+    {"name": "eye", "parent": "head", "pos": [200, -493], "sprite": "eye_open", "pivot": [58, 57], "order": 12, "scale": 0.8},
+    {"name": "whiskers", "parent": "head", "pos": [238, -453], "sprite": "whiskers", "pivot": [8, 25], "order": 13}
+  ]
+}

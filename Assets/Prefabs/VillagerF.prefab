@@ -96,7 +96,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 1.05}
+  m_Offset: {x: 0, y: 0.89}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -106,7 +106,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.9, y: 2.1}
+  m_Size: {x: 0.68, y: 1.78}
   m_EdgeRadius: 0
 --- !u!114 &1105496561102508527
 MonoBehaviour:
@@ -128,6 +128,7 @@ MonoBehaviour:
   edgeCheckOffset: 0.5
   edgeCheckRayDistance: 1.2
   viewDistance: 6.5
+  maxWanderRadius: 4
   targetMask:
     serializedVersion: 2
     m_Bits: 0
@@ -153,7 +154,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8882521913868989780}
   - component: {fileID: 6886692106622648228}
-  - component: {fileID: 565318661095951849}
+  - component: {fileID: 433804221994182203}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -221,11 +222,11 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 632417
+  m_SortingLayer: 3
   m_SortingOrder: 4
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 620491011999341382, guid: 439e78c3827bec44ba041b65591e64e5, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ebf2da879adb2874ba8a1f4c309235c3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -235,25 +236,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!95 &565318661095951849
-Animator:
-  serializedVersion: 7
+--- !u!114 &433804221994182203
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3387058357667966555}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 84dec6c4284ed7847be4c704b8bce6ef, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30f17dd0b66a9d541bd144369b6d1c9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VillagerSpriteAnimator
+  animations: {fileID: 11400000, guid: 9ec1b96391cfe944fa76617d9c81975c, type: 2}
+  tempoJitter: 0.08
+  actionInterval: {x: 5, y: 11}
+  breathAmount: 0.012
+  breathPeriod: 2.8

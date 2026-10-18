@@ -47,9 +47,9 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        float musicVol = PlayerPrefs.GetFloat(MusicVolumeParam, 0.75f);
-        float sfxVol = PlayerPrefs.GetFloat(SFXVolumeParam, 0.75f);
-        SetMusicVolume(musicVol);
+        float musicVol = PlayerPrefs.GetFloat(MusicVolumeParam, 1.0f);
+        float sfxVol = PlayerPrefs.GetFloat(SFXVolumeParam, 0.85f);
+        SetMusicVolume(Mathf.Max(musicVol, 0.95f));
         SetSFXVolume(sfxVol);
     }
 
@@ -192,7 +192,7 @@ public class AudioManager : MonoBehaviour
             menuMusicClip = GenerateToneClip("Provisional_MenuMusic", 2f, 330f, 330f, true);
 
         if (levelMusicClip == null)
-            levelMusicClip = GenerateToneClip("Provisional_LevelMusic", 2f, 260f, 260f, true);
+            levelMusicClip = GenerateLevelMelodyClip("Provisional_LevelMusic");
 
         if (heartBreakClip == null)
             heartBreakClip = GenerateToneClip("Provisional_HeartBreak", 0.25f, 520f, 160f);
@@ -202,6 +202,38 @@ public class AudioManager : MonoBehaviour
 
         if (checkpointClip == null)
             checkpointClip = GenerateToneClip("Provisional_Checkpoint", 0.35f, 523f, 659f);
+    }
+
+    private AudioClip GenerateLevelMelodyClip(string clipName)
+    {
+        // Melodía misteriosa y temática de Salem (D menor / arpegio místico en loop)
+        int sampleRate = 44100;
+        float[] notes = new float[] { 293.66f, 349.23f, 440.00f, 523.25f, 440.00f, 349.23f, 392.00f, 329.63f }; // D4, F4, A4, C5, A4, F4, G4, E4
+        float noteDuration = 0.5f;
+        float duration = notes.Length * noteDuration; // 4.0 segundos de bucle
+        int totalSamples = (int)(sampleRate * duration);
+        float[] samples = new float[totalSamples];
+
+        for (int i = 0; i < totalSamples; i++)
+        {
+            float t = (float)i / sampleRate;
+            int noteIndex = (int)(t / noteDuration) % notes.Length;
+            float noteTime = t % noteDuration;
+            float freq = notes[noteIndex];
+
+            // Tono principal suave con armónicos cálidos tipo campana / xilófono mágico
+            float env = Mathf.Sin((noteTime / noteDuration) * Mathf.PI);
+            float baseTone = Mathf.Sin(2f * Mathf.PI * freq * t);
+            float harmonic = Mathf.Sin(2f * Mathf.PI * freq * 2f * t) * 0.4f;
+            float subTone = Mathf.Sin(2f * Mathf.PI * (freq * 0.5f) * t) * 0.25f;
+
+            // Volumen global incrementado para que se escuche claro y envolvente
+            samples[i] = (baseTone + harmonic + subTone) * env * 0.55f;
+        }
+
+        AudioClip clip = AudioClip.Create(clipName, totalSamples, 1, sampleRate, false);
+        clip.SetData(samples, 0);
+        return clip;
     }
 
     private AudioClip GenerateToneClip(string clipName, float duration, float startFreq, float endFreq, bool isAmbient = false)
@@ -218,8 +250,8 @@ public class AudioManager : MonoBehaviour
             
             // Envelope
             float envelope = isAmbient 
-                ? Mathf.Sin(t * Mathf.PI) * 0.15f 
-                : Mathf.Pow(1f - t, 2f) * 0.35f;
+                ? Mathf.Sin(t * Mathf.PI) * 0.45f 
+                : Mathf.Pow(1f - t, 2f) * 0.45f;
 
             samples[i] = Mathf.Sin(2f * Mathf.PI * freq * time) * envelope;
         }

@@ -23,7 +23,6 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private List<TutorialTip> predefinedTips = new List<TutorialTip>();
 
     private readonly Queue<TutorialTip> tipQueue = new Queue<TutorialTip>();
-    private float previousTimeScale = 1.0f;
     private bool isOpen = false;
 
     /// <summary>
@@ -201,12 +200,6 @@ public class TutorialManager : MonoBehaviour
         isOpen = true;
         seenTips.Add(tip.id);
 
-        if (tip.pauseGame)
-        {
-            previousTimeScale = Time.timeScale;
-            Time.timeScale = 0f;
-        }
-
         if (tutorialPanel == null)
         {
             tutorialPanel = Object.FindFirstObjectByType<TutorialPanel>(FindObjectsInactive.Include);
@@ -225,7 +218,6 @@ public class TutorialManager : MonoBehaviour
 
     private void OnPanelClosed()
     {
-        Time.timeScale = previousTimeScale;
         isOpen = false;
 
         // Si hay tips en cola, mostrar el siguiente

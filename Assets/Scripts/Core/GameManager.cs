@@ -139,9 +139,17 @@ public class GameManager : MonoBehaviour
         OnStatsUpdated?.Invoke();
     }
 
+    private float levelStartRealTime = -10f;
+
     public bool LoseHeart(int amount = 1, string source = "")
     {
         if (CurrentState != GameState.Playing) return false;
+
+        // Protección inicial al cargar/iniciar el nivel para evitar daño espurio en el arranque
+        if (Time.unscaledTime - levelStartRealTime < 1.0f && source != "Test")
+        {
+            return false;
+        }
 
         PlayerInvulnerability inv = UnityEngine.Object.FindFirstObjectByType<PlayerInvulnerability>();
         if (inv != null && inv.IsInvulnerable)
@@ -197,6 +205,20 @@ public class GameManager : MonoBehaviour
         HypnotizeCharges += hypnotize;
         SleepCharges += sleep;
         OnStatsUpdated?.Invoke();
+
+        // Si la ranura seleccionada actualmente no tiene cargas, seleccionar automáticamente la poción recién recogida
+        PotionInventory inv = UnityEngine.Object.FindFirstObjectByType<PotionInventory>();
+        if (inv != null)
+        {
+            int sel = (int)inv.SelectedPotion;
+            int currentSelCharges = sel == 0 ? BlindCharges : (sel == 1 ? HypnotizeCharges : SleepCharges);
+            if (currentSelCharges <= 0)
+            {
+                if (blind > 0) inv.SelectPotion(PotionType.Blind);
+                else if (hypnotize > 0) inv.SelectPotion(PotionType.Hypnotize);
+                else if (sleep > 0) inv.SelectPotion(PotionType.Sleep);
+            }
+        }
     }
 
     public bool TryConsumeSpell(int spellType)
@@ -213,10 +235,15 @@ public class GameManager : MonoBehaviour
 
     public void StartLevel()
     {
+        levelStartRealTime = Time.unscaledTime;
         currentHearts = maxHearts;
         Score = 0;
         TimeElapsed = 0f;
         SetState(GameState.Playing);
+        if (FrenzyController.Instance != null)
+        {
+            FrenzyController.Instance.StopFrenzy();
+        }
         OnHeartsChanged?.Invoke(currentHearts, maxHearts);
         OnStatsUpdated?.Invoke();
 

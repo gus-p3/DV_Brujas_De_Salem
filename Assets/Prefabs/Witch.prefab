@@ -107,6 +107,7 @@ GameObject:
   - component: {fileID: -7559975629141373121}
   - component: {fileID: 2430778405580967504}
   - component: {fileID: 5727415491681803073}
+  - component: {fileID: 7691441851865693514}
   m_Layer: 7
   m_Name: Witch
   m_TagString: Player
@@ -130,6 +131,7 @@ Transform:
   - {fileID: 7230459495414850397}
   - {fileID: 3203840164133208494}
   - {fileID: 6595183217972845907}
+  - {fileID: 1173235543289517012}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &6873385379959461159
@@ -193,7 +195,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0.856}
+  m_Offset: {x: 0, y: 0.8}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -272,10 +274,15 @@ MonoBehaviour:
     m_Bits: 64
   humanController: {fileID: 9100000, guid: e13beb1af4fbc94489c6daaecf17948e, type: 2}
   humanColliderSize: {x: 0.6, y: 1.6}
-  humanColliderOffset: {x: 0, y: 0.856}
+  humanColliderOffset: {x: 0, y: 0.8}
+  humanVisualScale: 0.45
+  humanVisualOffsetY: -0.1
   catController: {fileID: 9100000, guid: 24b16964c197ba0469e16f576a829ae9, type: 2}
-  catColliderSize: {x: 0.8, y: 0.5}
-  catColliderOffset: {x: 0, y: 0.306}
+  catColliderSize: {x: 0.65, y: 0.45}
+  catColliderOffset: {x: 0, y: 0.225}
+  catVisualScale: 0.34
+  catVisualOffsetY: -0.09
+  blockedMessage: Espacio muy estrecho para transformarse
 --- !u!114 &-7559975629141373121
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -321,6 +328,20 @@ MonoBehaviour:
   broomScale: {x: 0.55, y: 0.55, z: 1}
   sortingLayerName: Gameplay
   sortingOrder: 1
+--- !u!114 &7691441851865693514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2484219030927747412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc29e62949e1f12408713a875c7a97d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RigSpriteProxy
+  source: {fileID: 7176073946537965529}
+  rig: {fileID: 408615622243189520}
 --- !u!1 &4364815756299105017
 GameObject:
   m_ObjectHideFlags: 0
@@ -379,8 +400,8 @@ Transform:
   m_GameObject: {fileID: 8031860601558102642}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.45, y: 0.45, z: 0.45}
+  m_LocalPosition: {x: 0, y: -0.1, z: 0}
+  m_LocalScale: {x: 0.45, y: 0.45, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5986530936462079083}
@@ -466,3 +487,76 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1001 &7394461986332012700
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5986530936462079083}
+    m_Modifications:
+    - target: {fileID: 2990611921065964611, guid: 05b5a8f136053f045b3de8e5f19eaba7, type: 3}
+      propertyPath: m_Name
+      value: Rig
+      objectReference: {fileID: 0}
+    - target: {fileID: 8563115843189252936, guid: 05b5a8f136053f045b3de8e5f19eaba7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8563115843189252936, guid: 05b5a8f136053f045b3de8e5f19eaba7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.06
+      objectReference: {fileID: 0}
+    - target: {fileID: 8563115843189252936, guid: 05b5a8f136053f045b3de8e5f19eaba7, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8563115843189252936, guid: 05b5a8f136053f045b3de8e5f19eaba7, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8563115843189252936, guid: 05b5a8f136053f045b3de8e5f19eaba7, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8563115843189252936, guid: 05b5a8f136053f045b3de8e5f19eaba7, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8563115843189252936, guid: 05b5a8f136053f045b3de8e5f19eaba7, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8563115843189252936, guid: 05b5a8f136053f045b3de8e5f19eaba7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8563115843189252936, guid: 05b5a8f136053f045b3de8e5f19eaba7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8563115843189252936, guid: 05b5a8f136053f045b3de8e5f19eaba7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 05b5a8f136053f045b3de8e5f19eaba7, type: 3}
+--- !u!114 &408615622243189520 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7148855560682206092, guid: 05b5a8f136053f045b3de8e5f19eaba7, type: 3}
+  m_PrefabInstance: {fileID: 7394461986332012700}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce31f4c42466b044b897075e4d53bbea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WitchRigAnimator
+--- !u!4 &1173235543289517012 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8563115843189252936, guid: 05b5a8f136053f045b3de8e5f19eaba7, type: 3}
+  m_PrefabInstance: {fileID: 7394461986332012700}
+  m_PrefabAsset: {fileID: 0}

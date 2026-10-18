@@ -1,0 +1,24 @@
+Create a CHARACTER PARTS SHEET for 2D cutout/skeletal animation of the attached witch character. Keep her exact design and identity from the reference: young girl, brown pointed hood, dark brown ponytail, rust-red scarf, brown patched robe with ragged torn hem, bare feet, rosy cheeks, mischievous curious smile.
+
+Style: polished cartoon illustration for a 2D game (quality bar: Hollow Knight, Ori, Cuphead). Dark outline #1D0F0C about 4 px thick, flat fills with exactly one soft shadow tone and one highlight tone per material. Light comes from the TOP-LEFT: shadows on the bottom-right of every volume, highlights on the top-left edges. Use only this palette: robe #4A2A20 #6E452D #905C37 #B97E4F; scarf #7A2E1F #A8452B #D2734A; skin #CD9A7D #F8C0A2 #FFE0CC; hair #2E1A14 #4E2C1F #76452F.
+
+View: side 3/4 profile facing RIGHT.
+
+Draw every part SEPARATED from the others with generous empty space between them (at least 40 px), arranged in a neat grid, nothing overlapping, nothing cropped at the image edges. Each part must be complete and fully drawn (no missing areas hidden behind other parts), with a little extra overlap material at the joints (rounded ends at shoulders, elbows, hips, knees) so the pieces can rotate without gaps.
+
+Parts to draw (one of each):
+1. head (face and ears, NO hood, NO eyes, NO mouth drawn — just the skin, nose, cheeks, eyebrows)
+2. eye open, 3. eye half-closed, 4. eye closed
+5. mouth smiling, 6. mouth small "o"
+7. hood (pointed, as a separate piece that sits over the head)
+8. ponytail
+9. scarf (wrapped around the neck)
+10. scarf loose tail
+11. torso (upper robe, without arms)
+12. robe skirt (lower robe with the ragged torn hem)
+13. front upper arm, 14. front forearm with hand
+15. back upper arm, 16. back forearm with hand (slightly darker, it is behind the body)
+17. front thigh, 18. front shin with bare foot
+19. back thigh, 20. back shin with bare foot (slightly darker)
+
+Background: perfectly flat solid magenta #FF00FF everywhere, no gradients, no shadows on the floor, no text, no labels, no numbers.

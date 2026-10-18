@@ -36,11 +36,17 @@ public class PotionInventory : MonoBehaviour
     private TransformationManager transformationManager;
     private PotionType selectedPotion = PotionType.Blind;
     private float lastThrowTime = -10f;
+    private int lastTutorialOpenFrame = -10;
 
     /// <summary>
     /// Evento disparado cuando cambia el tipo de poción seleccionada en el inventario.
     /// </summary>
     public event Action<PotionType> OnPotionSelected;
+
+    /// <summary>
+    /// Evento disparado al lanzar una poción (lo usa el rig animado para la animación de hechizo).
+    /// </summary>
+    public event Action OnPotionThrown;
 
     public PotionType SelectedPotion => selectedPotion;
 
@@ -69,6 +75,13 @@ public class PotionInventory : MonoBehaviour
 
         // Bloquear mientras haya un diálogo/tip de tutorial activo
         if (TutorialManager.Instance != null && TutorialManager.Instance.IsOpen)
+        {
+            lastTutorialOpenFrame = Time.frameCount;
+            return;
+        }
+
+        // Evitar que el mismo clic que cerró el tutorial dispare una poción en el mismo frame
+        if (Time.frameCount <= lastTutorialOpenFrame + 1)
         {
             return;
         }
@@ -107,8 +120,20 @@ public class PotionInventory : MonoBehaviour
 
     private void HandleThrowInput()
     {
-        // Lanzar con tecla E o clic izquierdo
-        if (Input.GetKeyDown(KeyCode.E) || Input.GetMouseButtonDown(0))
+        bool mouseClick = Input.GetMouseButtonDown(0);
+        if (mouseClick && UnityEngine.EventSystems.EventSystem.current != null &&
+            UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+        {
+            // Si el clic fue sobre un botón de UI interactivo, no lanzar
+            var selectedGo = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
+            if (selectedGo != null && selectedGo.GetComponent<UnityEngine.UI.Button>() != null)
+            {
+                mouseClick = false;
+            }
+        }
+
+        // Lanzar con tecla E, Q o clic izquierdo
+        if (Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.Q) || mouseClick)
         {
             TryThrowPotion();
         }
@@ -134,8 +159,17 @@ public class PotionInventory : MonoBehaviour
             return;
         }
 
-        // Intentar consumir carga del GameManager
+        // Si el tipo seleccionado no tiene cargas pero el jugador tiene de otro tipo, auto-seleccionar el disponible
         int spellIndex = (int)selectedPotion;
+        if (GetChargesForType(selectedPotion) <= 0)
+        {
+            if (GameManager.Instance.BlindCharges > 0) SelectPotion(PotionType.Blind);
+            else if (GameManager.Instance.HypnotizeCharges > 0) SelectPotion(PotionType.Hypnotize);
+            else if (GameManager.Instance.SleepCharges > 0) SelectPotion(PotionType.Sleep);
+            spellIndex = (int)selectedPotion;
+        }
+
+        // Intentar consumir carga del GameManager
         bool consumed = GameManager.Instance.TryConsumeSpell(spellIndex);
 
         if (!consumed)
@@ -153,11 +187,32 @@ public class PotionInventory : MonoBehaviour
         // Lanzar proyectil
         lastThrowTime = Time.time;
         SpawnAndLaunchProjectile();
+        OnPotionThrown?.Invoke();
+
+        // Si se agotaron las cargas de esta poción y hay otra disponible, cambiar selección automáticamente
+        if (GetChargesForType(selectedPotion) <= 0)
+        {
+            if (GameManager.Instance.BlindCharges > 0) SelectPotion(PotionType.Blind);
+            else if (GameManager.Instance.HypnotizeCharges > 0) SelectPotion(PotionType.Hypnotize);
+            else if (GameManager.Instance.SleepCharges > 0) SelectPotion(PotionType.Sleep);
+        }
 
         if (AudioManager.Instance != null && throwSound != null)
         {
             AudioManager.Instance.PlaySFX(throwSound);
         }
+    }
+
+    private int GetChargesForType(PotionType type)
+    {
+        if (GameManager.Instance == null) return 0;
+        return type switch
+        {
+            PotionType.Blind => GameManager.Instance.BlindCharges,
+            PotionType.Hypnotize => GameManager.Instance.HypnotizeCharges,
+            PotionType.Sleep => GameManager.Instance.SleepCharges,
+            _ => 0
+        };
     }
 
     private void SpawnAndLaunchProjectile()
@@ -194,6 +249,20 @@ public class PotionInventory : MonoBehaviour
             SpriteRenderer sr = projectileObj.AddComponent<SpriteRenderer>();
             sr.sortingLayerName = "Default";
             sr.sortingOrder = 10;
+        }
+
+        // Ignorar colisiones con la propia bruja para que el proyectil salga limpio en arco
+        Collider2D projCol = projectileObj.GetComponent<Collider2D>();
+        if (projCol != null)
+        {
+            Collider2D[] playerCols = GetComponentsInChildren<Collider2D>(true);
+            foreach (Collider2D pc in playerCols)
+            {
+                if (pc != null)
+                {
+                    Physics2D.IgnoreCollision(projCol, pc, true);
+                }
+            }
         }
 
         PotionProjectile projComp = projectileObj.GetComponent<PotionProjectile>();

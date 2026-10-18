@@ -65,11 +65,76 @@ public class CornFoliageFade : MonoBehaviour
     private void HandlePlayerEntered()
     {
         targetAlpha = fadeAlpha;
+        SetPlayerStealthVisual(true);
     }
 
     private void HandlePlayerExited()
     {
         targetAlpha = normalAlpha;
+        SetPlayerStealthVisual(false);
+    }
+
+    // ------------------------------------------------------------- Visibilidad del jugador
+    private static int activeFieldCount = 0;
+    private static SpriteRenderer playerRenderer;
+    private static string originalLayer;
+    private static int originalOrder;
+    private static Color originalColor = Color.white;
+    private bool playerInside = false;
+
+    [Header("Indicador de sigilo")]
+    [Tooltip("Tinte aplicado a la bruja/gato mientras está oculto en el maizal.")]
+    [SerializeField] private Color stealthTint = new Color(0.72f, 0.68f, 1f, 0.9f);
+
+    private void SetPlayerStealthVisual(bool inside)
+    {
+        if (inside == playerInside) return;
+        playerInside = inside;
+
+        if (playerRenderer == null)
+        {
+            PlayerController pc = Object.FindFirstObjectByType<PlayerController>();
+            if (pc != null)
+            {
+                Animator a = pc.GetComponentInChildren<Animator>();
+                playerRenderer = a != null ? a.GetComponent<SpriteRenderer>() : pc.GetComponentInChildren<SpriteRenderer>();
+            }
+        }
+        if (playerRenderer == null) return;
+
+        if (inside)
+        {
+            if (activeFieldCount == 0)
+            {
+                originalLayer = playerRenderer.sortingLayerName;
+                originalOrder = playerRenderer.sortingOrder;
+                originalColor = playerRenderer.color;
+            }
+            activeFieldCount++;
+            // Delante de los tallos frontales (Foreground/5) para que nunca desaparezca
+            playerRenderer.sortingLayerName = "Foreground";
+            playerRenderer.sortingOrder = 8;
+            playerRenderer.color = stealthTint;
+        }
+        else
+        {
+            activeFieldCount = Mathf.Max(0, activeFieldCount - 1);
+            if (activeFieldCount == 0)
+            {
+                playerRenderer.sortingLayerName = string.IsNullOrEmpty(originalLayer) ? "Gameplay" : originalLayer;
+                playerRenderer.sortingOrder = originalOrder;
+                playerRenderer.color = originalColor.a <= 0f ? Color.white : originalColor;
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (playerInside)
+        {
+            activeFieldCount = Mathf.Max(0, activeFieldCount - 1);
+        }
+        if (activeFieldCount == 0) playerRenderer = null;
     }
 
     private void Update()

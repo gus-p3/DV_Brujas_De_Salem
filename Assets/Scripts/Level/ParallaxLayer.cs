@@ -70,22 +70,22 @@ public class ParallaxLayer : MonoBehaviour
         float distance = camX * parallaxFactor;
         float temp = camX * (1f - parallaxFactor);
 
-        float targetX = startX + distance;
-        float targetY = lockY ? startY : startY + (cameraTransform.position.y * parallaxFactor);
-
-        transform.position = new Vector3(targetX, targetY, transform.position.z);
-
         if (infiniteHorizontal && spriteWidth > 0.01f)
         {
-            if (temp > startX + spriteWidth)
+            while (temp > startX + spriteWidth)
             {
                 startX += spriteWidth;
             }
-            else if (temp < startX - spriteWidth)
+            while (temp < startX - spriteWidth)
             {
                 startX -= spriteWidth;
             }
         }
+
+        float targetX = startX + distance;
+        float targetY = lockY ? startY : startY + (cameraTransform.position.y * parallaxFactor);
+
+        transform.position = new Vector3(targetX, targetY, transform.position.z);
     }
 
     /// <summary>
