@@ -1,11 +1,11 @@
 using UnityEngine;
 
 /// <summary>
-/// Reproduce las animaciones cuadro a cuadro de un aldeano según el estado de su VillagerAI:
-/// paseo (idle/caminar con la cadencia ajustada a la velocidad), aviso, grito, frenesí, hechizos
-/// y una acción propia que hace de vez en cuando al quedarse quieto.
+/// Reproduce las animaciones cuadro a cuadro de un aldeano (VillagerAI) o de un guardia (PatrolRoute):
+/// paseo (idle/caminar con la cadencia ajustada a la velocidad), aviso, grito, persecución, hechizos
+/// y una acción propia que hace de vez en cuando al quedarse quieto (si el set la trae).
 /// Cada instancia tiene un tempo y unos tiempos ligeramente distintos para que no se muevan al unísono.
-/// Va en el objeto "Visual" (el que VillagerAI voltea en X).
+/// Va en el objeto "Visual" (el que VillagerAI/PatrolRoute voltean en X).
 /// </summary>
 [RequireComponent(typeof(SpriteRenderer))]
 public class VillagerSpriteAnimator : MonoBehaviour
@@ -23,6 +23,7 @@ public class VillagerSpriteAnimator : MonoBehaviour
     [SerializeField] private float breathPeriod = 2.8f;
 
     private VillagerAI ai;
+    private PatrolRoute guard;
     private Rigidbody2D body;
     private SpriteRenderer spriteRenderer;
     private VillagerAnimationSet.Clip current;
@@ -43,6 +44,7 @@ public class VillagerSpriteAnimator : MonoBehaviour
     private void Awake()
     {
         ai = GetComponentInParent<VillagerAI>();
+        if (ai == null) guard = GetComponentInParent<PatrolRoute>();
         body = GetComponentInParent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         tempo = 1f + Random.Range(-tempoJitter, tempoJitter);
@@ -54,11 +56,12 @@ public class VillagerSpriteAnimator : MonoBehaviour
 
     private void Start()
     {
-        if (animations == null || ai == null) return;
+        Transform owner = ai != null ? ai.transform : guard != null ? guard.transform : null;
+        if (animations == null || owner == null) return;
         // Los iconos de aviso y hechizo se colocan a la altura de la cabeza de este personaje
         foreach (string iconName in new[] { "NoticeIcon", "StatusIcon" })
         {
-            Transform icon = ai.transform.Find(iconName);
+            Transform icon = owner.Find(iconName);
             if (icon != null) icon.localPosition = new Vector3(0f, animations.iconHeight, 0f);
         }
         Play(animations.idle);
@@ -67,7 +70,7 @@ public class VillagerSpriteAnimator : MonoBehaviour
 
     private void Update()
     {
-        if (animations == null || ai == null) return;
+        if (animations == null || (ai == null && guard == null)) return;
 
         float speed = body != null ? Mathf.Abs(body.linearVelocity.x) : 0f;
         VillagerAnimationSet.Clip target = ChooseClip(speed);
@@ -75,10 +78,11 @@ public class VillagerSpriteAnimator : MonoBehaviour
         if (current == null || current.IsEmpty) return;
 
         float fps = current.fps * tempo;
-        if (current == animations.walk && ai.WalkSpeed > 0.01f)
+        float walkSpeed = ai != null ? ai.WalkSpeed : guard.WalkSpeed;
+        if (current == animations.walk && walkSpeed > 0.01f)
         {
             // La cadencia sigue a la velocidad para que los pies no patinen
-            fps *= Mathf.Clamp(speed / ai.WalkSpeed, 0.6f, 2.2f);
+            fps *= Mathf.Clamp(speed / walkSpeed, 0.6f, 2.2f);
         }
 
         frameTimer += Time.deltaTime * fps;
@@ -109,6 +113,8 @@ public class VillagerSpriteAnimator : MonoBehaviour
 
     private VillagerAnimationSet.Clip ChooseClip(float speed)
     {
+        if (guard != null) return ChooseGuardClip(speed);
+
         switch (ai.ActiveSpell)
         {
             case VillagerAI.VillagerSpellType.Blind: return Fallback(animations.blind);
@@ -148,6 +154,23 @@ public class VillagerSpriteAnimator : MonoBehaviour
             return animations.action;
         }
         return animations.idle;
+    }
+
+    private VillagerAnimationSet.Clip ChooseGuardClip(float speed)
+    {
+        switch (guard.ActiveSpell)
+        {
+            case PatrolRoute.SpellEffectType.Blind: return Fallback(animations.blind);
+            case PatrolRoute.SpellEffectType.Hypnotize: return Fallback(animations.hypnotize);
+            case PatrolRoute.SpellEffectType.Sleep: return Fallback(animations.sleep);
+        }
+
+        bool moving = speed > 0.15f;
+        AlertState sight = guard.SightState;
+        if (guard.CurrentState == PatrolState.Chasing) return moving ? Fallback(animations.run) : Fallback(animations.scream);
+        if (sight == AlertState.Alert || sight == AlertState.Capture) return Fallback(animations.scream);
+        if (sight == AlertState.Suspicion && !moving) return Fallback(animations.notice);
+        return moving ? animations.walk : animations.idle;
     }
 
     private VillagerAnimationSet.Clip Fallback(VillagerAnimationSet.Clip clip)
