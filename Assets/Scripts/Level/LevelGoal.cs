@@ -23,6 +23,29 @@ public class LevelGoal : MonoBehaviour
     {
         triggerCollider = GetComponent<Collider2D>();
         triggerCollider.isTrigger = true;
+
+        // Si existen múltiples LevelGoal en la escena (ej. Goal_Spawn legado a mitad del nivel),
+        // desactivar cualquiera que no sea la meta final del nivel.
+        LevelGoal[] allGoals = UnityEngine.Object.FindObjectsByType<LevelGoal>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        if (allGoals.Length > 1)
+        {
+            float maxX = float.MinValue;
+            foreach (LevelGoal g in allGoals)
+            {
+                if (g != null && g.transform.position.x > maxX)
+                {
+                    maxX = g.transform.position.x;
+                }
+            }
+
+            if (transform.position.x < maxX - 5f)
+            {
+                triggerCollider.enabled = false;
+                enabled = false;
+                gameObject.SetActive(false);
+                return;
+            }
+        }
     }
 
     private void Update()
@@ -35,7 +58,7 @@ public class LevelGoal : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (levelCompleted) return;
+        if (! isActiveAndEnabled || levelCompleted) return;
 
         PlayerController pc = other.GetComponentInParent<PlayerController>();
         if (pc == null) return;

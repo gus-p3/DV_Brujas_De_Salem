@@ -80,11 +80,11 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
+  m_SortingLayerID: -1652816201
   m_SortingLayer: 0
-  m_SortingOrder: 12
+  m_SortingOrder: 14
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: a470c3ad4194f9d4e860586c82142ca5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -92,7 +92,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
 --- !u!58 &4851617335183743500
 CircleCollider2D:
@@ -171,9 +171,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PotionProjectile
   potionType: 1
   effectDuration: 4
-  splashRadius: 1.6
+  splashRadius: 2.4
   horizontalSpeed: 7
   verticalSpeed: 6
   rotationSpeed: 360
+  projectileSprite: {fileID: 21300000, guid: a470c3ad4194f9d4e860586c82142ca5, type: 3}
+  splashSprites:
+  - {fileID: -43603381638198065, guid: 0d4f88ea6d28f9940861d280198c15aa, type: 3}
+  - {fileID: 6790917796415312330, guid: 0d4f88ea6d28f9940861d280198c15aa, type: 3}
+  - {fileID: -558900511378597954, guid: 0d4f88ea6d28f9940861d280198c15aa, type: 3}
+  - {fileID: -4379070331690841510, guid: 0d4f88ea6d28f9940861d280198c15aa, type: 3}
   splashPrefab: {fileID: 0}
   splashColor: {r: 1, g: 1, b: 1, a: 1}

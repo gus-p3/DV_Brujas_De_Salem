@@ -10,11 +10,11 @@ public class CameraFollow : MonoBehaviour
     [Tooltip("Transform que la cámara sigue (la bruja).")]
     [SerializeField] private Transform target;
     [Tooltip("Desplazamiento respecto al objetivo (u). Z debe ser negativa.")]
-    [SerializeField] private Vector3 offset = new Vector3(0f, 2.5f, -10f);
+    [SerializeField] private Vector3 offset = new Vector3(0f, 0.15f, -10f);
 
     [Header("Suavizado")]
     [Tooltip("Tiempo aproximado que tarda la cámara en alcanzar al objetivo (s).")]
-    [SerializeField] private float smoothTime = 0.2f;
+    [SerializeField] private float smoothTime = 0.18f;
     [Tooltip("Velocidad máxima de la cámara (u/s).")]
     [SerializeField] private float maxSpeed = 50f;
 
@@ -22,9 +22,9 @@ public class CameraFollow : MonoBehaviour
     [Tooltip("Si está activo, la vista de la cámara no sale del rectángulo definido abajo.")]
     [SerializeField] private bool useLimits = false;
     [Tooltip("Esquina inferior izquierda del área visible permitida (mundo).")]
-    [SerializeField] private Vector2 minLimit = new Vector2(-20f, -1f);
+    [SerializeField] private Vector2 minLimit = new Vector2(-20f, -2.3f);
     [Tooltip("Esquina superior derecha del área visible permitida (mundo).")]
-    [SerializeField] private Vector2 maxLimit = new Vector2(20f, 13f);
+    [SerializeField] private Vector2 maxLimit = new Vector2(235f, 15f);
 
     private Camera cam;
     private Vector3 velocity;

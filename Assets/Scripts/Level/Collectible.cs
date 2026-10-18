@@ -33,9 +33,9 @@ public class Collectible : MonoBehaviour
 
     [Header("Animación de flotación (Bobbing)")]
     [Tooltip("Amplitud vertical del vaivén.")]
-    [SerializeField] private float bobAmplitude = 0.15f;
+    [SerializeField] private float bobAmplitude = 0.04f;
     [Tooltip("Velocidad de oscilación.")]
-    [SerializeField] private float bobSpeed = 3.5f;
+    [SerializeField] private float bobSpeed = 2.5f;
 
     [Header("Zona de Proximidad")]
     [Tooltip("Radio de proximidad para recoger si el jugador está junto al objeto.")]
@@ -53,6 +53,22 @@ public class Collectible : MonoBehaviour
     {
         col = GetComponent<Collider2D>();
         if (col != null) col.isTrigger = true;
+
+        if (bobAmplitude > 0.05f) bobAmplitude = 0.04f;
+
+        SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.sortingLayerName = "Foreground";
+            sr.sortingOrder = 10;
+        }
+
+        Vector3 pos = transform.position;
+        if (pos.y > 0.35f && pos.y < 1.25f)
+        {
+            pos.y = 0.44f;
+            transform.position = pos;
+        }
         initialPosition = transform.position;
 
         int colLayer = LayerMask.NameToLayer("Collectible");

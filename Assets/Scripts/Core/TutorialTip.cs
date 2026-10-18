@@ -20,7 +20,7 @@ public class TutorialTip
     [Tooltip("Icono opcional que acompaña al texto en el cuadro.")]
     public Sprite icon;
 
-    [Tooltip("Si es verdadero, congela el tiempo del juego (timeScale = 0) mientras el panel esté abierto.")]
+    [Tooltip("Obsoleto: los tips ya no congelan el juego (se muestran como banner con cierre automático). Se conserva por compatibilidad con datos serializados.")]
     public bool pauseGame = true;
 
     public TutorialTip() { }

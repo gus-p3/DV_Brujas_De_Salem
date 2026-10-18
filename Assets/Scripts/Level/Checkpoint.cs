@@ -44,6 +44,20 @@ public class Checkpoint : MonoBehaviour
         boxCollider = GetComponent<BoxCollider2D>();
         boxCollider.isTrigger = true;
 
+        // Asentar el poste firmemente sobre la superficie del pasto (y = 0.17) compensando el padding inferior del sprite
+        Vector3 pos = transform.position;
+        if (pos.y < 1.2f)
+        {
+            pos.y = 0.12f;
+            transform.position = pos;
+        }
+
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.sortingLayerName = "Midground";
+            spriteRenderer.sortingOrder = 3;
+        }
+
         if (litLightObject != null)
         {
             litLightObject.SetActive(false);

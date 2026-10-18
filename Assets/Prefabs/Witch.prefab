@@ -193,7 +193,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0.856}
+  m_Offset: {x: 0, y: 0.8}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -272,10 +272,14 @@ MonoBehaviour:
     m_Bits: 64
   humanController: {fileID: 9100000, guid: e13beb1af4fbc94489c6daaecf17948e, type: 2}
   humanColliderSize: {x: 0.6, y: 1.6}
-  humanColliderOffset: {x: 0, y: 0.856}
+  humanColliderOffset: {x: 0, y: 0.8}
+  humanVisualScale: 0.45
+  humanVisualOffsetY: -0.1
   catController: {fileID: 9100000, guid: 24b16964c197ba0469e16f576a829ae9, type: 2}
-  catColliderSize: {x: 0.8, y: 0.5}
-  catColliderOffset: {x: 0, y: 0.306}
+  catColliderSize: {x: 0.65, y: 0.45}
+  catColliderOffset: {x: 0, y: 0.225}
+  catVisualScale: 0.34
+  catVisualOffsetY: -0.09
 --- !u!114 &-7559975629141373121
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -379,8 +383,8 @@ Transform:
   m_GameObject: {fileID: 8031860601558102642}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.45, y: 0.45, z: 0.45}
+  m_LocalPosition: {x: 0, y: -0.1, z: 0}
+  m_LocalScale: {x: 0.45, y: 0.45, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5986530936462079083}

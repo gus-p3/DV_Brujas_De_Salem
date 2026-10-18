@@ -50,7 +50,9 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
 
     [Header("Visión")]
     [Tooltip("Distancia máxima de visión frontal (u).")]
-    [SerializeField] private float viewDistance = 6.5f;
+    [SerializeField] private float viewDistance = 5.0f;
+    [Tooltip("Radio máximo de paseo desde su punto inicial (u).")]
+    [SerializeField] private float maxWanderRadius = 4.0f;
     [Tooltip("Capas donde se detecta a la bruja.")]
     [SerializeField] private LayerMask targetMask;
     [Tooltip("Capas de obstáculos que bloquean la visión (paredes/suelo).")]
@@ -58,11 +60,11 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
 
     [Header("Tiempos de Reacción")]
     [Tooltip("Tiempo en Notice antes de comenzar a gritar (s).")]
-    [SerializeField] private float noticeDuration = 0.5f;
+    [SerializeField] private float noticeDuration = 0.6f;
     [Tooltip("Duración de la animación y grito de alerta (s).")]
-    [SerializeField] private float screamDuration = 2.0f;
+    [SerializeField] private float screamDuration = 1.6f;
     [Tooltip("Radio de alerta en el que despierta a los guardias (u).")]
-    [SerializeField] private float guardAlertRadius = 14f;
+    [SerializeField] private float guardAlertRadius = 12f;
     [Tooltip("Tiempo de enfriamiento tras terminar el frenesí (s).")]
     [SerializeField] private float cooldownDuration = 5f;
 
@@ -89,8 +91,10 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
     private VillagerState currentState = VillagerState.Wander;
     private WanderPattern currentPattern = WanderPattern.WalkAndReturn;
     private bool facingRight = true;
+    private Vector3 spawnPosition;
     private Transform playerTarget;
     private IDetectable playerDetectable;
+    private TransformationManager playerTransformation;
 
     // Control de patrones de Wander
     private float patternTimer = 0f;
@@ -101,6 +105,7 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
     private enum VillagerSpellType { None, Blind, Hypnotize, Sleep }
     private VillagerSpellType activeSpellType = VillagerSpellType.None;
     private Coroutine activeSpellCoroutine;
+    private Coroutine detectionCoroutine;
 
     /// <summary>
     /// Evento estático disparado cuando un aldeano percibe que la bruja se aproxima.
@@ -114,7 +119,10 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        if (visualTransform == null)
+        spawnPosition = transform.position;
+        if (viewDistance > 5.2f) viewDistance = 5.0f;
+
+        if (visualTransform == null || visualTransform == transform)
         {
             Transform v = transform.Find("Visual");
             visualTransform = v != null ? v : transform;
@@ -122,6 +130,29 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
         if (animator == null)
         {
             animator = GetComponentInChildren<Animator>();
+        }
+
+        // Ajustar proporción de Aldeanos (100%-108% de la Bruja) y eliminar el padding inferior (19px) para que pisen el suelo
+        if (visualTransform != transform)
+        {
+            SpriteRenderer sr = visualTransform.GetComponent<SpriteRenderer>();
+            bool isFemale = sr != null && sr.sprite != null && sr.sprite.name.Contains("VillagerF");
+            float targetScale = isFemale ? 0.74f : 0.67f;
+            float signX = visualTransform.localScale.x < 0f ? -1f : 1f;
+            visualTransform.localScale = new Vector3(targetScale * signX, targetScale, 1f);
+            visualTransform.localPosition = new Vector3(0f, -0.21f, 0f);
+            if (sr != null)
+            {
+                sr.sortingLayerName = "Gameplay";
+                sr.sortingOrder = 4;
+            }
+        }
+
+        BoxCollider2D col = GetComponent<BoxCollider2D>();
+        if (col != null && !col.isTrigger)
+        {
+            col.size = new Vector2(0.68f, 1.78f);
+            col.offset = new Vector2(0f, 0.89f);
         }
 
         if (groundMask.value == 0)
@@ -150,12 +181,17 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
             {
                 GameObject g = new GameObject("NoticeIcon");
                 g.transform.SetParent(transform, false);
-                g.transform.localPosition = new Vector3(0f, 2.3f, 0f);
+                g.transform.localPosition = new Vector3(0f, 2.05f, 0f);
                 noticeIconRenderer = g.AddComponent<SpriteRenderer>();
-                noticeIconRenderer.sortingLayerName = "Default";
+                noticeIconRenderer.sortingLayerName = "Gameplay";
                 noticeIconRenderer.sortingOrder = 15;
                 noticeIconRenderer.enabled = false;
             }
+        }
+        else
+        {
+            noticeIconRenderer.sortingLayerName = "Gameplay";
+            noticeIconRenderer.sortingOrder = 15;
         }
 
         if (statusIconRenderer == null)
@@ -166,17 +202,23 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
             {
                 GameObject g = new GameObject("StatusIcon");
                 g.transform.SetParent(transform, false);
-                g.transform.localPosition = new Vector3(0f, 2.3f, 0f);
+                g.transform.localPosition = new Vector3(0f, 2.05f, 0f);
                 statusIconRenderer = g.AddComponent<SpriteRenderer>();
-                statusIconRenderer.sortingLayerName = "Default";
+                statusIconRenderer.sortingLayerName = "Gameplay";
                 statusIconRenderer.sortingOrder = 16;
                 statusIconRenderer.enabled = false;
             }
+        }
+        else
+        {
+            statusIconRenderer.sortingLayerName = "Gameplay";
+            statusIconRenderer.sortingOrder = 16;
         }
     }
 
     private void Start()
     {
+        spawnPosition = transform.position;
         FindPlayer();
         SelectRandomPattern();
     }
@@ -188,6 +230,7 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
         {
             playerTarget = pc.transform;
             playerDetectable = pc.GetComponent<IDetectable>();
+            playerTransformation = pc.GetComponent<TransformationManager>();
         }
     }
 
@@ -240,47 +283,68 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
 
     // ----------------------------------------------------------------- Visión y Alerta
 
-    private void CheckVision()
+    private bool CanCurrentlySeePlayer(float distanceMultiplier = 1f)
     {
         if (playerTarget == null)
         {
             FindPlayer();
-            if (playerTarget == null) return;
+            if (playerTarget == null) return false;
         }
 
         // Solo detecta si la bruja es detectable (no en gato, no en maizal/escondite)
         if (playerDetectable != null && !playerDetectable.IsDetectable)
         {
-            return;
+            return false;
+        }
+        if (playerTransformation != null && (playerTransformation.IsCatForm || playerTransformation.IsInHideout))
+        {
+            return false;
         }
 
         float diffX = playerTarget.position.x - transform.position.x;
-        bool isAhead = (facingRight && diffX > 0f) || (!facingRight && diffX < 0f);
+        float diffY = Mathf.Abs(playerTarget.position.y - transform.position.y);
+        if (diffY > 1.7f)
+        {
+            return false;
+        }
+
+        bool isAhead = (facingRight && diffX > 0.1f) || (!facingRight && diffX < -0.1f);
         float distance = Vector2.Distance(transform.position, playerTarget.position);
 
-        if (distance <= viewDistance && isAhead)
+        if (!isAhead || distance > viewDistance * distanceMultiplier)
         {
-            // Comprobar si hay obstáculo bloqueando la visión
-            Vector2 origin = (Vector2)transform.position + Vector2.up * 1.2f;
-            Vector2 targetPoint = (Vector2)playerTarget.position + Vector2.up * 0.8f;
-            Vector2 dir = (targetPoint - origin).normalized;
-            RaycastHit2D hitWall = Physics2D.Raycast(origin, dir, distance, obstacleMask);
+            return false;
+        }
 
-            if (hitWall.collider == null)
-            {
-                // Disparar evento de aproximación para el tutorial
-                OnWitchApproaching?.Invoke();
-                StartCoroutine(NoticeRoutine());
-            }
+        Vector2 origin = (Vector2)transform.position + Vector2.up * 1.1f;
+        Vector2 targetPoint = (Vector2)playerTarget.position + Vector2.up * 0.8f;
+        RaycastHit2D hitWall = Physics2D.Linecast(origin, targetPoint, obstacleMask);
+        if (hitWall.collider != null && !hitWall.collider.isTrigger && hitWall.collider.transform.root != playerTarget.root)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private void CheckVision()
+    {
+        if (CanCurrentlySeePlayer(1f))
+        {
+            OnWitchApproaching?.Invoke();
+            if (detectionCoroutine != null) StopCoroutine(detectionCoroutine);
+            detectionCoroutine = StartCoroutine(NoticeRoutine());
         }
     }
 
     private IEnumerator NoticeRoutine()
     {
         currentState = VillagerState.Notice;
-        FaceDirection(Mathf.Sign(playerTarget.position.x - transform.position.x));
+        if (playerTarget != null)
+        {
+            FaceDirection(Mathf.Sign(playerTarget.position.x - transform.position.x));
+        }
 
-        // Mostrar signo "!"
         if (noticeIconRenderer != null)
         {
             noticeIconRenderer.enabled = true;
@@ -290,18 +354,18 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
         while (elapsed < noticeDuration)
         {
             elapsed += Time.deltaTime;
-            // Si la bruja se transformó en gato o se escondió durante el notice, cancelar
-            if (playerDetectable != null && !playerDetectable.IsDetectable)
+            if (IsAffectedBySpell || !CanCurrentlySeePlayer(1.15f))
             {
                 if (noticeIconRenderer != null) noticeIconRenderer.enabled = false;
-                currentState = VillagerState.Wander;
+                if (!IsAffectedBySpell) currentState = VillagerState.Wander;
+                detectionCoroutine = null;
                 yield break;
             }
             yield return null;
         }
 
         if (noticeIconRenderer != null) noticeIconRenderer.enabled = false;
-        StartCoroutine(ScreamRoutine());
+        detectionCoroutine = StartCoroutine(ScreamRoutine());
     }
 
     private IEnumerator ScreamRoutine()
@@ -313,12 +377,30 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
             AudioManager.Instance.PlaySFX(screamSound);
         }
 
-        // Alertar a guardias en radio de 14 u
+        float elapsed = 0f;
+        while (elapsed < screamDuration)
+        {
+            elapsed += Time.deltaTime;
+            if (IsAffectedBySpell || !CanCurrentlySeePlayer(1.25f))
+            {
+                if (!IsAffectedBySpell) currentState = VillagerState.Wander;
+                detectionCoroutine = null;
+                yield break;
+            }
+            yield return null;
+        }
+
+        detectionCoroutine = null;
+
+        if (IsAffectedBySpell || !CanCurrentlySeePlayer(1.25f))
+        {
+            if (!IsAffectedBySpell) currentState = VillagerState.Wander;
+            yield break;
+        }
+
+        // Alertar a guardias cercanos y desencadenar el frenesí solo si la bruja sigue visible
         AlertNearbyGuards();
 
-        yield return new WaitForSeconds(screamDuration);
-
-        // Desencadenar el frenesí general a través de FrenzyController
         FrenzyController frenzy = UnityEngine.Object.FindFirstObjectByType<FrenzyController>();
         if (frenzy != null && playerTarget != null)
         {
@@ -339,12 +421,9 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
             float dist = Vector2.Distance(transform.position, guard.transform.position);
             if (dist <= guardAlertRadius && playerTarget != null)
             {
-                // Poner al guardia en persecución hacia la posición de la bruja
                 PatrolRoute route = guard.GetComponent<PatrolRoute>();
                 if (route != null && !route.IsAffectedBySpell)
                 {
-                    // Asignar estado de alerta directamente en su EnemySight
-                    // Al disparar el evento Alert, el guardia persigue
                     var method = typeof(EnemySight).GetMethod("SetState", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                     if (method != null)
                     {
@@ -390,6 +469,20 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
     private void HandleWanderMovement()
     {
         patternTimer -= Time.fixedDeltaTime;
+
+        // Mantener al aldeano dentro de su radio de paseo asignado
+        if (maxWanderRadius > 0.5f)
+        {
+            float offsetFromSpawn = transform.position.x - spawnPosition.x;
+            if (offsetFromSpawn > maxWanderRadius && moveDir > 0f)
+            {
+                moveDir = -1f;
+            }
+            else if (offsetFromSpawn < -maxWanderRadius && moveDir < 0f)
+            {
+                moveDir = 1f;
+            }
+        }
 
         switch (currentPattern)
         {

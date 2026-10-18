@@ -9,7 +9,7 @@ public class HeartPickup : MonoBehaviour
 {
     [Header("Flotación Visual")]
     [Tooltip("Amplitud del movimiento vertical suave (u).")]
-    [SerializeField] private float bobAmplitude = 0.15f;
+    [SerializeField] private float bobAmplitude = 0.04f;
 
     [Tooltip("Velocidad de oscilación senoidal (ciclos/seg).")]
     [SerializeField] private float bobSpeed = 2.5f;
@@ -31,6 +31,21 @@ public class HeartPickup : MonoBehaviour
 
     private void Start()
     {
+        if (bobAmplitude > 0.05f) bobAmplitude = 0.04f;
+
+        SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.sortingLayerName = "Foreground";
+            sr.sortingOrder = 10;
+        }
+
+        Vector3 pos = transform.position;
+        if (pos.y > 0.35f && pos.y < 1.25f)
+        {
+            pos.y = 0.42f;
+            transform.position = pos;
+        }
         initialPosition = transform.position;
         Collider2D col = GetComponent<Collider2D>();
         if (col != null) col.isTrigger = true;

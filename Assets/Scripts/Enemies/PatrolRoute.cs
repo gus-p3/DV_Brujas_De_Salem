@@ -112,7 +112,32 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
         rb = GetComponent<Rigidbody2D>();
         if (enemySight == null) enemySight = GetComponent<EnemySight>();
         if (animator == null) animator = GetComponentInChildren<Animator>();
-        if (visualTransform == null) visualTransform = transform;
+        if (visualTransform == null || visualTransform == transform)
+        {
+            Transform v = transform.Find("Visual");
+            visualTransform = v != null ? v : transform;
+        }
+
+        // Ajustar proporción del Guardia (~10% más alto que la Bruja humana) y apoyar botas en el pasto
+        if (visualTransform != transform)
+        {
+            float signX = visualTransform.localScale.x < 0f ? -1f : 1f;
+            visualTransform.localScale = new Vector3(0.55f * signX, 0.55f, 1f);
+            visualTransform.localPosition = new Vector3(0f, -0.07f, 0f);
+            SpriteRenderer sr = visualTransform.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                sr.sortingLayerName = "Gameplay";
+                sr.sortingOrder = 4;
+            }
+        }
+
+        BoxCollider2D col = GetComponent<BoxCollider2D>();
+        if (col != null && !col.isTrigger)
+        {
+            col.size = new Vector2(0.70f, 1.85f);
+            col.offset = new Vector2(0f, 0.925f);
+        }
 
         if (statusIconRenderer == null)
         {
@@ -125,12 +150,17 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
             {
                 GameObject iconGo = new GameObject("StatusIcon");
                 iconGo.transform.SetParent(transform);
-                iconGo.transform.localPosition = new Vector3(0f, 2.2f, 0f);
+                iconGo.transform.localPosition = new Vector3(0f, 2.15f, 0f);
                 statusIconRenderer = iconGo.AddComponent<SpriteRenderer>();
-                statusIconRenderer.sortingLayerName = "Default";
-                statusIconRenderer.sortingOrder = 10;
+                statusIconRenderer.sortingLayerName = "Gameplay";
+                statusIconRenderer.sortingOrder = 15;
                 statusIconRenderer.enabled = false;
             }
+        }
+        else
+        {
+            statusIconRenderer.sortingLayerName = "Gameplay";
+            statusIconRenderer.sortingOrder = 15;
         }
 
         // Capa Ground por defecto si no se asignó
@@ -236,7 +266,7 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
                 else
                 {
                     float dir = facingRight ? 1f : -1f;
-                    if (!HasGroundAhead(dir))
+                    if (!HasGroundAhead(dir) || HasWallAhead(dir))
                     {
                         FaceDirection(-dir);
                         dir = -dir;
@@ -246,7 +276,7 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
                 break;
 
             case SpellEffectType.Hypnotize:
-                if (!HasGroundAhead(hypnotizeDirection))
+                if (!HasGroundAhead(hypnotizeDirection) || HasWallAhead(hypnotizeDirection))
                 {
                     rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
                 }
@@ -283,14 +313,13 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
 
         float dirX = Mathf.Sign(diffX);
         
-        // Verificar borde de plataforma o choque con muro antes de avanzar
+        // Verificar borde de plataforma o choque con tronco/muro antes de avanzar
         if (!HasGroundAhead(dirX) || HasWallAhead(dirX))
         {
-            // No hay suelo o hay muro hacia el waypoint: iniciar espera y cambiar de dirección
+            // No llamar AdvanceWaypoint() aquí porque HandleWaiting() ya avanza al siguiente waypoint al terminar la espera
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             currentState = PatrolState.Waiting;
-            waitTimer = waitTimeAtPoint;
-            AdvanceWaypoint();
+            waitTimer = Mathf.Min(waitTimeAtPoint, 0.8f);
             FaceDirection(-dirX);
             return;
         }
@@ -357,8 +386,8 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
             return;
         }
 
-        // Si hay un precipicio delante, detenerse en el borde para no caer
-        if (!HasGroundAhead(dirX))
+        // Si hay un precipicio o tronco sólido delante, detenerse para no quedar caminando contra la madera
+        if (!HasGroundAhead(dirX) || HasWallAhead(dirX))
         {
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             FaceDirection(dirX);
@@ -387,9 +416,10 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
         }
 
         float dirX = Mathf.Sign(diffX);
-        if (!HasGroundAhead(dirX))
+        if (!HasGroundAhead(dirX) || HasWallAhead(dirX))
         {
-            // Si el camino de regreso está bloqueado, se reanuda la patrulla desde aquí
+            // Si el camino de regreso está bloqueado, se cambia al otro waypoint y se reanuda la patrulla
+            AdvanceWaypoint();
             currentState = PatrolState.Patrolling;
             return;
         }
@@ -458,15 +488,32 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
 
     private bool HasWallAhead(float dirX)
     {
-        Vector2 checkOrigin = (Vector2)transform.position + Vector2.up * 0.5f;
-        RaycastHit2D hit = Physics2D.Raycast(checkOrigin, Vector2.right * dirX, 0.8f, groundMask);
-        return hit.collider != null && !hit.collider.isTrigger;
+        int mask = groundMask.value;
+        int defLayer = LayerMask.NameToLayer("Default");
+        int gndLayer = LayerMask.NameToLayer("Ground");
+        if (defLayer >= 0) mask |= (1 << defLayer);
+        if (gndLayer >= 0) mask |= (1 << gndLayer);
+
+        float[] heights = { 0.35f, 0.95f };
+        for (int h = 0; h < heights.Length; h++)
+        {
+            Vector2 checkOrigin = (Vector2)transform.position + Vector2.up * heights[h];
+            RaycastHit2D[] hits = Physics2D.RaycastAll(checkOrigin, Vector2.right * dirX, 0.75f, mask);
+            for (int i = 0; i < hits.Length; i++)
+            {
+                Collider2D col = hits[i].collider;
+                if (col == null || col.isTrigger || col.transform.root == transform.root) continue;
+                if (col.attachedRigidbody != null && col.attachedRigidbody.bodyType == RigidbodyType2D.Dynamic) continue;
+                return true;
+            }
+        }
+        return false;
     }
 
     private bool HasGroundAhead(float dirX)
     {
-        Vector2 checkPos = new Vector2(transform.position.x + dirX * edgeCheckOffset, transform.position.y);
-        RaycastHit2D hit = Physics2D.Raycast(checkPos, Vector2.down, edgeCheckRayDistance, groundMask);
+        Vector2 checkPos = new Vector2(transform.position.x + dirX * edgeCheckOffset, transform.position.y + 0.25f);
+        RaycastHit2D hit = Physics2D.Raycast(checkPos, Vector2.down, edgeCheckRayDistance + 0.25f, groundMask);
         return hit.collider != null;
     }
 

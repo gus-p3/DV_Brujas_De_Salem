@@ -168,16 +168,24 @@ public class HUDController : MonoBehaviour
     private void UpdateStatsUI()
     {
         if (GameManager.Instance == null) return;
-        scoreText.text = GameManager.Instance.Score.ToString("D4");
+        if (scoreText != null) scoreText.text = GameManager.Instance.Score.ToString("D4");
 
-        for (int i = 0; i < heartIcons.Length; i++)
+        if (heartIcons != null)
         {
-            heartIcons[i].enabled = i < GameManager.Instance.Lives;
+            for (int i = 0; i < heartIcons.Length; i++)
+            {
+                if (heartIcons[i] != null)
+                {
+                    heartIcons[i].enabled = i < GameManager.Instance.Lives;
+                }
+            }
         }
 
-        blindChargesText.text = $"x {GameManager.Instance.BlindCharges}";
-        hypnotizeChargesText.text = $"x {GameManager.Instance.HypnotizeCharges}";
-        sleepChargesText.text = $"x {GameManager.Instance.SleepCharges}";
+        if (blindChargesText != null) blindChargesText.text = $"x {GameManager.Instance.BlindCharges}";
+        if (hypnotizeChargesText != null) hypnotizeChargesText.text = $"x {GameManager.Instance.HypnotizeCharges}";
+        if (sleepChargesText != null) sleepChargesText.text = $"x {GameManager.Instance.SleepCharges}";
+
+        UpdatePotionSelectionVisuals();
     }
 
     private void UpdateFlightEnergy(float energy01)
@@ -195,6 +203,10 @@ public class HUDController : MonoBehaviour
     public void ShowMessage(string message, float duration = 2.0f)
     {
         if (messageBannerText == null) return;
+        if (messageBannerText.fontSize < 32f)
+        {
+            messageBannerText.fontSize = 32f;
+        }
         if (messageCoroutine != null)
         {
             StopCoroutine(messageCoroutine);
@@ -249,15 +261,30 @@ public class HUDController : MonoBehaviour
             bool isSelected = (i == selectedPotionIndex);
             bool hasCharges = i < charges.Length && charges[i] > 0;
 
-            // Desactivar Image cuando la ranura no tiene sprite asignado o está vacía para evitar el recuadro amarillo sólido
-            if (potionSelectionFrames[i].sprite == null || !hasCharges)
+            // Desactivar Image cuando la ranura no tiene sprite asignado para evitar el recuadro amarillo sólido
+            if (potionSelectionFrames[i].sprite == null)
             {
                 potionSelectionFrames[i].enabled = false;
             }
             else
             {
-                potionSelectionFrames[i].enabled = isSelected;
+                potionSelectionFrames[i].enabled = isSelected && hasCharges;
                 potionSelectionFrames[i].color = isSelected ? selectedFrameColor : unselectedFrameColor;
+            }
+
+            // Resaltar el icono padre con escala y borde dorado sutil cuando está seleccionado
+            Transform flaskParent = potionSelectionFrames[i].transform.parent;
+            if (flaskParent != null)
+            {
+                flaskParent.localScale = isSelected ? new Vector3(1.15f, 1.15f, 1f) : Vector3.one;
+                Outline outline = flaskParent.GetComponent<Outline>();
+                if (outline == null)
+                {
+                    outline = flaskParent.gameObject.AddComponent<Outline>();
+                    outline.effectDistance = new Vector2(2f, -2f);
+                }
+                outline.effectColor = new Color(1f, 0.85f, 0.2f, 0.95f);
+                outline.enabled = isSelected;
             }
         }
     }

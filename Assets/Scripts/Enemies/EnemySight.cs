@@ -104,11 +104,55 @@ public class EnemySight : MonoBehaviour
             if (visual != null) facingReference = visual;
         }
 
+        int groundLayer = LayerMask.NameToLayer("Ground");
+        int defaultLayer = LayerMask.NameToLayer("Default");
+        if (groundLayer >= 0) obstacleMask |= (1 << groundLayer);
+        if (defaultLayer >= 0) obstacleMask |= (1 << defaultLayer);
+
+        if (string.IsNullOrEmpty(coneSortingLayer) || coneSortingLayer == "Default")
+        {
+            coneSortingLayer = "Gameplay";
+            coneSortingOrder = 3;
+        }
+
         rayCount = Mathf.Max(2, rayCount);
         rayDirections = new Vector2[rayCount];
         rayLengths = new float[rayCount];
         BuildConeObject();
         currentColor = StateColor(AlertState.Calm);
+    }
+
+    private float GetSolidObstacleDistance(Vector2 origin, Vector2 dir, float maxDist)
+    {
+        RaycastHit2D[] hits = Physics2D.RaycastAll(origin, dir, maxDist, obstacleMask);
+        float closest = maxDist;
+        int playerLayer = LayerMask.NameToLayer("Player");
+        int enemyLayer = LayerMask.NameToLayer("Enemy");
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            Collider2D col = hits[i].collider;
+            if (col == null || col.isTrigger) continue;
+            if (col.transform.root == transform.root) continue;
+            int l = col.gameObject.layer;
+            if (l == playerLayer || l == enemyLayer) continue;
+            if (col.attachedRigidbody != null && col.attachedRigidbody.bodyType == RigidbodyType2D.Dynamic) continue;
+
+            if (hits[i].distance < closest)
+            {
+                closest = hits[i].distance;
+            }
+        }
+        return closest;
+    }
+
+    private bool HasLineOfSightBlocked(Vector2 origin, Vector2 targetPos, Transform targetRoot)
+    {
+        Vector2 delta = targetPos - origin;
+        float dist = delta.magnitude;
+        if (dist <= 0.001f) return false;
+        float solidDist = GetSolidObstacleDistance(origin, delta / dist, dist);
+        return solidDist < dist - 0.02f;
     }
 
     private void OnEnable()
@@ -189,9 +233,7 @@ public class EnemySight : MonoBehaviour
             for (int i = 0; i < rayCount; i++)
             {
                 Vector2 dir = Rotate(forward, startAngle + step * i);
-                float length = viewDistance;
-                RaycastHit2D wall = Physics2D.Raycast(origin, dir, viewDistance, obstacleMask);
-                if (wall.collider != null) length = wall.distance;
+                float length = GetSolidObstacleDistance(origin, dir, viewDistance);
                 rayDirections[i] = dir;
                 rayLengths[i] = length;
             }
@@ -203,14 +245,9 @@ public class EnemySight : MonoBehaviour
         for (int i = 0; i < rayCount; i++)
         {
             Vector2 dir = Rotate(forward, startAngle + step * i);
-            float length = viewDistance;
 
-            // 1) El obstáculo más cercano corta el rayo: no se ve a través de paredes
-            RaycastHit2D wall = Physics2D.Raycast(origin, dir, viewDistance, obstacleMask);
-            if (wall.collider != null)
-            {
-                length = wall.distance;
-            }
+            // 1) El obstáculo sólido más cercano corta el rayo: no atraviesa troncos ni paredes
+            float length = GetSolidObstacleDistance(origin, dir, viewDistance);
 
             // 2) Dentro del tramo libre se busca al objetivo
             RaycastHit2D hit = Physics2D.Raycast(origin, dir, length, targetMask);
@@ -226,9 +263,8 @@ public class EnemySight : MonoBehaviour
 
                     if (!isHiddenInCornfield)
                     {
-                        // Comprobación de línea de visión directa mediante Linecast entre el farol y el objetivo filtrando suelo/obstáculos
-                        RaycastHit2D losCheck = Physics2D.Linecast(origin, detectable.DetectionPoint.position, obstacleMask);
-                        bool isOccluded = losCheck.collider != null && !losCheck.collider.isTrigger && losCheck.collider.transform.root != hit.collider.transform.root;
+                        // Comprobación de línea de visión directa entre el farol y el objetivo filtrando troncos/suelo
+                        bool isOccluded = HasLineOfSightBlocked(origin, detectable.DetectionPoint.position, hit.collider.transform.root);
 
                         if (!isOccluded)
                         {
