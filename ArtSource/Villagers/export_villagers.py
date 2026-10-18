@@ -20,7 +20,7 @@ CANVAS = (420, 320)
 PIVOT_Y = 8  # px desde abajo
 
 # Altura en pie de cada personaje en unidades de mundo (la bruja mide ~1.6)
-HEIGHT_UNITS = {"farmer": 1.85, "milkmaid": 1.75, "preacher": 2.0, "boy": 1.35}
+HEIGHT_UNITS = {"farmer": 1.85, "milkmaid": 1.75, "preacher": 2.0, "boy": 1.35, "guard": 1.95}
 
 # Por hoja: fotograma(s) de referencia en pie ("max" = el más alto) y factor si la referencia va agachada.
 # Animaciones: nombre -> (hoja, fotogramas 1-based)
@@ -65,6 +65,20 @@ CHARACTERS = {
             "hypnotize": ("react", [11, 12, 13]),
             "sleep": ("react", [14, 15, 16]),
             "action": ("react", list(range(17, 25))),
+        },
+    },
+    "guard": {
+        "sheets": {"idle": ("median", 1.0), "walk": ("max", 1.0), "react": (1, 1.0)},
+        "anims": {
+            # Idle sin 7-9 (farol duplicado); persigue con la caminata acelerada (su carrera no alterna piernas)
+            "idle": ("idle", [1, 2, 3, 4, 5, 6, 10, 11, 12]),
+            "walk": ("walk", list(range(1, 13))),
+            "run": ("walk", list(range(1, 13))),
+            "notice": ("react", [1, 2]),
+            "scream": ("react", [3, 4, 5, 6, 7, 8]),
+            "blind": ("react", [9, 10, 11]),
+            "hypnotize": ("react", [12, 13, 14]),
+            "sleep": ("react", [15, 16]),
         },
     },
     "boy": {

@@ -88,7 +88,7 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
     private static readonly int IsAlertHash = Animator.StringToHash("IsAlert");
 
-    private enum SpellEffectType { None, Blind, Hypnotize, Sleep }
+    public enum SpellEffectType { None, Blind, Hypnotize, Sleep }
 
     private Rigidbody2D rb;
     private PatrolState currentState = PatrolState.Patrolling;
@@ -105,6 +105,9 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
 
     public bool IsAffectedBySpell => activeSpellType != SpellEffectType.None;
     public PatrolState CurrentState => currentState;
+    public SpellEffectType ActiveSpell => activeSpellType;
+    public float WalkSpeed => walkSpeed;
+    public AlertState SightState => enemySight != null ? enemySight.CurrentState : AlertState.Calm;
     public Transform[] Waypoints => waypoints;
 
     private void Awake()
@@ -118,8 +121,9 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
             visualTransform = v != null ? v : transform;
         }
 
-        // Ajustar proporción del Guardia (~10% más alto que la Bruja humana) y apoyar botas en el pasto
-        if (visualTransform != transform)
+        // Ajustar proporción del Guardia (~10% más alto que la Bruja humana) y apoyar botas en el pasto.
+        // Con VillagerSpriteAnimator los fotogramas ya vienen a escala con los pies en el pivote.
+        if (visualTransform != transform && visualTransform.GetComponent<VillagerSpriteAnimator>() == null)
         {
             float signX = visualTransform.localScale.x < 0f ? -1f : 1f;
             visualTransform.localScale = new Vector3(0.55f * signX, 0.55f, 1f);

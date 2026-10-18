@@ -171,8 +171,15 @@ MonoBehaviour:
   edgeCheckRayDistance: 1.2
   captureDistance: 1.2
   enemySight: {fileID: 3857786083608617018}
-  animator: {fileID: 516098894763459164}
+  animator: {fileID: 0}
   visualTransform: {fileID: 4974559713387957055}
+  blindDefaultDuration: 5
+  hypnotizeDefaultDuration: 4
+  sleepDefaultDuration: 6
+  statusIconRenderer: {fileID: 0}
+  blindIconSprite: {fileID: 0}
+  hypnotizeIconSprite: {fileID: 0}
+  sleepIconSprite: {fileID: 0}
   debugLogs: 0
 --- !u!1 &6012871363723277335
 GameObject:
@@ -199,7 +206,7 @@ Transform:
   m_GameObject: {fileID: 6012871363723277335}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.45, y: 1.0, z: 0}
+  m_LocalPosition: {x: 0.45, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -215,7 +222,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4974559713387957055}
   - component: {fileID: 4280223577553330011}
-  - component: {fileID: 516098894763459164}
+  - component: {fileID: 8939212574283709062}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -232,8 +239,8 @@ Transform:
   m_GameObject: {fileID: 6107764794029172522}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.07, z: 0}
-  m_LocalScale: {x: 0.55, y: 0.55, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8960725040163654727}
@@ -287,7 +294,7 @@ SpriteRenderer:
   m_SortingLayer: 3
   m_SortingOrder: 4
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 161118413143241750, guid: 137f3591c48291d41913e228c35f79dd, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8c7becf6a7fac244e91d3cccaf311882, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -297,25 +304,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!95 &516098894763459164
-Animator:
-  serializedVersion: 7
+--- !u!114 &8939212574283709062
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6107764794029172522}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 485b0f20a0244424ba048000ef136b93, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30f17dd0b66a9d541bd144369b6d1c9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VillagerSpriteAnimator
+  animations: {fileID: 11400000, guid: 97f3f08e994ceee41aab65ecf04b9073, type: 2}
+  tempoJitter: 0.08
+  actionInterval: {x: 5, y: 11}
+  breathAmount: 0.012
+  breathPeriod: 2.8

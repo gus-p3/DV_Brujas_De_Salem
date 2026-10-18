@@ -5,7 +5,7 @@ using UnityEngine;
 
 /// <summary>
 /// Importa los fotogramas de los aldeanos (Assets/Art/Characters/Villagers/&lt;personaje&gt;/&lt;animación&gt;_NN.png),
-/// crea un VillagerAnimationSet por personaje y lo aplica a los prefabs de aldeano.
+/// crea un VillagerAnimationSet por personaje y lo aplica a los prefabs de aldeano y de guardia.
 /// Los fotogramas los exporta ArtSource/Villagers/export_villagers.py.
 /// </summary>
 public static class VillagerSpriteSetBuilder
@@ -25,6 +25,7 @@ public static class VillagerSpriteSetBuilder
         ("milkmaid", "Assets/Prefabs/VillagerF.prefab", null, 2.1f),
         ("preacher", "Assets/Prefabs/VillagerPreacher.prefab", "Assets/Prefabs/Villager.prefab", 2.4f),
         ("boy", "Assets/Prefabs/VillagerBoy.prefab", "Assets/Prefabs/Villager.prefab", 1.75f),
+        ("guard", "Assets/Prefabs/Guard.prefab", null, 2.35f),
     };
 
     [MenuItem("Tools/Aldeanos/Importar animaciones y aplicar a prefabs")]
@@ -70,8 +71,8 @@ public static class VillagerSpriteSetBuilder
             ClipFor(set, anim).frames = frames;
         }
 
-        // El niño persigue con su caminata acelerada (su hoja de carrera no era utilizable)
-        set.run.fps = character == "boy" ? 24f : 14f;
+        // El niño y el guardia persiguen con su caminata acelerada (sus hojas de carrera no eran utilizables)
+        set.run.fps = character == "boy" ? 24f : character == "guard" ? 20f : 14f;
         set.iconHeight = iconHeight;
         EditorUtility.SetDirty(set);
         return set;

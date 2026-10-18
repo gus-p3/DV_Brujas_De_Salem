@@ -1,0 +1,34 @@
+{
+  "items": [
+    {
+      "path": "Assets/Art/Environment/Env_Ledge_Rock_A.png",
+      "x": 0.5,
+      "y": 0.7108433734939759
+    },
+    {
+      "path": "Assets/Art/Environment/Env_Ledge_Rock_B.png",
+      "x": 0.5,
+      "y": 0.5555555555555556
+    },
+    {
+      "path": "Assets/Art/Environment/Env_Platform_Log_A.png",
+      "x": 0.5,
+      "y": 0.6923076923076923
+    },
+    {
+      "path": "Assets/Art/Environment/Env_Platform_Log_B.png",
+      "x": 0.5,
+      "y": 0.7
+    },
+    {
+      "path": "Assets/Art/Environment/Env_Platform_Log_C.png",
+      "x": 0.5,
+      "y": 0.6883116883116883
+    },
+    {
+      "path": "Assets/Art/Environment/Env_Goal_Gate.png",
+      "x": 0.5,
+      "y": 0.5
+    }
+  ]
+}
