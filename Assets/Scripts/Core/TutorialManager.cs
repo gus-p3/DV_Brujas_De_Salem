@@ -92,6 +92,7 @@ public class TutorialManager : MonoBehaviour
         AddPredefinedTip("tip_aldeano", "Aldeanos", "Los aldeanos caminan de forma errática. Si te ven en forma humana, gritarán y entrarán en frenesí para atacarte.");
         AddPredefinedTip("tip_frenesí", "Frenesí de Aldeano", "¡El aldeano está en frenesí! Transfórmate en gato para calmarlo o apártate de su camino antes de que te golpee.");
         AddPredefinedTip("tip_frenesi", "Frenesí de Aldeano", "¡El aldeano está en frenesí! Transfórmate en gato para calmarlo o apártate de su camino antes de que te golpee.");
+        AddPredefinedTip("tip_gato_tiempo", "Forma Felina Limitada", "La forma de gato dura poco: vigila la barra morada bajo tus corazones. Vuelve a ser bruja con {Transformar} para recuperar fuerzas.");
         AddPredefinedTip("tip_gato_túnel", "Pasaje Estrecho", "Este pasaje es demasiado estrecho para una bruja. Usa {Transformar} para cruzarlo en forma de gato.");
         AddPredefinedTip("tip_gato_tunel", "Pasaje Estrecho", "Este pasaje es demasiado estrecho para una bruja. Usa {Transformar} para cruzarlo en forma de gato.");
         AddPredefinedTip("tip_escoba_completa", "Escoba Completa", "¡Escoba completada! Mantén {Volar} para volar y usa {VolarSubirBajar} para cambiar de altura. ¡La energía es limitada!");

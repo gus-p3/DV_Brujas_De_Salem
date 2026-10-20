@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4600739333078957229}
   - component: {fileID: 5805662078512646245}
   - component: {fileID: 7277147822159291525}
+  - component: {fileID: 3277012139666421854}
   m_Layer: 0
   m_Name: HeartPickup
   m_TagString: Untagged
@@ -141,8 +142,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2517440a31e07ec43abe95291aa90e85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HeartPickup
-  bobAmplitude: 0.04
-  bobSpeed: 2.5
   pickupParticles: {fileID: 0}
   pickupSound: {fileID: 0}
   fullHealthMessageCooldown: 3
+--- !u!114 &3277012139666421854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4835636382792681}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05d5a4c37653ec04fb481cd3ab12aea3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GroundAnchor
+  sink: 0.03
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 0
+  searchDistance: 2.5
+  target: {fileID: 0}

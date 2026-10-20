@@ -29,6 +29,16 @@ public class TransformationManager : MonoBehaviour
     [Tooltip("Desplazamiento vertical local del Visual en forma de gato.")]
     public float catVisualOffsetY = -0.09f;
 
+    [Header("Límite de la forma de gato")]
+    [Tooltip("Segundos que dura la forma de gato con la energía llena.")]
+    public float catMaxDuration = 8f;
+    [Tooltip("Energía (0..1) que se recupera por segundo en forma humana.")]
+    public float catRechargePerSecond = 0.15f;
+    [Tooltip("Energía mínima (0..1) necesaria para convertirse en gato.")]
+    public float catMinEnergyToTransform = 0.25f;
+    [Tooltip("Por debajo de esta energía (0..1) se avisa de que el hechizo se acaba.")]
+    public float catLowEnergyWarning = 0.3f;
+
     [Header("Bloqueo de Transformación")]
     [Tooltip("Mensaje mostrado cuando no hay espacio para volver a forma humana.")]
     public string blockedMessage = "Espacio muy estrecho para transformarse";
@@ -40,6 +50,14 @@ public class TransformationManager : MonoBehaviour
     public bool CanCastSpells => !IsCatForm;
 
     public event Action<bool> OnTransformed;
+
+    /// <summary>Energía de la forma de gato (0..1). Se dispara cada vez que cambia.</summary>
+    public event Action<float> OnCatEnergyChanged;
+    public float CatEnergy01 => catEnergy;
+
+    private float catEnergy = 1f;
+    private bool lowEnergyWarned;
+    private bool exhausted;
 
     private float cooldownTimer;
     private PlayerController pc;
@@ -153,6 +171,7 @@ public class TransformationManager : MonoBehaviour
     private void Update()
     {
         if (cooldownTimer > 0f) cooldownTimer -= Time.deltaTime;
+        UpdateCatEnergy(Time.deltaTime);
 
         if (Input.GetKeyDown(KeyCode.T) && cooldownTimer <= 0f)
         {
@@ -161,9 +180,63 @@ public class TransformationManager : MonoBehaviour
         }
     }
 
+    /// <summary>Consume la energía en forma de gato y la recupera en forma humana.</summary>
+    private void UpdateCatEnergy(float dt)
+    {
+        float before = catEnergy;
+        if (IsCatForm)
+        {
+            catEnergy = Mathf.Max(0f, catEnergy - dt / Mathf.Max(0.1f, catMaxDuration));
+            if (!lowEnergyWarned && catEnergy <= catLowEnergyWarning)
+            {
+                lowEnergyWarned = true;
+                ShowHudMessage("¡La forma de gato se agota!", 1.6f);
+            }
+            if (catEnergy <= 0f)
+            {
+                // Sin energía: vuelve a ser bruja en cuanto haya espacio (en un túnel espera a salir)
+                if (HasRoomForHuman(out _))
+                {
+                    exhausted = false;
+                    ForceHuman();
+                    ShowHudMessage("El hechizo felino se agotó", 1.8f);
+                }
+                else if (!exhausted)
+                {
+                    exhausted = true;
+                    ShowHudMessage("¡Sin fuerzas! Sal del pasaje para volver a ser bruja", 2.2f);
+                }
+            }
+        }
+        else
+        {
+            catEnergy = Mathf.Min(1f, catEnergy + catRechargePerSecond * dt);
+            if (catEnergy > catLowEnergyWarning) lowEnergyWarned = false;
+        }
+        if (!Mathf.Approximately(before, catEnergy)) OnCatEnergyChanged?.Invoke(catEnergy);
+    }
+
+    private void ForceHuman()
+    {
+        cooldownTimer = 0f;
+        TryTransformToHuman();
+    }
+
+    private static void ShowHudMessage(string message, float seconds)
+    {
+        HUDController hud = UnityEngine.Object.FindFirstObjectByType<HUDController>();
+        if (hud != null) hud.ShowMessage(message, seconds);
+    }
+
     public void TransformToCat()
     {
         EnsureComponents();
+        if (catEnergy < catMinEnergyToTransform)
+        {
+            cooldownTimer = 0.35f;
+            ShowHudMessage("Aún no tienes fuerzas para ser gato", 1.6f);
+            return;
+        }
         IsCatForm = true;
         cooldownTimer = transformCooldown;
         PlaySmoke();
@@ -190,6 +263,12 @@ public class TransformationManager : MonoBehaviour
         }
         
         OnTransformed?.Invoke(true);
+
+        // La primera vez se explica el límite de tiempo
+        if (TutorialManager.Instance != null && !TutorialManager.Instance.HasSeen("tip_gato_tiempo"))
+        {
+            TutorialManager.Instance.ShowTipById("tip_gato_tiempo");
+        }
     }
 
     public void TryTransformToHuman()
@@ -240,6 +319,11 @@ public class TransformationManager : MonoBehaviour
     public void ResetToHumanForm()
     {
         EnsureComponents();
+        // Al reaparecer la energía felina vuelve a estar llena
+        catEnergy = 1f;
+        exhausted = false;
+        lowEnergyWarned = false;
+        OnCatEnergyChanged?.Invoke(catEnergy);
         if (!IsCatForm) return;
 
         IsCatForm = false;

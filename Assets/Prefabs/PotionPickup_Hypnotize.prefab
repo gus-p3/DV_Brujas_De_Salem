@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7197818348080362530}
   - component: {fileID: 3378958932747547122}
   - component: {fileID: 5503293796532642369}
+  - component: {fileID: 7765706887964917357}
   m_Layer: 0
   m_Name: PotionPickup_Hypnotize
   m_TagString: Untagged
@@ -144,6 +145,22 @@ MonoBehaviour:
   potionType: 1
   amount: 1
   maxCharges: 3
-  bobbingAmplitude: 0.04
-  bobbingFrequency: 3
   collectSound: {fileID: 0}
+--- !u!114 &7765706887964917357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 408435755146837156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05d5a4c37653ec04fb481cd3ab12aea3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GroundAnchor
+  sink: 0.03
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 0
+  searchDistance: 2.5
+  target: {fileID: 0}

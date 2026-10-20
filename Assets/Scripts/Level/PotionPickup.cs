@@ -17,12 +17,6 @@ public class PotionPickup : MonoBehaviour
     [Tooltip("Límite máximo de cargas permitido para este tipo.")]
     [SerializeField] private int maxCharges = 3;
 
-    [Header("Animación de Flotación")]
-    [Tooltip("Amplitud de la oscilación vertical (u).")]
-    [SerializeField] private float bobbingAmplitude = 0.04f;
-    [Tooltip("Frecuencia de la oscilación vertical (ciclos/s).")]
-    [SerializeField] private float bobbingFrequency = 2.5f;
-
     [Header("Audio")]
     [Tooltip("Clip de sonido al recolectar.")]
     [SerializeField] private AudioClip collectSound;
@@ -33,7 +27,6 @@ public class PotionPickup : MonoBehaviour
     /// </summary>
     public static event Action<PotionType> OnCollected;
 
-    private Vector3 initialPosition;
     private Collider2D triggerCollider;
 
     public PotionType Type => potionType;
@@ -43,8 +36,6 @@ public class PotionPickup : MonoBehaviour
         triggerCollider = GetComponent<Collider2D>();
         triggerCollider.isTrigger = true;
 
-        if (bobbingAmplitude > 0.05f) bobbingAmplitude = 0.04f;
-
         SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
         if (sr != null)
         {
@@ -52,20 +43,15 @@ public class PotionPickup : MonoBehaviour
             sr.sortingOrder = 10;
         }
 
-        Vector3 pos = transform.position;
-        if (pos.y > 0.35f && pos.y < 1.25f)
+        // La altura la fija GroundAnchor; un brillo del color de la poción sustituye a la antigua flotación
+        PickupGlint glint = GetComponent<PickupGlint>();
+        if (glint == null) glint = gameObject.AddComponent<PickupGlint>();
+        glint.SetColor(potionType switch
         {
-            pos.y = 0.42f;
-            transform.position = pos;
-        }
-        initialPosition = transform.position;
-    }
-
-    private void Update()
-    {
-        // Movimiento de flotación vertical sutil asentado sobre el suelo
-        float newY = initialPosition.y + Mathf.Sin(Time.time * bobbingFrequency) * bobbingAmplitude;
-        transform.position = new Vector3(initialPosition.x, newY, initialPosition.z);
+            PotionType.Blind => new Color(1f, 0.95f, 0.8f, 1f),
+            PotionType.Hypnotize => new Color(0.8f, 0.45f, 1f, 1f),
+            _ => new Color(0.45f, 0.65f, 1f, 1f)
+        });
     }
 
     private void OnTriggerEnter2D(Collider2D other)

@@ -138,6 +138,14 @@ public class VillagerSpriteAnimator : MonoBehaviour
                 return speed > 0.1f ? animations.walk : animations.idle;
         }
 
+        // Mirando al gato o girándose: quieto, sin empezar su acción propia
+        if (ai.IsLookingAround)
+        {
+            CancelAction();
+            stillTime = 0f;
+            return animations.idle;
+        }
+
         // Paseo: caminar, idle o, tras un rato quieto, su acción propia
         if (speed > 0.15f)
         {
