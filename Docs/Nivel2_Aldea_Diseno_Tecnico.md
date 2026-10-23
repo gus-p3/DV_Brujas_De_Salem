@@ -145,3 +145,18 @@ classDiagram
 | **Zona 4: Callejón y Casa Abandonada** | `95 .. 125 u` | Callejón con túnel felino (`y = 1.05 u`), fachada de la Casa Abandonada con puerta en calle (`x = 102.2 u`) y puerta/balcón en tejado (`x = 115.2 u, y = 4.4 u`). | **Casa 3: Casa del Tejedor Abandonada** (3 niveles: Planta Baja + 2º Piso con balcón al tejado + **Ático Secreto** bajo el tejado). | **Ruta Alternativa Interior** para cruzar sobre el callejón; **Ático Secreto** con Cofre Arcano (Poción de Hipnosis + 300 pts) y Grimorio Oculto. |
 | **Zona 5: Gran Mercado y Mansión** | `125 .. 165 u` | Gran plaza multinivel (`y = 0.17 .. 6.2 u`), escaleras de madera a las pasarelas altas (`x = 133.2 u`, `x = 152.8 u`) y balcón señorial. | **Casa 4: Mansión del Magistrado** (3 niveles: Sótano de Archivos + Gran Salón + Galería/Biblioteca en 2º piso con salida al balcón alto). | **Llave del Magistrado** en el sótano tras salto de plataformas; **Cofre Real del Magistrado** en 2º piso (Corazón + Poción + 400 pts); Actas del Juicio. |
 | **Zona 6: Portón de la Iglesia** | `165 .. 190 u` | Guardia del portón, Caseta de Guardia con puerta cerrada por misión (se desbloquea al reunir los 8 ingredientes o con llave maestra), `IngredientGate` y `Level2Goal`. | **Caseta del Guardián** (Puerta sellada por misión de ingredientes, con recompensa final de bonificación antes de cruzar la meta). | Bonificación de exploración completa antes de cruzar hacia el Acto 3. |
+
+---
+
+## 4. HERRAMIENTAS DE CONSTRUCCIÓN Y VERIFICACIÓN AUTOMATIZADA (FASE 11)
+
+- **Constructor de Aldea e Interiores (`Level2VillageBuilder.cs`)**:
+  - Menú: `Brujas/Nivel 2/Construir Aldea Explorable e Interiores (Siglo XVII)`
+  - Reconstruye de forma idempotente todas las fachadas coloniales, balcones, escaleras exteriores, puertas y los 4 interiores multinivel en `Assets/Scenes/Level2.unity`.
+- **Verificador de Exploración e Interiores (`Level2ExplorationVerifier.cs`)**:
+  - Menú: `Brujas/Nivel 2/4. Verificar Aldea Explorable e Interiores (20 Pruebas Fase 11)`
+  - Resultado verificado: **20/20 pruebas superadas (`allPassed = true`)**.
+- **Verificador Maestro del Nivel 2 (`Level2MasterVerifier.cs`)**:
+  - Menú: `Brujas/Nivel 2/1. Verificación Master Nivel 2 (10 Hitos)`
+  - Resultado verificado: **10/10 hitos superados (`allPassed = true`)**.
+
