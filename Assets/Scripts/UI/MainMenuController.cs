@@ -155,7 +155,8 @@ public class MainMenuController : MonoBehaviour
 
     public void ContinueGame()
     {
-        int maxLevel = SaveSystem.GetMaxLevelUnlocked();
+        // Tras el último nivel el progreso apunta a un índice que no existe: se reanuda en el último nivel
+        int maxLevel = Mathf.Clamp(SaveSystem.GetMaxLevelUnlocked(), 1, SceneManager.sceneCountInBuildSettings - 1);
         SceneManager.LoadScene(maxLevel);
         if (GameManager.Instance != null) GameManager.Instance.StartLevel();
     }

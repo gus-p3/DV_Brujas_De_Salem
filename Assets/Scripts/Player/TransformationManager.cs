@@ -184,6 +184,9 @@ public class TransformationManager : MonoBehaviour
     private void UpdateCatEnergy(float dt)
     {
         float before = catEnergy;
+        // Los tutoriales no pausan el juego: mientras se lee uno la forma de gato no se consume
+        bool readingTip = TutorialManager.Instance != null && TutorialManager.Instance.IsOpen;
+        if (IsCatForm && readingTip) return;
         if (IsCatForm)
         {
             catEnergy = Mathf.Max(0f, catEnergy - dt / Mathf.Max(0.1f, catMaxDuration));

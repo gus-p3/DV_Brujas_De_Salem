@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Level1.unity
     guid: 71cbd5ecda1f96e43b2491e1718a05a0
   - enabled: 1
+    path: Assets/Scenes/Level2.unity
+    guid: 4e765bb7552661d4b8e12b1708de4eb7
+  - enabled: 0
     path: Assets/Scenes/Test_Bruja.unity
     guid: 281321e6708696c468ec98a165b8896d
   m_configObjects:

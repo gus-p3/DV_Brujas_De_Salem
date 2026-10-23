@@ -880,10 +880,12 @@ public static class Level1TutorialRedesign
         {
             new EditorBuildSettingsScene("Assets/Scenes/MainMenu.unity", true),
             new EditorBuildSettingsScene("Assets/Scenes/Level1.unity", true),
-            new EditorBuildSettingsScene("Assets/Scenes/Test_Bruja.unity", true)
+            new EditorBuildSettingsScene("Assets/Scenes/Level2.unity", true),
+            // Escena de pruebas: listada pero fuera del build para que "Siguiente nivel" no la cargue
+            new EditorBuildSettingsScene("Assets/Scenes/Test_Bruja.unity", false)
         };
         EditorBuildSettings.scenes = scenes;
-        Debug.Log("[Redesign] Build Settings confirmadas: MainMenu (0), Level1 (1), Test_Bruja (2).");
+        Debug.Log("[Redesign] Build Settings confirmadas: MainMenu (0), Level1 (1), Level2 (2).");
     }
 }
 
