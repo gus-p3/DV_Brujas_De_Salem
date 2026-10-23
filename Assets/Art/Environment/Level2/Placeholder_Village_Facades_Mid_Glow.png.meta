@@ -1,0 +1,988 @@
+fileFormatVersion: 2
+guid: 9c352e43e1a24a849ba5eb8210d3ead9
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -6107995785241900716
+    second: Placeholder_Village_Facades_Mid_Glow_0
+  - first:
+      213: -5554263507787424542
+    second: Placeholder_Village_Facades_Mid_Glow_1
+  - first:
+      213: 5964814305261175059
+    second: Placeholder_Village_Facades_Mid_Glow_2
+  - first:
+      213: -5607072129583576531
+    second: Placeholder_Village_Facades_Mid_Glow_3
+  - first:
+      213: 6198843505156360536
+    second: Placeholder_Village_Facades_Mid_Glow_4
+  - first:
+      213: -7967501538922164286
+    second: Placeholder_Village_Facades_Mid_Glow_5
+  - first:
+      213: -7314287169570326461
+    second: Placeholder_Village_Facades_Mid_Glow_6
+  - first:
+      213: -9191219071443991829
+    second: Placeholder_Village_Facades_Mid_Glow_7
+  - first:
+      213: 6758869317824270081
+    second: Placeholder_Village_Facades_Mid_Glow_8
+  - first:
+      213: 8726946232570571293
+    second: Placeholder_Village_Facades_Mid_Glow_9
+  - first:
+      213: -7324628071962911614
+    second: Placeholder_Village_Facades_Mid_Glow_10
+  - first:
+      213: -8008708880494276966
+    second: Placeholder_Village_Facades_Mid_Glow_11
+  - first:
+      213: -5798980728771447191
+    second: Placeholder_Village_Facades_Mid_Glow_12
+  - first:
+      213: 8081210178342266216
+    second: Placeholder_Village_Facades_Mid_Glow_13
+  - first:
+      213: 4925152631037556691
+    second: Placeholder_Village_Facades_Mid_Glow_14
+  - first:
+      213: 2197019905071625634
+    second: Placeholder_Village_Facades_Mid_Glow_15
+  - first:
+      213: -4193479926762928207
+    second: Placeholder_Village_Facades_Mid_Glow_16
+  - first:
+      213: -1476419732805696959
+    second: Placeholder_Village_Facades_Mid_Glow_17
+  - first:
+      213: -191788273113314442
+    second: Placeholder_Village_Facades_Mid_Glow_18
+  - first:
+      213: 9147309393315807412
+    second: Placeholder_Village_Facades_Mid_Glow_19
+  - first:
+      213: -6261852589794091358
+    second: Placeholder_Village_Facades_Mid_Glow_20
+  - first:
+      213: -4378150077798117125
+    second: Placeholder_Village_Facades_Mid_Glow_21
+  - first:
+      213: -403556559880019163
+    second: Placeholder_Village_Facades_Mid_Glow_22
+  - first:
+      213: 3987036504781276206
+    second: Placeholder_Village_Facades_Mid_Glow_23
+  - first:
+      213: -2708101592727340654
+    second: Placeholder_Village_Facades_Mid_Glow_24
+  - first:
+      213: 346962601599518565
+    second: Placeholder_Village_Facades_Mid_Glow_25
+  - first:
+      213: 2397724667198957737
+    second: Placeholder_Village_Facades_Mid_Glow_26
+  - first:
+      213: -2090100646395085752
+    second: Placeholder_Village_Facades_Mid_Glow_27
+  - first:
+      213: 1887003606925430141
+    second: Placeholder_Village_Facades_Mid_Glow_28
+  - first:
+      213: -75022327871650159
+    second: Placeholder_Village_Facades_Mid_Glow_29
+  - first:
+      213: -2106106031215833751
+    second: Placeholder_Village_Facades_Mid_Glow_30
+  - first:
+      213: -7375887336519486490
+    second: Placeholder_Village_Facades_Mid_Glow_31
+  - first:
+      213: 8803137363741742697
+    second: Placeholder_Village_Facades_Mid_Glow_32
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 0
+  spriteMeshType: 0
+  alignment: 7
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_0
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 184
+        width: 37
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 459c213e13a0c3ba0800000000000000
+      internalID: -6107995785241900716
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_1
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 180
+        width: 33
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ec5a6574ca4be2b0800000000000000
+      internalID: -5554263507787424542
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_2
+      rect:
+        serializedVersion: 2
+        x: 228
+        y: 197
+        width: 37
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 311c248f10747c250800000000000000
+      internalID: 5964814305261175059
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_3
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 193
+        width: 33
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d2a8d2e0b9daf22b0800000000000000
+      internalID: -5607072129583576531
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_4
+      rect:
+        serializedVersion: 2
+        x: 998
+        y: 206
+        width: 38
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 85905173357b60650800000000000000
+      internalID: 6198843505156360536
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_5
+      rect:
+        serializedVersion: 2
+        x: 1426
+        y: 174
+        width: 26
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2cf8a21609fbd6190800000000000000
+      internalID: -7967501538922164286
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_6
+      rect:
+        serializedVersion: 2
+        x: 1889
+        y: 170
+        width: 25
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3483090729e6e7a90800000000000000
+      internalID: -7314287169570326461
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_7
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 96
+        width: 29
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be209c1a3fa327080800000000000000
+      internalID: -9191219071443991829
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_8
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 100
+        width: 33
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 10fc334a5d35ccd50800000000000000
+      internalID: 6758869317824270081
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_9
+      rect:
+        serializedVersion: 2
+        x: 228
+        y: 112
+        width: 37
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1a6d467c575c1970800000000000000
+      internalID: 8726946232570571293
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_10
+      rect:
+        serializedVersion: 2
+        x: 337
+        y: 104
+        width: 29
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 28cdbca7391b95a90800000000000000
+      internalID: -7324628071962911614
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_11
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 107
+        width: 29
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9e4f9484b95bd090800000000000000
+      internalID: -8008708880494276966
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_12
+      rect:
+        serializedVersion: 2
+        x: 605
+        y: 107
+        width: 29
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 966fd3260c1e58fa0800000000000000
+      internalID: -5798980728771447191
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_13
+      rect:
+        serializedVersion: 2
+        x: 726
+        y: 117
+        width: 37
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 865ac5357d9362070800000000000000
+      internalID: 8081210178342266216
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_14
+      rect:
+        serializedVersion: 2
+        x: 855
+        y: 109
+        width: 29
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d7f29d2938a95440800000000000000
+      internalID: 4925152631037556691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_15
+      rect:
+        serializedVersion: 2
+        x: 1000
+        y: 114
+        width: 34
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a5b14e96f16d7e10800000000000000
+      internalID: 2197019905071625634
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_16
+      rect:
+        serializedVersion: 2
+        x: 1146
+        y: 123
+        width: 37
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1b780908934cdc5c0800000000000000
+      internalID: -4193479926762928207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_17
+      rect:
+        serializedVersion: 2
+        x: 1251
+        y: 123
+        width: 37
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1424dbe4314b28be0800000000000000
+      internalID: -1476419732805696959
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_18
+      rect:
+        serializedVersion: 2
+        x: 1398
+        y: 104
+        width: 38
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67bcefce491a65df0800000000000000
+      internalID: -191788273113314442
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_19
+      rect:
+        serializedVersion: 2
+        x: 1555
+        y: 105
+        width: 29
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b0ce2fbd65c1fe70800000000000000
+      internalID: 9147309393315807412
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_20
+      rect:
+        serializedVersion: 2
+        x: 1670
+        y: 105
+        width: 29
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ae967d0f3e6919a0800000000000000
+      internalID: -6261852589794091358
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_21
+      rect:
+        serializedVersion: 2
+        x: 1822
+        y: 106
+        width: 38
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf09e7f53bfad33c0800000000000000
+      internalID: -4378150077798117125
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_22
+      rect:
+        serializedVersion: 2
+        x: 1948
+        y: 98
+        width: 30
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 523a2996277466af0800000000000000
+      internalID: -403556559880019163
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_23
+      rect:
+        serializedVersion: 2
+        x: 42
+        y: 16
+        width: 29
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e24c00ea39cc45730800000000000000
+      internalID: 3987036504781276206
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_24
+      rect:
+        serializedVersion: 2
+        x: 155
+        y: 50
+        width: 18
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29931d513f3ea6ad0800000000000000
+      internalID: -2708101592727340654
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_25
+      rect:
+        serializedVersion: 2
+        x: 235
+        y: 23
+        width: 33
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5674faad5a8a0d400800000000000000
+      internalID: 346962601599518565
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_26
+      rect:
+        serializedVersion: 2
+        x: 361
+        y: 54
+        width: 18
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9a8e59191ed664120800000000000000
+      internalID: 2397724667198957737
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_27
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 24
+        width: 34
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 84c7ec239887ef2e0800000000000000
+      internalID: -2090100646395085752
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_28
+      rect:
+        serializedVersion: 2
+        x: 735
+        y: 21
+        width: 29
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d7dcba068cbff2a10800000000000000
+      internalID: 1887003606925430141
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_29
+      rect:
+        serializedVersion: 2
+        x: 1150
+        y: 24
+        width: 29
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 196ccfc179775fef0800000000000000
+      internalID: -75022327871650159
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_30
+      rect:
+        serializedVersion: 2
+        x: 1370
+        y: 50
+        width: 18
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96d821629bb95c2e0800000000000000
+      internalID: -2106106031215833751
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_31
+      rect:
+        serializedVersion: 2
+        x: 1553
+        y: 23
+        width: 33
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e3347beb8593a990800000000000000
+      internalID: -7375887336519486490
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Placeholder_Village_Facades_Mid_Glow_32
+      rect:
+        serializedVersion: 2
+        x: 1827
+        y: 25
+        width: 38
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9669bc29ac60b2a70800000000000000
+      internalID: 8803137363741742697
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Placeholder_Village_Facades_Mid_Glow_0: -6107995785241900716
+      Placeholder_Village_Facades_Mid_Glow_1: -5554263507787424542
+      Placeholder_Village_Facades_Mid_Glow_10: -7324628071962911614
+      Placeholder_Village_Facades_Mid_Glow_11: -8008708880494276966
+      Placeholder_Village_Facades_Mid_Glow_12: -5798980728771447191
+      Placeholder_Village_Facades_Mid_Glow_13: 8081210178342266216
+      Placeholder_Village_Facades_Mid_Glow_14: 4925152631037556691
+      Placeholder_Village_Facades_Mid_Glow_15: 2197019905071625634
+      Placeholder_Village_Facades_Mid_Glow_16: -4193479926762928207
+      Placeholder_Village_Facades_Mid_Glow_17: -1476419732805696959
+      Placeholder_Village_Facades_Mid_Glow_18: -191788273113314442
+      Placeholder_Village_Facades_Mid_Glow_19: 9147309393315807412
+      Placeholder_Village_Facades_Mid_Glow_2: 5964814305261175059
+      Placeholder_Village_Facades_Mid_Glow_20: -6261852589794091358
+      Placeholder_Village_Facades_Mid_Glow_21: -4378150077798117125
+      Placeholder_Village_Facades_Mid_Glow_22: -403556559880019163
+      Placeholder_Village_Facades_Mid_Glow_23: 3987036504781276206
+      Placeholder_Village_Facades_Mid_Glow_24: -2708101592727340654
+      Placeholder_Village_Facades_Mid_Glow_25: 346962601599518565
+      Placeholder_Village_Facades_Mid_Glow_26: 2397724667198957737
+      Placeholder_Village_Facades_Mid_Glow_27: -2090100646395085752
+      Placeholder_Village_Facades_Mid_Glow_28: 1887003606925430141
+      Placeholder_Village_Facades_Mid_Glow_29: -75022327871650159
+      Placeholder_Village_Facades_Mid_Glow_3: -5607072129583576531
+      Placeholder_Village_Facades_Mid_Glow_30: -2106106031215833751
+      Placeholder_Village_Facades_Mid_Glow_31: -7375887336519486490
+      Placeholder_Village_Facades_Mid_Glow_32: 8803137363741742697
+      Placeholder_Village_Facades_Mid_Glow_4: 6198843505156360536
+      Placeholder_Village_Facades_Mid_Glow_5: -7967501538922164286
+      Placeholder_Village_Facades_Mid_Glow_6: -7314287169570326461
+      Placeholder_Village_Facades_Mid_Glow_7: -9191219071443991829
+      Placeholder_Village_Facades_Mid_Glow_8: 6758869317824270081
+      Placeholder_Village_Facades_Mid_Glow_9: 8726946232570571293
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

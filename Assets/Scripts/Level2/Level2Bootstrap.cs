@@ -40,7 +40,10 @@ namespace Level2
                 return;
             }
 
-            CleanSceneEntryState();
+            // En Awake solo lo que no depende de otros componentes: el orden de Awake entre objetos no está
+            // garantizado y, si la bruja aún no se inicializó, ResetPhysics fijaría su gravedad a 0 de forma
+            // permanente (PlayerController toma la gravedad base en su propio Awake). La limpieza completa va en Start.
+            Time.timeScale = 1f;
         }
 
         private void Start()
