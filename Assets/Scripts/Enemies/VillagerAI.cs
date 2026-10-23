@@ -96,6 +96,14 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
     private IDetectable playerDetectable;
     private TransformationManager playerTransformation;
 
+    // Percepción cercana: mirar al gato con curiosidad y girarse si siente a la bruja detrás
+    private float curiosityTimer = 0f;
+    private float curiosityCooldown = 0f;
+    private float suspicionTimer = 0f;
+    private const float CuriosityRange = 2.8f;
+    private const float SuspicionRange = 2.2f;
+    private const float SuspicionDelay = 0.9f;
+
     // Control de patrones de Wander
     private float patternTimer = 0f;
     private float moveDir = 1f;
@@ -122,6 +130,8 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
     {
         rb = GetComponent<Rigidbody2D>();
         spawnPosition = transform.position;
+        // Pequeña variación por aldeano para que no caminen todos al mismo ritmo
+        walkSpeed *= UnityEngine.Random.Range(0.9f, 1.1f);
         if (viewDistance > 5.2f) viewDistance = 5.0f;
 
         if (visualTransform == null || visualTransform == transform)
@@ -248,9 +258,61 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
 
         if (currentState == VillagerState.Wander)
         {
-            CheckVision();
+            UpdateAwareness();
+            if (currentState == VillagerState.Wander) CheckVision();
         }
     }
+
+    /// <summary>
+    /// Reacciones cercanas que dan vida y avisan al jugador antes de que lo detecten:
+    /// se detiene a mirar al gato que pasa cerca y, si la bruja está justo a su espalda, se gira despacio.
+    /// </summary>
+    private void UpdateAwareness()
+    {
+        if (curiosityCooldown > 0f) curiosityCooldown -= Time.deltaTime;
+        if (playerTarget == null) return;
+
+        float dx = playerTarget.position.x - transform.position.x;
+        bool sameLevel = Mathf.Abs(playerTarget.position.y - transform.position.y) < 1.2f;
+        bool isCat = playerTransformation != null && playerTransformation.IsCatForm;
+        bool hidden = playerTransformation != null && playerTransformation.IsInHideout;
+        bool behind = (facingRight && dx < 0f) || (!facingRight && dx > 0f);
+
+        // Curiosidad por el gato (no lo delata: los aldeanos no detectan al gato)
+        if (curiosityTimer > 0f)
+        {
+            curiosityTimer -= Time.deltaTime;
+            FaceDirection(Mathf.Sign(dx));
+            if (curiosityTimer <= 0f || !isCat || Mathf.Abs(dx) > CuriosityRange * 1.5f) EndCuriosity();
+            return;
+        }
+        if (isCat && !hidden && sameLevel && Mathf.Abs(dx) < CuriosityRange && curiosityCooldown <= 0f)
+        {
+            curiosityTimer = UnityEngine.Random.Range(1.5f, 2.6f);
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            FaceDirection(Mathf.Sign(dx));
+            return;
+        }
+
+        // Sospecha: la bruja humana pegada a su espalda; tras un instante se gira (y la visión decide)
+        bool sensing = !isCat && !hidden && sameLevel && behind && Mathf.Abs(dx) < SuspicionRange &&
+                       (playerDetectable == null || playerDetectable.IsDetectable);
+        suspicionTimer = sensing ? suspicionTimer + Time.deltaTime : 0f;
+        if (suspicionTimer >= SuspicionDelay)
+        {
+            suspicionTimer = 0f;
+            FaceDirection(Mathf.Sign(dx));
+        }
+    }
+
+    private void EndCuriosity()
+    {
+        curiosityTimer = 0f;
+        curiosityCooldown = UnityEngine.Random.Range(5f, 8f);
+    }
+
+    /// <summary>Está quieto mirando algo (el animador lo muestra en idle).</summary>
+    public bool IsLookingAround => curiosityTimer > 0f || suspicionTimer > 0f;
 
     private void FixedUpdate()
     {
@@ -471,6 +533,13 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
 
     private void HandleWanderMovement()
     {
+        // Se detiene mientras mira al gato o siente algo a su espalda
+        if (curiosityTimer > 0f || suspicionTimer > 0f)
+        {
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            return;
+        }
+
         patternTimer -= Time.fixedDeltaTime;
 
         // Mantener al aldeano dentro de su radio de paseo asignado

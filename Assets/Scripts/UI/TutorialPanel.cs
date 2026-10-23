@@ -71,8 +71,8 @@ public class TutorialPanel : MonoBehaviour
             contentContainer.anchorMin = new Vector2(0.5f, 1f);
             contentContainer.anchorMax = new Vector2(0.5f, 1f);
             contentContainer.pivot = new Vector2(0.5f, 1f);
-            contentContainer.anchoredPosition = new Vector2(0f, -86f);
-            contentContainer.sizeDelta = new Vector2(720f, 145f);
+            contentContainer.anchoredPosition = new Vector2(0f, -120f);
+            contentContainer.sizeDelta = new Vector2(1100f, 250f);
 
             Image boxImg = contentContainer.GetComponent<Image>();
             if (boxImg != null)
@@ -84,34 +84,38 @@ public class TutorialPanel : MonoBehaviour
 
         if (titleText != null)
         {
-            titleText.fontSize = 24f;
+            titleText.fontSize = 40f;
             titleText.color = new Color(0.96f, 0.82f, 0.42f, 1f);
             titleText.alignment = TextAlignmentOptions.Top;
             RectTransform rt = titleText.rectTransform;
-            rt.anchorMin = new Vector2(0.05f, 0.64f);
-            rt.anchorMax = new Vector2(0.95f, 0.94f);
+            rt.anchorMin = new Vector2(0.05f, 0.72f);
+            rt.anchorMax = new Vector2(0.95f, 0.95f);
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
         }
         if (bodyText != null)
         {
-            bodyText.fontSize = 19f;
+            bodyText.fontSize = 32f;
+            // Textos largos se reducen solos hasta 24 antes de desbordar la caja
+            bodyText.enableAutoSizing = true;
+            bodyText.fontSizeMin = 24f;
+            bodyText.fontSizeMax = 32f;
             bodyText.color = new Color(0.95f, 0.93f, 0.88f, 1f);
             bodyText.alignment = TextAlignmentOptions.Center;
             RectTransform rt = bodyText.rectTransform;
-            rt.anchorMin = new Vector2(0.05f, 0.22f);
-            rt.anchorMax = new Vector2(0.95f, 0.64f);
+            rt.anchorMin = new Vector2(0.05f, 0.2f);
+            rt.anchorMax = new Vector2(0.95f, 0.72f);
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
         }
         if (continuePromptText != null)
         {
-            continuePromptText.fontSize = 14f;
+            continuePromptText.fontSize = 22f;
             continuePromptText.color = new Color(0.75f, 0.70f, 0.58f, 0.85f);
             continuePromptText.alignment = TextAlignmentOptions.Bottom;
             RectTransform rt = continuePromptText.rectTransform;
-            rt.anchorMin = new Vector2(0.05f, 0.04f);
-            rt.anchorMax = new Vector2(0.95f, 0.22f);
+            rt.anchorMin = new Vector2(0.05f, 0.03f);
+            rt.anchorMax = new Vector2(0.95f, 0.18f);
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
         }

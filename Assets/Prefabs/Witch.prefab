@@ -108,6 +108,7 @@ GameObject:
   - component: {fileID: 2430778405580967504}
   - component: {fileID: 5727415491681803073}
   - component: {fileID: 7691441851865693514}
+  - component: {fileID: 1315787035899786392}
   m_Layer: 7
   m_Name: Witch
   m_TagString: Player
@@ -280,8 +281,12 @@ MonoBehaviour:
   catController: {fileID: 9100000, guid: 24b16964c197ba0469e16f576a829ae9, type: 2}
   catColliderSize: {x: 0.65, y: 0.45}
   catColliderOffset: {x: 0, y: 0.225}
-  catVisualScale: 0.34
-  catVisualOffsetY: -0.09
+  catVisualScale: 1
+  catVisualOffsetY: 0
+  catMaxDuration: 8
+  catRechargePerSecond: 0.15
+  catMinEnergyToTransform: 0.25
+  catLowEnergyWarning: 0.3
   blockedMessage: Espacio muy estrecho para transformarse
 --- !u!114 &-7559975629141373121
 MonoBehaviour:
@@ -342,6 +347,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RigSpriteProxy
   source: {fileID: 7176073946537965529}
   rig: {fileID: 408615622243189520}
+--- !u!114 &1315787035899786392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2484219030927747412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6265a51fc958eb24c8ca181379e120c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CatAnimationDriver
+  sitAfter: 3
 --- !u!1 &4364815756299105017
 GameObject:
   m_ObjectHideFlags: 0

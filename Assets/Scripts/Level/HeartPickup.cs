@@ -2,18 +2,11 @@ using UnityEngine;
 
 /// <summary>
 /// Ítem coleccionable en el mundo que recupera un corazón si la bruja no tiene
-/// la vida completa. Presenta flotación suave y aviso en pantalla si ya está llena.
+/// la vida completa. Descansa sobre el suelo (GroundAnchor) con un brillo y avisa en pantalla si la vida ya está llena.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
 public class HeartPickup : MonoBehaviour
 {
-    [Header("Flotación Visual")]
-    [Tooltip("Amplitud del movimiento vertical suave (u).")]
-    [SerializeField] private float bobAmplitude = 0.04f;
-
-    [Tooltip("Velocidad de oscilación senoidal (ciclos/seg).")]
-    [SerializeField] private float bobSpeed = 2.5f;
-
     [Header("Efectos")]
     [Tooltip("Partículas instanciadas al ser recogido.")]
     [SerializeField] private ParticleSystem pickupParticles;
@@ -26,13 +19,10 @@ public class HeartPickup : MonoBehaviour
     [SerializeField] private float fullHealthMessageCooldown = 3.0f;
 
     private static float lastFullMessageTime = -10f;
-    private Vector3 initialPosition;
     private bool isCollected = false;
 
     private void Start()
     {
-        if (bobAmplitude > 0.05f) bobAmplitude = 0.04f;
-
         SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
         if (sr != null)
         {
@@ -40,22 +30,12 @@ public class HeartPickup : MonoBehaviour
             sr.sortingOrder = 10;
         }
 
-        Vector3 pos = transform.position;
-        if (pos.y > 0.35f && pos.y < 1.25f)
-        {
-            pos.y = 0.42f;
-            transform.position = pos;
-        }
-        initialPosition = transform.position;
+        // La altura la fija GroundAnchor; el brillo sustituye a la antigua flotación
+        PickupGlint glint = GetComponent<PickupGlint>();
+        if (glint == null) glint = gameObject.AddComponent<PickupGlint>();
+        glint.SetColor(new Color(1f, 0.45f, 0.4f, 1f));
         Collider2D col = GetComponent<Collider2D>();
         if (col != null) col.isTrigger = true;
-    }
-
-    private void Update()
-    {
-        // Flotación suave senoidal
-        float newY = initialPosition.y + Mathf.Sin(Time.time * bobSpeed) * bobAmplitude;
-        transform.position = new Vector3(initialPosition.x, newY, initialPosition.z);
     }
 
     private void OnTriggerEnter2D(Collider2D other)

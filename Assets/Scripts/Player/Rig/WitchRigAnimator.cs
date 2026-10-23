@@ -239,7 +239,12 @@ public class WitchRigAnimator : MonoBehaviour
     // ----------------------------------------------------------------- Disparadores
 
     public void TriggerCast() => castTimer = 0f;
-    public void TriggerHurt() { if (!IsDying) hurtTimer = 0f; }
+    public void TriggerHurt()
+    {
+        if (IsDying) return;
+        hurtTimer = 0f;
+        CameraFollow.Shake(0.22f, 0.3f);
+    }
     public void TriggerDie() { if (!IsDying) dieTimer = 0f; }
     public void ResetDeath() { dieTimer = -1f; hurtTimer = -1f; }
 
@@ -247,6 +252,8 @@ public class WitchRigAnimator : MonoBehaviour
     {
         landTimer = 0f;
         landStrength = Mathf.Clamp01(impactSpeed / 14f) * 0.8f + 0.2f;
+        // Caídas fuertes sacuden ligeramente la cámara
+        if (impactSpeed > 11f) CameraFollow.Shake(0.06f + 0.06f * Mathf.InverseLerp(11f, 22f, impactSpeed), 0.18f);
         if (landingDust) EmitDust(Mathf.RoundToInt(Mathf.Lerp(4, 12, landStrength)));
     }
 

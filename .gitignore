@@ -54,3 +54,4 @@ desktop.ini
 # Recortes intermedios de arte (se regeneran con ArtSource/Villagers/slice_sheet.py)
 ArtSource/Villagers/frames/
 ArtSource/Villagers/cut/
+ArtSource/Cat/cut/

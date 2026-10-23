@@ -14,7 +14,7 @@ public enum BroomPart
 /// <summary>
 /// Ítem recolectable en el nivel (rama, paja o cuerda).
 /// Solo puede ser recogido por la bruja en forma humana (TransformationManager.CanCollect).
-/// Flota suavemente en su posición inicial y se recoge al entrar en contacto o proximidad.
+/// Descansa sobre el suelo (GroundAnchor) con un brillo que lo hace notar y se recoge al entrar en contacto o proximidad.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
 public class Collectible : MonoBehaviour
@@ -31,12 +31,6 @@ public class Collectible : MonoBehaviour
     [Tooltip("Prefab de partículas instanciado al recoger.")]
     [SerializeField] private GameObject pickupVfx;
 
-    [Header("Animación de flotación (Bobbing)")]
-    [Tooltip("Amplitud vertical del vaivén.")]
-    [SerializeField] private float bobAmplitude = 0.04f;
-    [Tooltip("Velocidad de oscilación.")]
-    [SerializeField] private float bobSpeed = 2.5f;
-
     [Header("Zona de Proximidad")]
     [Tooltip("Radio de proximidad para recoger si el jugador está junto al objeto.")]
     [SerializeField] private float proximityRadius = 1.3f;
@@ -45,7 +39,6 @@ public class Collectible : MonoBehaviour
     public int ScoreValue => scoreValue;
 
     private Collider2D col;
-    private Vector3 initialPosition;
     private float messageCooldownTimer = 0f;
     private bool isCollected = false;
 
@@ -54,8 +47,6 @@ public class Collectible : MonoBehaviour
         col = GetComponent<Collider2D>();
         if (col != null) col.isTrigger = true;
 
-        if (bobAmplitude > 0.05f) bobAmplitude = 0.04f;
-
         SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
         if (sr != null)
         {
@@ -63,13 +54,8 @@ public class Collectible : MonoBehaviour
             sr.sortingOrder = 10;
         }
 
-        Vector3 pos = transform.position;
-        if (pos.y > 0.35f && pos.y < 1.25f)
-        {
-            pos.y = 0.44f;
-            transform.position = pos;
-        }
-        initialPosition = transform.position;
+        // La altura la fija GroundAnchor; el brillo sustituye a la antigua flotación
+        if (GetComponent<PickupGlint>() == null) gameObject.AddComponent<PickupGlint>();
 
         int colLayer = LayerMask.NameToLayer("Collectible");
         if (colLayer >= 0)
@@ -90,10 +76,6 @@ public class Collectible : MonoBehaviour
         {
             messageCooldownTimer -= Time.deltaTime;
         }
-
-        // Flotación suave
-        float newY = initialPosition.y + Mathf.Sin(Time.time * bobSpeed) * bobAmplitude;
-        transform.position = new Vector3(initialPosition.x, newY, initialPosition.z);
 
         // Detección por proximidad complementaria si la física aún no disparó el trigger
         if (!isCollected)

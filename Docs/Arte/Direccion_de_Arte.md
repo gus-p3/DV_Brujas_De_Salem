@@ -80,9 +80,32 @@ Física secundaria: resortes amortiguados en coleta, bufanda, capucha y falda. R
 - **Visual** (agente QA sobre las hojas de contacto): se corrigieron el encuadre de salto y muerte, las piernas en tijera al subir, los pies que se hundían al morir, el desplome brusco, el idle y el vuelo demasiado estáticos y el bulto del brazo trasero.
 - **Rendimiento**: escena de prueba con 8 brujas animadas a la vez en el editor: 228 FPS de promedio y 152 de mínimo (objetivo: 60).
 
+## Aldeanos y guardia (cuadro a cuadro)
+
+El rig por piezas no funcionó para el gato (cuerpo redondo sin articulaciones claras), así que los aldeanos, el guardia y el gato usan **hojas de animación generadas con ChatGPT**: una imagen por animación, 12 fotogramas a 12 fps. Los prompts están en `Docs/Arte/prompts/Correcciones_Lote1.md`.
+
+| Archivo | Función |
+|---|---|
+| `ArtSource/Villagers/<personaje>_<animación>.png` | Hojas originales (idle, walk, run, react). |
+| `ArtSource/Villagers/slice_sheet.py` | Quita el fondo (incluido el magenta encerrado y las líneas de cuadrícula que dibuja la IA), separa los fotogramas, los alinea por los pies y el torso, y mide la consistencia. Escribe en `ArtSource/Villagers/cut/` (ignorado por git, se regenera). |
+| `ArtSource/Villagers/export_villagers.py` | Elige los fotogramas buenos de cada hoja, iguala la escala entre hojas de distinta resolución, neutraliza el tinte magenta y exporta a `Assets/Art/Characters/Villagers/<personaje>/`. |
+| `Assets/Editor/VillagerSpriteSetBuilder.cs` | **Tools > Aldeanos > Importar animaciones y aplicar a prefabs**: crea un `VillagerAnimationSet` por personaje y lo aplica a `Villager` (granjero), `VillagerF` (lechera), `VillagerPreacher`, `VillagerBoy` y `Guard`. |
+| `Assets/Scripts/Enemies/VillagerSpriteAnimator.cs` | Reproduce la animación según el estado de `VillagerAI` o `PatrolRoute`/`EnemySight`: paseo con cadencia ligada a la velocidad, aviso, grito, persecución, hechizos y acción propia; tempo distinto por instancia. |
+
+Level1 usa solo **granjero y lechera** como aldeanos, más el **guardia** nuevo. El predicador y el niño quedan listos como prefabs para otros niveles.
+
+## Reemplazo de assets aprobados
+
+`ArtSource/replace_assets.py` sustituye el arte del nivel conservando cada archivo (mismo GUID y referencias), su tamaño de lienzo y la colocación del contenido anterior. Las plataformas mantienen la superficie caminable a la misma altura, el maíz y los letreros quedan apoyados en el suelo y los objetos centrados. Cada animación usa una sola escala, y el suelo y el cielo se repiten sin costura. Cuando un lienzo crece (raíces de las rocas, puerta de meta), el pivote se recalcula y se aplica con **Tools > Arte > Aplicar pivotes del reemplazo de assets**.
+
+Reemplazados: suelo, rocas, troncos, maizal, pociones (objeto, proyectil, íconos del HUD), íconos de estado, salpicaduras, corazones (objeto, HUD, romperse y curarse), escoba y sus piezas, letrero, checkpoint, puerta de meta y cielo.
+
 ## Pendientes
 
-- **Gato (Sprint 2):** generar la hoja de piezas con `Docs/Arte/prompts/gato_piezas.txt`, adjuntando `ArtSource/Cat/ref_estilo_bruja.png` (estilo) y `ArtSource/Cat/ref_cat.png` (identidad). Guardarla como `ArtSource/Cat/cat_parts_chatgpt.png`.
-- **Aldeanos (Sprint 3):** 5 variantes con piezas intercambiables, cada una con su propio idle y acción (barrer, cargar cajas, saludar), y que miren al jugador al acercarse.
-- La escoba (`BroomVisual`) sigue con su posición anterior; revisar su alineación con la pose de vuelo del rig.
+- **Anciana:** reenviar sus 4 hojas (no quedaron guardadas) y exportarla como los demás aldeanos.
+- **Guardia:** rehacer idle (con gesto), carrera (piernas alternadas) y acción propia con la regla de un solo farol. Hoy persigue con la caminata acelerada y su idle no tiene gesto.
+- **Niño y predicador:** el niño necesita una carrera nueva (la resortera desaparece).
+- **Gato:** integrar la hoja aprobada `ArtSource/Cat/sheets/cat_all_chatgpt.png` (o las de 12 fotogramas, si se generan).
+- **Por regenerar:** túnel de tronco (dos capas del mismo tronco) y fondos de bosque y aldea (fondo verde, sin neblina).
+- La escoba (`BroomVisual`) conserva su posición anterior; revisar su alineación con la pose de vuelo del rig.
 - Partículas de hechizo y screen shake.

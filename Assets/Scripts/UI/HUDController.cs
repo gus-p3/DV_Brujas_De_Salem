@@ -9,6 +9,8 @@ public class HUDController : MonoBehaviour
     public TextMeshProUGUI timeText;
     public Image[] heartIcons;
     public Slider flightEnergySlider;
+    [Tooltip("Barra de energía de la forma de gato (se busca 'CatSlider' si está vacía).")]
+    public Slider catEnergySlider;
 
     public TextMeshProUGUI blindChargesText;
     public TextMeshProUGUI hypnotizeChargesText;
@@ -84,6 +86,23 @@ public class HUDController : MonoBehaviour
             flightEnergySlider.gameObject.SetActive(false);
         }
 
+        if (catEnergySlider == null)
+        {
+            Transform t = transform.Find("CatSlider");
+            if (t != null) catEnergySlider = t.GetComponent<Slider>();
+        }
+        transformation = Object.FindFirstObjectByType<TransformationManager>();
+        if (transformation != null)
+        {
+            transformation.OnCatEnergyChanged += UpdateCatEnergy;
+            transformation.OnTransformed += HandleTransformed;
+            UpdateCatEnergy(transformation.CatEnergy01);
+        }
+        else if (catEnergySlider != null)
+        {
+            catEnergySlider.gameObject.SetActive(false);
+        }
+
         PotionInventory inv = Object.FindFirstObjectByType<PotionInventory>();
         if (inv != null)
         {
@@ -108,10 +127,46 @@ public class HUDController : MonoBehaviour
             player.OnFlightEnergyChanged -= UpdateFlightEnergy;
             player.OnFlightChanged -= HandleFlightChanged;
         }
+        if (transformation != null)
+        {
+            transformation.OnCatEnergyChanged -= UpdateCatEnergy;
+            transformation.OnTransformed -= HandleTransformed;
+        }
         PotionInventory inv = Object.FindFirstObjectByType<PotionInventory>();
         if (inv != null)
         {
             inv.OnPotionSelected -= HandlePotionSelected;
+        }
+    }
+
+    private TransformationManager transformation;
+
+    private void HandleTransformed(bool isCat)
+    {
+        if (transformation != null) UpdateCatEnergy(transformation.CatEnergy01);
+    }
+
+    /// <summary>Visible mientras es gato o mientras la energía se recupera; roja cuando queda poca.</summary>
+    private void UpdateCatEnergy(float energy01)
+    {
+        if (catEnergySlider == null || transformation == null) return;
+        bool show = transformation.IsCatForm || energy01 < 0.999f;
+        if (catEnergySlider.gameObject.activeSelf != show) catEnergySlider.gameObject.SetActive(show);
+        catEnergySlider.value = energy01;
+        if (catEnergySlider.fillRect != null)
+        {
+            Image fill = catEnergySlider.fillRect.GetComponent<Image>();
+            if (fill != null)
+            {
+                bool low = energy01 <= transformation.catLowEnergyWarning;
+                bool blocked = !transformation.IsCatForm && energy01 < transformation.catMinEnergyToTransform;
+                Color normal = new Color(0.62f, 0.42f, 0.95f, 1f);
+                Color warn = new Color(0.95f, 0.3f, 0.3f, 1f);
+                // Parpadea en rojo cuando se agota siendo gato; gris mientras no alcanza para transformarse
+                fill.color = blocked ? new Color(0.5f, 0.5f, 0.55f, 1f)
+                    : low && transformation.IsCatForm ? Color.Lerp(normal, warn, (Mathf.Sin(Time.unscaledTime * 12f) + 1f) * 0.5f)
+                    : normal;
+            }
         }
     }
 
@@ -203,10 +258,17 @@ public class HUDController : MonoBehaviour
     public void ShowMessage(string message, float duration = 2.0f)
     {
         if (messageBannerText == null) return;
-        if (messageBannerText.fontSize < 32f)
+        // Mensajes legibles a 1080p: letra grande y caja ancha con ajuste de línea
+        if (messageBannerText.fontSize < 42f)
         {
-            messageBannerText.fontSize = 32f;
+            messageBannerText.fontSize = 42f;
         }
+        RectTransform bannerRect = messageBannerText.rectTransform;
+        if (bannerRect.sizeDelta.x < 1300f)
+        {
+            bannerRect.sizeDelta = new Vector2(1300f, Mathf.Max(bannerRect.sizeDelta.y, 120f));
+        }
+        messageBannerText.textWrappingMode = TMPro.TextWrappingModes.Normal;
         if (messageCoroutine != null)
         {
             StopCoroutine(messageCoroutine);

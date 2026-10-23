@@ -95,6 +95,7 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
     private int currentWaypointIndex = 0;
     private int patrolDirection = 1; // 1: adelante, -1: atrás (PingPong)
     private float waitTimer = 0f;
+    private float waitStart = 0f;
     private Transform playerTarget;
     private bool facingRight = true;
 
@@ -113,6 +114,8 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        // Pequeña variación por guardia para que las patrullas no vayan sincronizadas
+        walkSpeed *= UnityEngine.Random.Range(0.92f, 1.08f);
         if (enemySight == null) enemySight = GetComponent<EnemySight>();
         if (animator == null) animator = GetComponentInChildren<Animator>();
         if (visualTransform == null || visualTransform == transform)
@@ -310,8 +313,7 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
         {
             // Llegó al waypoint: iniciar espera
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
-            currentState = PatrolState.Waiting;
-            waitTimer = waitTimeAtPoint;
+            BeginWait(waitTimeAtPoint);
             return;
         }
 
@@ -322,8 +324,7 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
         {
             // No llamar AdvanceWaypoint() aquí porque HandleWaiting() ya avanza al siguiente waypoint al terminar la espera
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
-            currentState = PatrolState.Waiting;
-            waitTimer = Mathf.Min(waitTimeAtPoint, 0.8f);
+            BeginWait(Mathf.Min(waitTimeAtPoint, 0.8f));
             FaceDirection(-dirX);
             return;
         }
@@ -334,13 +335,30 @@ public class PatrolRoute : MonoBehaviour, ISpellTarget
     private void HandleWaiting()
     {
         rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        float before = waitTimer;
         waitTimer -= Time.fixedDeltaTime;
+
+        // Vigila: a mitad de la espera mira hacia atrás un momento y vuelve a su lado
+        if (waitStart > 0.9f)
+        {
+            float lookBackAt = waitStart * 0.55f, lookFrontAt = waitStart * 0.25f;
+            if (before > lookBackAt && waitTimer <= lookBackAt) FaceDirection(facingRight ? -1f : 1f);
+            if (before > lookFrontAt && waitTimer <= lookFrontAt) FaceDirection(facingRight ? -1f : 1f);
+        }
 
         if (waitTimer <= 0f)
         {
             AdvanceWaypoint();
             currentState = PatrolState.Patrolling;
         }
+    }
+
+    /// <summary>Inicia la espera en un punto con una duración algo variable (patrullas menos mecánicas).</summary>
+    private void BeginWait(float baseDuration)
+    {
+        waitStart = baseDuration * UnityEngine.Random.Range(0.8f, 1.25f);
+        waitTimer = waitStart;
+        currentState = PatrolState.Waiting;
     }
 
     private void AdvanceWaypoint()

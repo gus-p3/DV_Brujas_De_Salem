@@ -135,78 +135,15 @@ public class MainMenuController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// La maquetación del menú la hace Tools > Menú > Maquetar menú principal (MainMenuStyler) y queda
+    /// guardada en la escena; aquí solo se localiza el título para ocultarlo en los paneles secundarios.
+    /// </summary>
     private void ApplyCleanMenuLayout()
     {
-        Transform tTitle = transform.Find("TitleText");
-        if (tTitle != null)
-        {
-            titleObject = tTitle.gameObject;
-            RectTransform rt = tTitle.GetComponent<RectTransform>();
-            if (rt != null)
-            {
-                rt.anchorMin = new Vector2(0.5f, 1f);
-                rt.anchorMax = new Vector2(0.5f, 1f);
-                rt.pivot = new Vector2(0.5f, 1f);
-                rt.anchoredPosition = new Vector2(0f, -48f);
-                rt.sizeDelta = new Vector2(1200f, 120f);
-            }
-            TextMeshProUGUI tmp = tTitle.GetComponent<TextMeshProUGUI>();
-            if (tmp != null)
-            {
-                tmp.fontSize = 92f;
-                tmp.alignment = TextAlignmentOptions.Center;
-            }
-        }
-
-        // Si existen subtítulos o textos extra debajo de TitleText, espaciarlos sin chocar con Jugar
-        int extraIdx = 0;
-        for (int i = 0; i < transform.childCount; i++)
-        {
-            Transform ch = transform.GetChild(i);
-            if (ch == tTitle || ch.name == "Background" || ch.name == "MainPanel" || ch.name == "OptionsPanel" || ch.name == "CreditsPanel")
-                continue;
-            TextMeshProUGUI subTmp = ch.GetComponent<TextMeshProUGUI>();
-            if (subTmp != null)
-            {
-                RectTransform srt = ch.GetComponent<RectTransform>();
-                srt.anchorMin = new Vector2(0.5f, 1f);
-                srt.anchorMax = new Vector2(0.5f, 1f);
-                srt.pivot = new Vector2(0.5f, 1f);
-                srt.anchoredPosition = new Vector2(0f, -172f - (extraIdx * 42f));
-                srt.sizeDelta = new Vector2(900f, 40f);
-                subTmp.fontSize = Mathf.Min(subTmp.fontSize, 28f);
-                extraIdx++;
-            }
-        }
-
-        if (mainPanel != null)
-        {
-            RectTransform mpRect = mainPanel.GetComponent<RectTransform>();
-            if (mpRect != null)
-            {
-                mpRect.anchorMin = new Vector2(0.5f, 0.5f);
-                mpRect.anchorMax = new Vector2(0.5f, 0.5f);
-                mpRect.pivot = new Vector2(0.5f, 0.5f);
-                mpRect.anchoredPosition = new Vector2(0f, -90f);
-                mpRect.sizeDelta = new Vector2(420f, 520f);
-            }
-
-            Button[] buttons = { playButton, continueButton, optionsButton, creditsButton, exitButton };
-            float[] yPositions = { 160f, 70f, -20f, -110f, -200f };
-            for (int i = 0; i < buttons.Length; i++)
-            {
-                if (buttons[i] == null) continue;
-                RectTransform brt = buttons[i].GetComponent<RectTransform>();
-                if (brt != null)
-                {
-                    brt.anchorMin = new Vector2(0.5f, 0.5f);
-                    brt.anchorMax = new Vector2(0.5f, 0.5f);
-                    brt.pivot = new Vector2(0.5f, 0.5f);
-                    brt.anchoredPosition = new Vector2(0f, yPositions[i]);
-                    brt.sizeDelta = new Vector2(290f, 66f);
-                }
-            }
-        }
+        Transform tTitle = transform.Find("TitleGroup");
+        if (tTitle == null) tTitle = transform.Find("TitleText");
+        if (tTitle != null) titleObject = tTitle.gameObject;
     }
 
     public void StartNewGame()
@@ -218,7 +155,8 @@ public class MainMenuController : MonoBehaviour
 
     public void ContinueGame()
     {
-        int maxLevel = SaveSystem.GetMaxLevelUnlocked();
+        // Tras el último nivel el progreso apunta a un índice que no existe: se reanuda en el último nivel
+        int maxLevel = Mathf.Clamp(SaveSystem.GetMaxLevelUnlocked(), 1, SceneManager.sceneCountInBuildSettings - 1);
         SceneManager.LoadScene(maxLevel);
         if (GameManager.Instance != null) GameManager.Instance.StartLevel();
     }
@@ -229,6 +167,7 @@ public class MainMenuController : MonoBehaviour
         if (mainPanel != null) mainPanel.SetActive(true);
         if (optionsPanel != null) optionsPanel.SetActive(false);
         if (creditsPanel != null) creditsPanel.SetActive(false);
+        Select(playButton);
     }
 
     public void ShowOptions()
@@ -237,6 +176,7 @@ public class MainMenuController : MonoBehaviour
         if (mainPanel != null) mainPanel.SetActive(false);
         if (optionsPanel != null) optionsPanel.SetActive(true);
         if (creditsPanel != null) creditsPanel.SetActive(false);
+        Select(backFromOptionsButton);
     }
 
     public void ShowCredits()
@@ -245,6 +185,21 @@ public class MainMenuController : MonoBehaviour
         if (mainPanel != null) mainPanel.SetActive(false);
         if (optionsPanel != null) optionsPanel.SetActive(false);
         if (creditsPanel != null) creditsPanel.SetActive(true);
+        Select(backFromCreditsButton);
+    }
+
+    /// <summary>Esc vuelve al menú principal desde Opciones o Créditos.</summary>
+    private void Update()
+    {
+        bool inSubPanel = (optionsPanel != null && optionsPanel.activeSelf) || (creditsPanel != null && creditsPanel.activeSelf);
+        if (inSubPanel && Input.GetKeyDown(KeyCode.Escape)) ShowMainPanel();
+    }
+
+    /// <summary>Deja un botón seleccionado para poder navegar con teclado o mando.</summary>
+    private static void Select(Button b)
+    {
+        if (b != null && b.gameObject.activeInHierarchy && UnityEngine.EventSystems.EventSystem.current != null)
+            UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(b.gameObject);
     }
 
     public void ExitGame()

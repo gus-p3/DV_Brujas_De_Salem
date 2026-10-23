@@ -120,6 +120,7 @@ public class PotionProjectile : MonoBehaviour
     private void HandleImpact(Vector2 impactPoint)
     {
         if (hasImpacted) return;
+        CameraFollow.Shake(0.08f, 0.15f);
         hasImpacted = true;
 
         SpawnSplashEffect(impactPoint);
