@@ -85,9 +85,28 @@ namespace Level2
 
             if (player != null)
             {
+                if (player.GetComponent<LadderClimber>() == null)
+                {
+                    player.gameObject.AddComponent<LadderClimber>();
+                }
+                else
+                {
+                    player.GetComponent<LadderClimber>().StopClimbing(restoreVelocityZero: true);
+                }
+
+                if (player.GetComponent<PlayerInteractor>() == null)
+                {
+                    player.gameObject.AddComponent<PlayerInteractor>();
+                }
+
                 player.ResetFallReference();
                 player.ResetPhysics(Vector2.zero);
                 player.CanFly = false;
+            }
+
+            if (InteriorTransitionManager.Instance != null && player != null && player.transform.position.y < 18f)
+            {
+                InteriorTransitionManager.Instance.ApplyCameraBounds(null);
             }
 
             // 4. Cancelar invulnerabilidad residual
