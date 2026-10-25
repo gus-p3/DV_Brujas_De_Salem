@@ -37,8 +37,12 @@ namespace Level2
 
         private void Awake()
         {
-            interactKey = KeyCode.Q;
+            interactKey = Level2Controls.InteractKey;
             potionInventory = GetComponent<PotionInventory>();
+            if (GetComponent<Level2Controls>() == null)
+            {
+                gameObject.AddComponent<Level2Controls>();
+            }
         }
 
         private void OnDisable()
@@ -72,19 +76,11 @@ namespace Level2
 
             RefreshFocus();
 
-            // Como la tecla de interacción en Nivel 2 es Q y la de pociones es E,
-            // ambas acciones están completamente separadas y E conserva su función normal.
-            bool shouldSuppressPotionThrow = interactKey == KeyCode.E && currentFocus != null && currentFocus.UsesInteractKey;
-            SetPotionThrowSuppressed(shouldSuppressPotionThrow);
-
-            if (shouldSuppressPotionThrow && potionInventory != null)
-            {
-                ForwardPotionSelectionKeys();
-            }
-
+            // En el Nivel 2 la tecla de interacción es exclusivamente Level2Controls.InteractKey (Q),
+            // mientras que E lanza la poción seleccionada (controlado por Level2Controls).
             if (currentFocus != null && currentFocus.UsesInteractKey)
             {
-                if (Input.GetKeyDown(interactKey) && Time.unscaledTime >= lastInteractTime + interactionCooldown)
+                if (Level2Controls.TryConsumeInteractDown(interactionCooldown) && Time.unscaledTime >= lastInteractTime + interactionCooldown)
                 {
                     TriggerCurrentInteraction();
                 }
@@ -93,12 +89,13 @@ namespace Level2
 
         /// <summary>
         /// Simula la pulsación de una tecla sobre el interactor (para pruebas automatizadas Q vs E).
-        /// Devuelve true solo si la tecla coincide con interactKey (Q) y ejecuta la interacción.
+        /// Devuelve true solo si la tecla coincide con Level2Controls.InteractKey (Q) y ejecuta la interacción.
         /// </summary>
         public bool TryProcessKey(KeyCode pressedKey, bool ignoreCooldown = false)
         {
-            if (pressedKey != interactKey) return false;
+            if (!Level2Controls.IsInteractKey(pressedKey)) return false;
             if (!ignoreCooldown && Time.unscaledTime < lastInteractTime + interactionCooldown) return false;
+            Level2Controls.ConsumeInteractNow();
             return TriggerCurrentInteraction();
         }
 

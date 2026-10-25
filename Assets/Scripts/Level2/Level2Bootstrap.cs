@@ -98,6 +98,10 @@ namespace Level2
                 {
                     player.gameObject.AddComponent<PlayerInteractor>();
                 }
+                if (player.GetComponent<Level2Controls>() == null)
+                {
+                    player.gameObject.AddComponent<Level2Controls>();
+                }
 
                 player.ResetFallReference();
                 player.ResetPhysics(Vector2.zero);
