@@ -58,6 +58,34 @@ public static class Level2CompleteFixer
                 case "BLOCK_E":
                     ApplyBlockE_NewParallaxBackground();
                     break;
+                case "MEGA_A":
+                    ApplyMegaBlockA_CatPickupGuards();
+                    break;
+                case "MEGA_B":
+                    ApplyMegaBlockB_MarketStallAnimations();
+                    break;
+                case "MEGA_C":
+                    ApplyMegaBlockC_InteriorExitDoorsAndIndicators();
+                    break;
+                case "MEGA_D":
+                    ApplyMegaBlockD_QKeyForDoors();
+                    break;
+                case "MEGA_E":
+                    ApplyBlockE_NewParallaxBackground();
+                    break;
+                case "CAPTURE_MEGA_BEFORE":
+                    CaptureMegaBeforeEvidences();
+                    break;
+                case "CAPTURE_MEGA_AFTER":
+                    CaptureMegaAfterEvidences();
+                    break;
+                case "VERIFY_MEGA":
+                    int mCount = Level2StructureVerifier.VerifyMegaCorrections();
+                    int sCount = Level2StructureVerifier.VerifyAllStructures();
+                    Level2GroundingTool.VerifyMenu();
+                    var expReport = Level2.Editor.Level2ExplorationVerifier.RunAllExplorationTests();
+                    logResult = $"VERIFY_MEGA_DONE: MegaFindings={mCount}, StructureFindings={sCount}, Exploration={expReport.passed}/{expReport.total}";
+                    break;
                 case "VERIFY":
                     int count = Level2StructureVerifier.VerifyAllStructures();
                     Level2GroundingTool.VerifyMenu();
@@ -540,8 +568,12 @@ public static class Level2CompleteFixer
     {
         EnsureLevel2Open();
 
-        Sprite skySprite = LoadSingleSprite(SKY_FONDO_PATH);
-        if (skySprite == null) skySprite = LoadSingleSprite(SKY_CLEAN_PATH);
+        EnsureSinglePanoramaTextureImport(SKY_CLEAN_PATH);
+        EnsureSinglePanoramaTextureImport(FAR_CLEAN_PATH);
+        EnsureSinglePanoramaTextureImport(MID_CLEAN_PATH);
+
+        Sprite skySprite = LoadSingleSprite(SKY_CLEAN_PATH);
+        if (skySprite == null) skySprite = LoadSingleSprite(SKY_FONDO_PATH);
         Sprite farSprite = LoadSingleSprite(FAR_CLEAN_PATH);
         Sprite midSprite = LoadSingleSprite(MID_CLEAN_PATH);
 
@@ -572,12 +604,12 @@ public static class Level2CompleteFixer
         }
         foreach (var go in oldLayers) Object.DestroyImmediate(go);
 
-        BuildParallaxLayer(parallaxRoot.transform, "Sky_Far",     skySprite, new Vector2(0.90f, 0.95f), -20, 4.8f, 1.85f, Color.white);
-        BuildParallaxLayer(parallaxRoot.transform, "Village_Far", farSprite, new Vector2(0.72f, 0.88f), -15, 4.1f, 1.65f, new Color(0.92f, 0.94f, 1.0f, 0.95f));
-        BuildParallaxLayer(parallaxRoot.transform, "Facades_Mid", midSprite, new Vector2(0.42f, 0.75f), -10, 3.6f, 1.60f, Color.white);
+        BuildParallaxLayer(parallaxRoot.transform, "Sky_Far",     skySprite, new Vector2(0.90f, 0.95f), -20, 5.2f, 2.00f, Color.white);
+        BuildParallaxLayer(parallaxRoot.transform, "Village_Far", farSprite, new Vector2(0.72f, 0.88f), -15, 4.3f, 2.00f, new Color(0.92f, 0.94f, 1.0f, 0.96f));
+        BuildParallaxLayer(parallaxRoot.transform, "Facades_Mid", midSprite, new Vector2(0.42f, 0.75f), -10, 3.7f, 2.00f, Color.white);
 
         SaveLevel2();
-        Debug.Log("[Level2CompleteFixer] Bloque E (Nuevo Fondo con Parallax >= 3 capas) aplicado correctamente.");
+        Debug.Log("[Level2CompleteFixer] Bloque E (Fondo continuo sin costuras con 3 capas de Parallax) aplicado correctamente.");
     }
 
     private static void BuildParallaxLayer(Transform parent, string layerName, Sprite sprite, Vector2 factor, int sortingOrder, float posY, float uniformScale, Color tint)
@@ -599,13 +631,13 @@ public static class Level2CompleteFixer
 
         ParallaxLayer pl = layerGO.GetComponent<ParallaxLayer>();
         if (pl == null) pl = layerGO.AddComponent<ParallaxLayer>();
-        pl.Setup(factor.x, true, true);
+        pl.Setup(factor.x, false, true);
 
         float tileWorldWidth = (sprite.rect.width / sprite.pixelsPerUnit) * uniformScale;
 
-        for (int i = -1; i <= 5; i++)
+        for (int i = -2; i <= 6; i++)
         {
-            GameObject copy = new GameObject($"Copy_{i + 1}");
+            GameObject copy = new GameObject($"Copy_{i + 2}");
             copy.transform.SetParent(layerGO.transform, false);
             copy.transform.localPosition = new Vector3(i * tileWorldWidth, 0f, 0f);
             copy.transform.localRotation = Quaternion.identity;
@@ -620,6 +652,277 @@ public static class Level2CompleteFixer
         }
 
         EditorUtility.SetDirty(layerGO);
+    }
+
+    [MenuItem("Tools/Nivel 2/Mega Correccion/A. Proteger Pickups contra Forma de Gato")]
+    public static void ApplyMegaBlockA_CatPickupGuards()
+    {
+        EnsureLevel2Open();
+        int attached = 0;
+
+        MonoBehaviour[] allMbs = Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (MonoBehaviour mb in allMbs)
+        {
+            if (mb == null) continue;
+            string tn = mb.GetType().Name;
+            if (tn == "Ingredient" || tn == "PotionPickup" || tn == "HeartPickup" || tn == "Collectible" || tn == "KeyItem")
+            {
+                Level2CatPickupGuard guard = mb.GetComponent<Level2CatPickupGuard>();
+                if (guard == null)
+                {
+                    guard = mb.gameObject.AddComponent<Level2CatPickupGuard>();
+                }
+                EditorUtility.SetDirty(mb.gameObject);
+                attached++;
+            }
+        }
+
+        SaveLevel2();
+        Debug.Log($"[Level2CompleteFixer] Mega Bloque A aplicado: {attached} objetos recogibles protegidos con Level2CatPickupGuard.");
+    }
+
+    [MenuItem("Tools/Nivel 2/Mega Correccion/B. Animar Puestos del Mercado")]
+    public static void ApplyMegaBlockB_MarketStallAnimations()
+    {
+        EnsureLevel2Open();
+
+        Sprite lanternSprite = LoadSingleSprite("Assets/Art/Environment/Level2/Placeholder_Market_Lantern.png");
+        Sprite herbSprite1 = LoadSingleSprite("Assets/Art/Environment/Level2/Placeholder_Ingredient_WitheredFlower.png");
+        Sprite herbSprite2 = LoadSingleSprite("Assets/Art/Environment/Level2/Placeholder_Ingredient_Root.png");
+        Sprite awningGold = LoadSingleSprite("Assets/Art/Environment/Level2/Placeholder_MarketStall_Awning_Gold.png");
+        Sprite awningRed = LoadSingleSprite("Assets/Art/Environment/Level2/Placeholder_MarketStall_Awning_Red.png");
+
+        GameObject[] allObjects = Object.FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        List<GameObject> stalls = allObjects
+            .Where(g => g != null && g.name.StartsWith("Stall_Z") && g.transform.parent != null && !g.transform.parent.name.StartsWith("Stall_Z"))
+            .OrderBy(g => g.transform.position.x)
+            .ToList();
+
+        int idx = 0;
+        foreach (GameObject stall in stalls)
+        {
+            // Crear o actualizar el hijo visual del toldo sin collider para que oscile con el viento
+            Transform swayVisualTr = stall.transform.Find("Awning_Sway_Visual");
+            GameObject swayVisualGO = swayVisualTr != null ? swayVisualTr.gameObject : new GameObject("Awning_Sway_Visual");
+            swayVisualGO.transform.SetParent(stall.transform, false);
+            swayVisualGO.transform.localPosition = new Vector3(0f, 2.25f, 0f);
+            swayVisualGO.transform.localRotation = Quaternion.identity;
+            swayVisualGO.transform.localScale = new Vector3(1.02f, 0.45f, 1f);
+
+            SpriteRenderer awningSr = swayVisualGO.GetComponent<SpriteRenderer>();
+            if (awningSr == null) awningSr = swayVisualGO.AddComponent<SpriteRenderer>();
+            awningSr.sprite = (idx % 2 == 0) ? awningGold : awningRed;
+            awningSr.sortingLayerName = "Gameplay";
+            awningSr.sortingOrder = -1;
+            awningSr.color = new Color(1f, 0.96f, 0.88f, 0.95f);
+
+            // Crear farola colgante con luz calida y parpadeo
+            Transform lanternTr = stall.transform.Find("Hanging_Lantern_Visual");
+            GameObject lanternGO = lanternTr != null ? lanternTr.gameObject : new GameObject("Hanging_Lantern_Visual");
+            lanternGO.transform.SetParent(stall.transform, false);
+            lanternGO.transform.localPosition = new Vector3(-1.15f, 1.75f, 0f);
+            lanternGO.transform.localRotation = Quaternion.identity;
+            lanternGO.transform.localScale = new Vector3(0.75f, 0.75f, 1f);
+
+            if (lanternSprite != null)
+            {
+                SpriteRenderer lsr = lanternGO.GetComponent<SpriteRenderer>();
+                if (lsr == null) lsr = lanternGO.AddComponent<SpriteRenderer>();
+                lsr.sprite = lanternSprite;
+                lsr.sortingLayerName = "Gameplay";
+                lsr.sortingOrder = 0;
+            }
+
+            UnityEngine.Rendering.Universal.Light2D light2D = lanternGO.GetComponent<UnityEngine.Rendering.Universal.Light2D>();
+            if (light2D == null) light2D = lanternGO.AddComponent<UnityEngine.Rendering.Universal.Light2D>();
+            light2D.color = new Color(1.0f, 0.78f, 0.38f, 1f);
+            light2D.intensity = 1.15f;
+            light2D.pointLightOuterRadius = 3.2f;
+            light2D.pointLightInnerRadius = 0.4f;
+
+            LanternFlicker flicker = lanternGO.GetComponent<LanternFlicker>();
+            if (flicker == null) flicker = lanternGO.AddComponent<LanternFlicker>();
+
+            // Crear manojo de hierbas/mercancia colgante al otro lado del puesto
+            Transform herbsTr = stall.transform.Find("Hanging_Wares_Visual");
+            GameObject herbsGO = herbsTr != null ? herbsTr.gameObject : new GameObject("Hanging_Wares_Visual");
+            herbsGO.transform.SetParent(stall.transform, false);
+            herbsGO.transform.localPosition = new Vector3(1.15f, 1.78f, 0f);
+            herbsGO.transform.localRotation = Quaternion.identity;
+            herbsGO.transform.localScale = new Vector3(0.68f, 0.68f, 1f);
+
+            Sprite wareSprite = (idx % 2 == 0) ? herbSprite1 : herbSprite2;
+            if (wareSprite != null)
+            {
+                SpriteRenderer hsr = herbsGO.GetComponent<SpriteRenderer>();
+                if (hsr == null) hsr = herbsGO.AddComponent<SpriteRenderer>();
+                hsr.sprite = wareSprite;
+                hsr.sortingLayerName = "Gameplay";
+                hsr.sortingOrder = 0;
+            }
+
+            MarketStallAnimator anim = stall.GetComponent<MarketStallAnimator>();
+            if (anim == null) anim = stall.AddComponent<MarketStallAnimator>();
+
+            float speedMult = 0.90f + (idx % 5) * 0.05f;
+            float phaseRad = (idx + 1) * 1.17f;
+            anim.Configure(
+                swayVisualGO.transform,
+                new Transform[] { lanternGO.transform, herbsGO.transform },
+                phaseRad,
+                speedMult);
+
+            EditorUtility.SetDirty(stall);
+            idx++;
+        }
+
+        SaveLevel2();
+        Debug.Log($"[Level2CompleteFixer] Mega Bloque B aplicado: {idx} puestos del mercado animados y desincronizados.");
+    }
+
+    [MenuItem("Tools/Nivel 2/Mega Correccion/C. Puertas Interiores con Indicador de Salida")]
+    public static void ApplyMegaBlockC_InteriorExitDoorsAndIndicators()
+    {
+        EnsureLevel2Open();
+        AlignAllDoorsToFloorSurfaces();
+
+        Sprite openDoorSprite = LoadSingleSprite("Assets/Art/Environment/Level2/Village_Door_Open.png");
+        Sprite closedDoorSprite = LoadSingleSprite("Assets/Art/Environment/Level2/Village_Door_Closed.png");
+
+        Dictionary<string, string> doorLabels = new Dictionary<string, string>
+        {
+            { "Door_Int_House1_Ground",  "Salir a la calle" },
+            { "Door_Int_House1_Balcony", "Salir al balcón (2º Piso)" },
+            { "Door_Int_House2_Ground",  "Salir a la calle" },
+            { "Door_Int_House2_Balcony", "Salir a la pasarela (2º Piso)" },
+            { "Door_Int_House3_Ground",  "Salir a la calle" },
+            { "Door_Int_House3_Roof",    "Salir al tejado" },
+            { "Door_Int_House4_Ground",  "Salir a la calle" },
+            { "Door_Int_House4_Balcony", "Salir a la galería (2º Piso)" },
+            { "Door_Ext_House1_Ground",  "Entrar a la Botica" },
+            { "Door_Ext_House1_Balcony", "Entrar al 2º Piso (Botica)" },
+            { "Door_Ext_House2_Ground",  "Entrar a la Posada" },
+            { "Door_Ext_House2_Balcony", "Entrar al 2º Piso (Posada)" },
+            { "Door_Ext_House3_Ground",  "Entrar a la Casa Abandonada" },
+            { "Door_Ext_House3_Roof",    "Entrar al Ático Secreto" },
+            { "Door_Ext_House4_Ground",  "Entrar a la Mansión" },
+            { "Door_Ext_House4_Balcony", "Entrar al 2º Piso (Mansión)" },
+            { "Door_Ext_Z6_Sanctum",     "Abrir Puerta del Santuario" }
+        };
+
+        HouseDoor[] doors = Object.FindObjectsByType<HouseDoor>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        int configured = 0;
+        foreach (HouseDoor door in doors)
+        {
+            if (door == null) continue;
+            bool isInteriorExit = door.name.StartsWith("Door_Int_") || door.transform.position.y > 15f;
+
+            SpriteRenderer sr = door.GetComponent<SpriteRenderer>();
+            if (sr == null) sr = door.gameObject.AddComponent<SpriteRenderer>();
+            if (isInteriorExit && openDoorSprite != null)
+            {
+                sr.sprite = openDoorSprite;
+            }
+            else if (!isInteriorExit && sr.sprite == null && closedDoorSprite != null)
+            {
+                sr.sprite = closedDoorSprite;
+            }
+            sr.sortingLayerName = "Gameplay";
+            sr.sortingOrder = isInteriorExit ? 1 : -1;
+
+            BoxCollider2D trig = door.GetComponent<BoxCollider2D>();
+            if (trig == null) trig = door.gameObject.AddComponent<BoxCollider2D>();
+            trig.isTrigger = true;
+            if (trig.size.x < 1.2f || trig.size.y < 1.8f)
+            {
+                trig.size = new Vector2(Mathf.Max(trig.size.x, 1.35f), Mathf.Max(trig.size.y, 2.1f));
+            }
+
+            SerializedObject so = new SerializedObject(door);
+            if (doorLabels.TryGetValue(door.name, out string label))
+            {
+                so.FindProperty("actionLabel").stringValue = label;
+            }
+            if (openDoorSprite != null && so.FindProperty("openSprite") != null) so.FindProperty("openSprite").objectReferenceValue = openDoorSprite;
+            if (closedDoorSprite != null && so.FindProperty("closedSprite") != null) so.FindProperty("closedSprite").objectReferenceValue = closedDoorSprite;
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            if (isInteriorExit)
+            {
+                Transform warmLightTr = door.transform.Find("ExitDoor_WarmLight");
+                GameObject warmLightGO = warmLightTr != null ? warmLightTr.gameObject : new GameObject("ExitDoor_WarmLight");
+                warmLightGO.transform.SetParent(door.transform, false);
+                warmLightGO.transform.localPosition = new Vector3(0f, 1.0f, 0f);
+
+                var l2d = warmLightGO.GetComponent<UnityEngine.Rendering.Universal.Light2D>();
+                if (l2d == null) l2d = warmLightGO.AddComponent<UnityEngine.Rendering.Universal.Light2D>();
+                l2d.color = new Color(1.0f, 0.85f, 0.45f, 1f);
+                l2d.intensity = 1.3f;
+                l2d.pointLightOuterRadius = 2.8f;
+                l2d.pointLightInnerRadius = 0.5f;
+            }
+
+            Level2DoorIndicator indicator = door.GetComponent<Level2DoorIndicator>();
+            if (indicator == null) indicator = door.gameObject.AddComponent<Level2DoorIndicator>();
+            indicator.Configure(isInteriorExit, 1.55f);
+
+            EditorUtility.SetDirty(door.gameObject);
+            configured++;
+        }
+
+        CellarExitBackupInteractable[] cellarExits = Object.FindObjectsByType<CellarExitBackupInteractable>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var ce in cellarExits)
+        {
+            if (ce == null) continue;
+            Level2DoorIndicator ind = ce.GetComponent<Level2DoorIndicator>();
+            if (ind == null) ind = ce.gameObject.AddComponent<Level2DoorIndicator>();
+            ind.Configure(true, 1.4f);
+            EditorUtility.SetDirty(ce.gameObject);
+        }
+
+        AlignAllDoorsToFloorSurfaces();
+        SaveLevel2();
+        Debug.Log($"[Level2CompleteFixer] Mega Bloque C aplicado: {configured} puertas configuradas con Level2DoorIndicator y luz guia.");
+    }
+
+    [MenuItem("Tools/Nivel 2/Mega Correccion/D. Configurar Tecla Q en Casas del Nivel 2")]
+    public static void ApplyMegaBlockD_QKeyForDoors()
+    {
+        EnsureLevel2Open();
+        GameObject witch = GameObject.Find("Witch");
+        if (witch != null)
+        {
+            PlayerInteractor pi = witch.GetComponent<PlayerInteractor>();
+            if (pi == null) pi = witch.AddComponent<PlayerInteractor>();
+            SerializedObject so = new SerializedObject(pi);
+            so.FindProperty("interactKey").intValue = (int)KeyCode.Q;
+            so.FindProperty("interactionCooldown").floatValue = 0.35f;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(pi);
+        }
+
+        SaveLevel2();
+        Debug.Log("[Level2CompleteFixer] Mega Bloque D aplicado: PlayerInteractor configurado con KeyCode.Q.");
+    }
+
+    public static void CaptureMegaBeforeEvidences()
+    {
+        EnsureLevel2Open();
+        System.IO.Directory.CreateDirectory("Assets/Screenshots/NIVEL2/Evidencias");
+        CaptureCameraAt(new Vector3(17.5f, 30.2f, -10f), 4.2f, "Assets/Screenshots/NIVEL2/Evidencias/BEFORE_Puerta_Interior_Casa1.png");
+        CaptureCameraAt(new Vector3(44.5f, 2.5f, -10f), 4.5f, "Assets/Screenshots/NIVEL2/Evidencias/BEFORE_Puestos_Mercado_Z2.png");
+        CaptureCameraAt(new Vector3(36.0f, 4.5f, -10f), 6.5f, "Assets/Screenshots/NIVEL2/Evidencias/BEFORE_Union_Fondo_Parallax.png");
+    }
+
+    public static void CaptureMegaAfterEvidences()
+    {
+        EnsureLevel2Open();
+        System.IO.Directory.CreateDirectory("Assets/Screenshots/NIVEL2/Evidencias");
+        CaptureCameraAt(new Vector3(15.5f, 3.2f, -10f), 4.2f, "Assets/Screenshots/NIVEL2/Evidencias/AFTER_Puerta_Exterior_IndicadorQ.png");
+        CaptureCameraAt(new Vector3(14.5f, 30.2f, -10f), 4.2f, "Assets/Screenshots/NIVEL2/Evidencias/AFTER_Puerta_Interior_IndicadorQ.png");
+        CaptureCameraAt(new Vector3(44.5f, 2.5f, -10f), 4.5f, "Assets/Screenshots/NIVEL2/Evidencias/AFTER_Puestos_Mercado_Animados.png");
+        CaptureCameraAt(new Vector3(43.44f, 4.5f, -10f), 6.5f, "Assets/Screenshots/NIVEL2/Evidencias/AFTER_Union_Fondo_SinCostura_1.png");
+        CaptureCameraAt(new Vector3(86.88f, 4.5f, -10f), 6.5f, "Assets/Screenshots/NIVEL2/Evidencias/AFTER_Union_Fondo_SinCostura_2.png");
     }
 
     private static void ConfigureInteractiveHouse(Transform parent, string name, Sprite sprite, float x, float scale, bool flipX)
@@ -859,6 +1162,22 @@ public static class Level2CompleteFixer
     {
         Object[] all = AssetDatabase.LoadAllAssetsAtPath(HOUSES_ATLAS_PATH);
         return all.OfType<Sprite>().OrderBy(s => s.name).ToArray();
+    }
+
+    private static void EnsureSinglePanoramaTextureImport(string assetPath)
+    {
+        TextureImporter ti = AssetImporter.GetAtPath(assetPath) as TextureImporter;
+        if (ti == null) return;
+        bool changed = false;
+        if (ti.textureType != TextureImporterType.Sprite) { ti.textureType = TextureImporterType.Sprite; changed = true; }
+        if (ti.spriteImportMode != SpriteImportMode.Single) { ti.spriteImportMode = SpriteImportMode.Single; changed = true; }
+        if (Mathf.Abs(ti.spritePixelsPerUnit - 100f) > 0.01f) { ti.spritePixelsPerUnit = 100f; changed = true; }
+        if (ti.maxTextureSize < 4096) { ti.maxTextureSize = 4096; changed = true; }
+        if (ti.wrapMode != TextureWrapMode.Clamp) { ti.wrapMode = TextureWrapMode.Clamp; changed = true; }
+        if (changed)
+        {
+            ti.SaveAndReimport();
+        }
     }
 
     private static Sprite LoadSingleSprite(string path)

@@ -144,10 +144,10 @@ namespace Level2.Editor
             Record(17, "Persistencia de llaves, cofres y puertas desbloqueadas entre zonas", t17,
                 "KeyInventory conserva cofres abiertos, llaves y puertas desbloqueadas al entrar y salir varias veces");
 
-            // 18. Casos límite (repetición de tecla E, fuera de rango, forma de gato, coordinación con pociones)
+            // 18. Casos límite (tecla Q independiente de E para pociones, bloqueo de recogida en gato 3x, fuera de rango)
             bool t18 = VerifyEdgeCases(witch, interactor, climber, tm, potionInv);
-            Record(18, "Casos límite (debounce tecla E, fuera de rango, forma felina, no lanzar poción al abrir puerta)", t18,
-                "PlayerInteractor suprime disparo accidental de poción en foco E, bloquea escalada en forma de gato y filtra fuera de rango");
+            Record(18, "Casos límite (tecla Q independiente de E, gato no recoge 3x, sótano 3x)", t18,
+                "PlayerInteractor usa Q sin bloquear pociones en E, Level2CatPickupGuard bloquea recogida en forma felina 3x y reactiva en humana");
 
             // 19. Captura visual y consola limpia sin errores
             CaptureVerificationScreenshots();
@@ -521,7 +521,7 @@ namespace Level2.Editor
             Physics2D.SyncTransforms();
             InvokePrivateUpdate(interactor);
 
-            bool visibleNearDoor = promptUI.IsVisible && promptUI.CurrentText.Contains("E —");
+            bool visibleNearDoor = promptUI.IsVisible && promptUI.CurrentText.Contains("Q:");
 
             witch.transform.position = new Vector3(5f, 0.17f, 0f);
             Physics2D.SyncTransforms();
@@ -636,18 +636,51 @@ namespace Level2.Editor
             InvokePrivateUpdate(interactor);
             bool nullOutOfRange = interactor.CurrentFocus == null;
 
-            // 2) En foco sobre puerta (UsesInteractKey=true): PotionInventory se suspende temporalmente para no lanzar pociones con E
+            // 2) En foco sobre puerta: usa KeyCode.Q y mantiene PotionInventory activo para que E lance pociones sin conflicto
             GameObject doorGo = GameObject.Find("Door_Ext_House1_Ground");
             witch.transform.position = doorGo.transform.position;
             Physics2D.SyncTransforms();
             InvokePrivateUpdate(interactor);
-            bool potionSuppressedOnDoor = potionInv == null || !potionInv.enabled;
+            bool usesQAndKeepsPotionE = interactor.InteractKey == KeyCode.Q && (potionInv == null || potionInv.enabled);
 
-            // 3) Al salir de foco: PotionInventory se reactiva inmediatamente
-            witch.transform.position = new Vector3(4.0f, 0.17f, 0f);
-            Physics2D.SyncTransforms();
-            InvokePrivateUpdate(interactor);
-            bool potionRestoredAway = potionInv == null || potionInv.enabled;
+            // 3) En forma de gato: ningun pickup del Nivel 2 puede recogerse (3 pasadas consecutivas), y al volver a humano se reactiva
+            bool catBlocked3xAndHumanRestored = true;
+            Level2CatPickupGuard[] guards = UnityEngine.Object.FindObjectsByType<Level2CatPickupGuard>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            if (guards.Length == 0 || tm == null)
+            {
+                catBlocked3xAndHumanRestored = false;
+            }
+            else
+            {
+                PropertyInfo isCatProp = typeof(TransformationManager).GetProperty("IsCatForm", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                bool prevCat = tm.IsCatForm;
+
+                Level2CatPickupGuard sampleGuard = guards[0];
+                InvokePrivateAwake(sampleGuard);
+                Collider2D sampleCol = sampleGuard.GetComponent<Collider2D>();
+
+                isCatProp?.SetValue(tm, true);
+                for (int pass = 0; pass < 3; pass++)
+                {
+                    witch.transform.position = sampleGuard.transform.position;
+                    Physics2D.SyncTransforms();
+                    InvokePrivateUpdate(sampleGuard);
+                    if (!sampleGuard.IsSuppressedForCat || (sampleCol != null && sampleCol.enabled))
+                    {
+                        catBlocked3xAndHumanRestored = false;
+                        break;
+                    }
+                }
+
+                isCatProp?.SetValue(tm, false);
+                InvokePrivateUpdate(sampleGuard);
+                if (sampleGuard.IsSuppressedForCat || (sampleCol != null && !sampleCol.enabled))
+                {
+                    catBlocked3xAndHumanRestored = false;
+                }
+
+                isCatProp?.SetValue(tm, prevCat);
+            }
 
             // 4) Escalera del sótano permite salir 3 veces seguidas tanto en forma humana como en forma de gato
             GameObject cellarLadderGo = GameObject.Find("Ladder_Int_House2_CellarToF1");
@@ -694,7 +727,7 @@ namespace Level2.Editor
                 }
             }
 
-            return nullOutOfRange && potionSuppressedOnDoor && potionRestoredAway && cellarExit3xHumanAndCat;
+            return nullOutOfRange && usesQAndKeepsPotionE && catBlocked3xAndHumanRestored && cellarExit3xHumanAndCat;
         }
 
         private static void CaptureVerificationScreenshots()

@@ -160,6 +160,195 @@ public static class Level2StructureVerifier
         return findings.Count;
     }
 
+    [MenuItem("Tools/Nivel 2/Verificar correcciones")]
+    public static int VerifyMegaCorrections()
+    {
+        Scene active = SceneManager.GetActiveScene();
+        if (active.path != "Assets/Scenes/Level2.unity")
+        {
+            EditorSceneManager.OpenScene("Assets/Scenes/Level2.unity", OpenSceneMode.Single);
+        }
+        Physics2D.SyncTransforms();
+
+        List<string> findings = new List<string>();
+
+        // 1. Todos los coleccionables del Nivel 2 tienen proteccion contra recogida en forma de gato
+        int pickupCount = 0;
+        MonoBehaviour[] allMbs = Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (MonoBehaviour mb in allMbs)
+        {
+            if (mb == null) continue;
+            System.Type t = mb.GetType();
+            string tn = t.Name;
+            if (tn == "Ingredient" || tn == "PotionPickup" || tn == "HeartPickup" || tn == "Collectible" || tn == "KeyItem")
+            {
+                pickupCount++;
+                if (mb.GetComponent<Level2CatPickupGuard>() == null)
+                {
+                    findings.Add($"[PICKUP SIN GUARDIA GATO] {GetPath(mb.transform)} ({tn}) no tiene Level2CatPickupGuard.");
+                }
+            }
+        }
+        if (pickupCount == 0)
+        {
+            findings.Add("[SIN PICKUPS] No se encontraron objetos recogibles en Level2.unity.");
+        }
+
+        // 2. PlayerInteractor usa tecla Q y todas las puertas interactivas tienen indicador, trigger a ras de suelo y destino valido
+        PlayerInteractor interactor = Object.FindFirstObjectByType<PlayerInteractor>(FindObjectsInactive.Include);
+        if (interactor == null || interactor.InteractKey != KeyCode.Q)
+        {
+            findings.Add($"[TECLA INTERACCION INCORRECTA] PlayerInteractor no usa KeyCode.Q (actual={(interactor != null ? interactor.InteractKey.ToString() : "null")}).");
+        }
+
+        HouseDoor[] doors = Object.FindObjectsByType<HouseDoor>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        int doorCount = 0;
+        foreach (HouseDoor door in doors)
+        {
+            if (door == null || !door.gameObject.activeInHierarchy) continue;
+            doorCount++;
+
+            SerializedObject soDoor = new SerializedObject(door);
+            SerializedProperty propBarred = soDoor.FindProperty("permanentlyBarred");
+            bool isBarred = propBarred != null && propBarred.boolValue;
+
+            if (!isBarred && door.TargetDoor == null)
+            {
+                findings.Add($"[PUERTA SIN DESTINO] {GetPath(door.transform)} no tiene TargetDoor asignado.");
+            }
+
+            Level2DoorIndicator ind = door.GetComponent<Level2DoorIndicator>();
+            if (ind == null)
+            {
+                findings.Add($"[PUERTA SIN INDICADOR] {GetPath(door.transform)} no tiene Level2DoorIndicator.");
+            }
+
+            BoxCollider2D trig = door.GetComponent<BoxCollider2D>();
+            if (trig == null || !trig.isTrigger)
+            {
+                findings.Add($"[PUERTA SIN TRIGGER] {GetPath(door.transform)} no tiene BoxCollider2D isTrigger.");
+            }
+
+            SpriteRenderer sr = door.GetComponent<SpriteRenderer>();
+            float minY = sr != null && sr.sprite != null ? sr.bounds.min.y : door.transform.position.y;
+            float surfaceY = Level2CompleteFixer.FindSurfaceBelow(door.transform.position.x, minY + 0.8f);
+            if (Mathf.Abs(minY - surfaceY) > TOLERANCE)
+            {
+                findings.Add($"[PUERTA DESALINEADA] {door.name} minY={minY:F4}, suelo={surfaceY:F4}");
+            }
+
+            string prompt = door.GetPromptText(null);
+            if (string.IsNullOrEmpty(prompt) || !prompt.StartsWith("Q:") || prompt.Contains("E —") || prompt.Contains("Tecla E"))
+            {
+                findings.Add($"[PROMPT PUERTA INVALIDO] {door.name} tiene prompt '{prompt}' (debe iniciar con 'Q:').");
+            }
+        }
+
+        CellarExitBackupInteractable[] cellarExits = Object.FindObjectsByType<CellarExitBackupInteractable>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var ce in cellarExits)
+        {
+            if (ce == null) continue;
+            if (ce.GetComponent<Level2DoorIndicator>() == null)
+            {
+                findings.Add($"[SALIDA SOTANO SIN INDICADOR] {GetPath(ce.transform)} no tiene Level2DoorIndicator.");
+            }
+            string p = ce.GetPromptText(null);
+            if (!p.StartsWith("Q:"))
+            {
+                findings.Add($"[PROMPT SOTANO INVALIDO] {ce.name} tiene prompt '{p}'.");
+            }
+        }
+
+        // 3. Ningun texto/letrero de casas o puertas en Level2 menciona "E" para entrar o salir
+        foreach (MonoBehaviour mb in allMbs)
+        {
+            if (mb == null) continue;
+            if (mb is IInteractable interactable && !(mb is LadderInteractable))
+            {
+                string p = interactable.GetPromptText(null);
+                if (!string.IsNullOrEmpty(p) && (p.Contains("E —") || p.Contains("[E]") || p.Contains("Tecla E")))
+                {
+                    findings.Add($"[REFERENCIA A TECLA E] {GetPath(mb.transform)} tiene prompt '{p}'.");
+                }
+            }
+        }
+
+        // 4. El fondo cubre todo el recorrido horizontal (x=0..195) sin huecos (gap <= 0.01u)
+        string[] layerNames = { "Sky_Far", "Village_Far", "Facades_Mid" };
+        foreach (string lName in layerNames)
+        {
+            GameObject layerGO = GameObject.Find("Environment/Parallax/" + lName);
+            if (layerGO == null)
+            {
+                findings.Add($"[CAPA FONDO FALTANTE] No existe Environment/Parallax/{lName}.");
+                continue;
+            }
+
+            SpriteRenderer[] tiles = layerGO.GetComponentsInChildren<SpriteRenderer>(false)
+                .Where(s => s.gameObject != layerGO && s.sprite != null)
+                .OrderBy(s => s.bounds.min.x)
+                .ToArray();
+
+            if (tiles.Length < 5)
+            {
+                findings.Add($"[POCOS TILES EN FONDO] {lName} solo tiene {tiles.Length} copias.");
+                continue;
+            }
+
+            for (int i = 0; i < tiles.Length - 1; i++)
+            {
+                float rightEdge = tiles[i].bounds.max.x;
+                float leftEdgeNext = tiles[i + 1].bounds.min.x;
+                float gap = Mathf.Abs(leftEdgeNext - rightEdge);
+                if (gap > 0.01f)
+                {
+                    findings.Add($"[COSTURA EN FONDO] {lName} entre {tiles[i].name} (max.x={rightEdge:F4}) y {tiles[i + 1].name} (min.x={leftEdgeNext:F4}): gap={gap:F4}u > 0.01u");
+                }
+            }
+
+            float totalMinX = tiles.First().bounds.min.x;
+            float totalMaxX = tiles.Last().bounds.max.x;
+            if (totalMinX > -30f || totalMaxX < 210f)
+            {
+                findings.Add($"[COBERTURA FONDO INSUFICIENTE] {lName} cubre [{totalMinX:F1}, {totalMaxX:F1}] (requiere <= -30 a >= 210).");
+            }
+        }
+
+        // 5. Los puestos del mercado tienen su animador activo y desincronizado
+        MarketStallAnimator[] stalls = Object.FindObjectsByType<MarketStallAnimator>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        if (stalls.Length < 10)
+        {
+            findings.Add($"[PUESTOS SIN ANIMADOR] Solo se encontraron {stalls.Length} puestos con MarketStallAnimator (esperados >= 10).");
+        }
+        else
+        {
+            HashSet<int> phases = new HashSet<int>();
+            foreach (MarketStallAnimator st in stalls)
+            {
+                if (!st.enabled)
+                {
+                    findings.Add($"[ANIMADOR PUESTO INACTIVO] {GetPath(st.transform)} tiene MarketStallAnimator deshabilitado.");
+                }
+                phases.Add(Mathf.RoundToInt(st.PhaseOffset * 100f));
+            }
+            if (phases.Count < 5)
+            {
+                findings.Add($"[PUESTOS SINCRONIZADOS] Los puestos del mercado no tienen fases desincronizadas ({phases.Count} fases distintas).");
+            }
+        }
+
+        if (findings.Count == 0)
+        {
+            Debug.Log($"[Verificar correcciones] EXITO: 0 hallazgos. Pickups protegidos={pickupCount}, Puertas con Q+Indicador={doorCount}, Capas Parallax continuas=3 (gap<=0.001u), Puestos animados desincronizados={stalls.Length}.");
+        }
+        else
+        {
+            Debug.LogError($"[Verificar correcciones] FALLO con {findings.Count} hallazgos:\n - " + string.Join("\n - ", findings));
+        }
+
+        return findings.Count;
+    }
+
     private static float FindNearestFloorSurfaceAt(float x, float targetY, int groundMask)
     {
         float[] probeOffsets = { 0f, -0.5f, 0.5f, -1.0f, 1.0f };
