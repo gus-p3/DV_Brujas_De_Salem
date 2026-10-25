@@ -3090,15 +3090,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level2.MarketStallAnimator
   awningVisual: {fileID: 1454333066}
-  awningSwayAngle: 1.6
-  awningScalePulse: 0.018
+  awningSwayAngle: 2.4
+  awningScalePulse: 0.03
   baseSpeed: 1.85
   hangingItems:
-  - {fileID: 1608190421}
-  - {fileID: 604155013}
-  hangingSwingAngle: 4.8
-  phaseOffset: 3.69
-  speedMultiplier: 1
+  - {fileID: 495359536}
+  hangingSwingAngle: 6
+  phaseOffset: 5.14992
+  speedMultiplier: 0.974
 --- !u!1 &56064222
 GameObject:
   m_ObjectHideFlags: 0
@@ -6322,15 +6321,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level2.MarketStallAnimator
   awningVisual: {fileID: 401907532}
-  awningSwayAngle: 1.6
-  awningScalePulse: 0.018
+  awningSwayAngle: 2.4
+  awningScalePulse: 0.03
   baseSpeed: 1.85
   hangingItems:
-  - {fileID: 18942854}
-  - {fileID: 1064864580}
-  hangingSwingAngle: 4.8
-  phaseOffset: 4.92
-  speedMultiplier: 1.05
+  - {fileID: 932695715}
+  hangingSwingAngle: 6
+  phaseOffset: 1.2666947
+  speedMultiplier: 0.91099995
 --- !u!1 &179981641
 GameObject:
   m_ObjectHideFlags: 0
@@ -6802,15 +6800,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd505cfe18595b84696fb04d100a9638, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level2.MarketStallAnimator
-  awningVisual: {fileID: 0}
-  awningSwayAngle: 1.6
-  awningScalePulse: 0.018
+  awningVisual: {fileID: 120041909}
+  awningSwayAngle: 2.4
+  awningScalePulse: 0.03
   baseSpeed: 1.85
   hangingItems:
-  - {fileID: 405073102}
-  hangingSwingAngle: 4.8
-  phaseOffset: 6.85
-  speedMultiplier: 0.92
+  - {fileID: 283546810}
+  hangingSwingAngle: 6
+  phaseOffset: 5.500044
+  speedMultiplier: 1.0699999
 --- !u!1 &183762993
 GameObject:
   m_ObjectHideFlags: 0
@@ -9929,15 +9927,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level2.MarketStallAnimator
   awningVisual: {fileID: 1398235040}
-  awningSwayAngle: 1.6
-  awningScalePulse: 0.018
+  awningSwayAngle: 2.4
+  awningScalePulse: 0.03
   baseSpeed: 1.85
   hangingItems:
-  - {fileID: 1413839211}
-  - {fileID: 1704107985}
-  hangingSwingAngle: 4.8
-  phaseOffset: 2.46
-  speedMultiplier: 0.95
+  - {fileID: 1734441685}
+  hangingSwingAngle: 6
+  phaseOffset: 2.74996
+  speedMultiplier: 1.037
 --- !u!1 &260576412
 GameObject:
   m_ObjectHideFlags: 0
@@ -10750,15 +10747,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level2.MarketStallAnimator
   awningVisual: {fileID: 1148479649}
-  awningSwayAngle: 1.6
-  awningScalePulse: 0.018
+  awningSwayAngle: 2.4
+  awningScalePulse: 0.03
   baseSpeed: 1.85
   hangingItems:
-  - {fileID: 968049186}
-  - {fileID: 750831772}
-  hangingSwingAngle: 4.8
-  phaseOffset: 11.07
-  speedMultiplier: 1.05
+  - {fileID: 106053073}
+  hangingSwingAngle: 6
+  phaseOffset: 0.7001239
+  speedMultiplier: 0.99599993
 --- !u!1 &280599599
 GameObject:
   m_ObjectHideFlags: 0
@@ -23090,15 +23086,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level2.MarketStallAnimator
   awningVisual: {fileID: 1776503626}
-  awningSwayAngle: 1.6
-  awningScalePulse: 0.018
+  awningSwayAngle: 2.4
+  awningScalePulse: 0.03
   baseSpeed: 1.85
   hangingItems:
-  - {fileID: 1627625249}
-  - {fileID: 1894555996}
-  hangingSwingAngle: 4.8
-  phaseOffset: 12.3
-  speedMultiplier: 1.1
+  - {fileID: 1518922353}
+  hangingSwingAngle: 6
+  phaseOffset: 3.1000838
+  speedMultiplier: 0.9329999
 --- !u!1 &625645948
 GameObject:
   m_ObjectHideFlags: 0
@@ -24101,15 +24096,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level2.MarketStallAnimator
   awningVisual: {fileID: 698567894}
-  awningSwayAngle: 1.6
-  awningScalePulse: 0.018
+  awningSwayAngle: 2.4
+  awningScalePulse: 0.03
   baseSpeed: 1.85
   hangingItems:
-  - {fileID: 1203388222}
-  - {fileID: 857843914}
-  hangingSwingAngle: 4.8
-  phaseOffset: 6.15
-  speedMultiplier: 1.1
+  - {fileID: 1388961708}
+  hangingSwingAngle: 6
+  phaseOffset: 3.6666546
+  speedMultiplier: 1.048
 --- !u!1 &644159761
 GameObject:
   m_ObjectHideFlags: 0
@@ -28954,14 +28948,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level2.MarketStallAnimator
   awningVisual: {fileID: 440482406}
-  awningSwayAngle: 1.6
-  awningScalePulse: 0.018
+  awningSwayAngle: 2.4
+  awningScalePulse: 0.03
   baseSpeed: 1.85
   hangingItems:
-  - {fileID: 0}
-  hangingSwingAngle: 4.8
-  phaseOffset: 13.7
-  speedMultiplier: 0.97
+  - {fileID: 1819897266}
+  hangingSwingAngle: 6
+  phaseOffset: 6.4167385
+  speedMultiplier: 1.0809999
 --- !u!1 &769268390
 GameObject:
   m_ObjectHideFlags: 0
@@ -35880,15 +35874,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level2.MarketStallAnimator
   awningVisual: {fileID: 368076718}
-  awningSwayAngle: 1.6
-  awningScalePulse: 0.018
+  awningSwayAngle: 2.4
+  awningScalePulse: 0.03
   baseSpeed: 1.85
   hangingItems:
-  - {fileID: 1389859860}
-  - {fileID: 882380527}
-  hangingSwingAngle: 4.8
-  phaseOffset: 7.38
-  speedMultiplier: 0.9
+  - {fileID: 525122106}
+  hangingSwingAngle: 6
+  phaseOffset: 6.0666146
+  speedMultiplier: 0.98499995
 --- !u!1 &954936844
 GameObject:
   m_ObjectHideFlags: 0
@@ -41440,15 +41433,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd505cfe18595b84696fb04d100a9638, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level2.MarketStallAnimator
-  awningVisual: {fileID: 0}
-  awningSwayAngle: 1.6
-  awningScalePulse: 0.018
+  awningVisual: {fileID: 988368156}
+  awningSwayAngle: 2.4
+  awningScalePulse: 0.03
   baseSpeed: 1.85
   hangingItems:
-  - {fileID: 0}
-  hangingSwingAngle: 4.8
-  phaseOffset: 9.59
-  speedMultiplier: 1.02
+  - {fileID: 1524641884}
+  hangingSwingAngle: 6
+  phaseOffset: 1.6168185
+  speedMultiplier: 1.0069999
 --- !u!1 &1064864579
 GameObject:
   m_ObjectHideFlags: 0
@@ -60102,14 +60095,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level2.MarketStallAnimator
   awningVisual: {fileID: 2110332888}
-  awningSwayAngle: 1.6
-  awningScalePulse: 0.018
+  awningSwayAngle: 2.4
+  awningScalePulse: 0.03
   baseSpeed: 1.85
   hangingItems:
-  - {fileID: 0}
-  hangingSwingAngle: 4.8
-  phaseOffset: 10.96
-  speedMultiplier: 1.07
+  - {fileID: 822084232}
+  hangingSwingAngle: 6
+  phaseOffset: 4.0167785
+  speedMultiplier: 0.9439999
 --- !u!1 &1554074069
 GameObject:
   m_ObjectHideFlags: 0
@@ -73424,16 +73417,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd505cfe18595b84696fb04d100a9638, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level2.MarketStallAnimator
-  awningVisual: {fileID: 0}
-  awningSwayAngle: 1.6
-  awningScalePulse: 0.018
+  awningVisual: {fileID: 540582001}
+  awningSwayAngle: 2.4
+  awningScalePulse: 0.03
   baseSpeed: 1.85
   hangingItems:
-  - {fileID: 409723246}
-  - {fileID: 1506278860}
-  hangingSwingAngle: 4.8
-  phaseOffset: 8.610001
-  speedMultiplier: 0.95
+  - {fileID: 1040058070}
+  hangingSwingAngle: 6
+  phaseOffset: 2.1833892
+  speedMultiplier: 0.92199993
 --- !u!1 &1864911281
 GameObject:
   m_ObjectHideFlags: 0
@@ -75787,15 +75779,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd505cfe18595b84696fb04d100a9638, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level2.MarketStallAnimator
-  awningVisual: {fileID: 0}
-  awningSwayAngle: 1.6
-  awningScalePulse: 0.018
+  awningVisual: {fileID: 612843576}
+  awningSwayAngle: 2.4
+  awningScalePulse: 0.03
   baseSpeed: 1.85
   hangingItems:
-  - {fileID: 0}
-  hangingSwingAngle: 4.8
-  phaseOffset: 12.33
-  speedMultiplier: 0.92
+  - {fileID: 828169232}
+  hangingSwingAngle: 6
+  phaseOffset: 2.533513
+  speedMultiplier: 1.0179999
 --- !u!1 &1918967537
 GameObject:
   m_ObjectHideFlags: 0
@@ -78444,15 +78436,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level2.MarketStallAnimator
   awningVisual: {fileID: 1041347522}
-  awningSwayAngle: 1.6
-  awningScalePulse: 0.018
+  awningSwayAngle: 2.4
+  awningScalePulse: 0.03
   baseSpeed: 1.85
   hangingItems:
-  - {fileID: 487610377}
-  - {fileID: 926866021}
-  hangingSwingAngle: 4.8
-  phaseOffset: 9.84
-  speedMultiplier: 1
+  - {fileID: 1019385536}
+  hangingSwingAngle: 6
+  phaseOffset: 4.583349
+  speedMultiplier: 1.0589999
 --- !u!1 &1981054277
 GameObject:
   m_ObjectHideFlags: 0
@@ -82261,14 +82252,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level2.MarketStallAnimator
   awningVisual: {fileID: 1910292696}
-  awningSwayAngle: 1.6
-  awningScalePulse: 0.018
+  awningSwayAngle: 2.4
+  awningScalePulse: 0.03
   baseSpeed: 1.85
   hangingItems:
-  - {fileID: 246249026}
-  - {fileID: 2133854825}
-  hangingSwingAngle: 4.8
-  phaseOffset: 1.23
+  - {fileID: 2068432149}
+  hangingSwingAngle: 6
+  phaseOffset: 0.35
   speedMultiplier: 0.9
 --- !u!1 &2076005439
 GameObject:
