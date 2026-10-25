@@ -109,14 +109,30 @@ public static class Level2StealthVerifier
         CheckpointManager cm = Object.FindFirstObjectByType<CheckpointManager>();
         Assert("Infraestructura de Captura y Respawn", cl != null && cm != null, $"CaptureListener={cl != null}, CheckpointManager={cm != null}");
 
-        // 9. Recursos de Pociones y Corazones
-        PotionPickup[] potionPickups = Object.FindObjectsByType<PotionPickup>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        HeartPickup[] heartPickups = Object.FindObjectsByType<HeartPickup>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        int blindCount = potionPickups.Count(p => p.Type == PotionType.Blind);
-        int hypnoCount = potionPickups.Count(p => p.Type == PotionType.Hypnotize);
-        int sleepCount = potionPickups.Count(p => p.Type == PotionType.Sleep);
-        Assert("Recursos de Pociones", potionPickups.Length >= 5 && blindCount >= 1 && hypnoCount >= 1 && sleepCount >= 1, $"Pociones: {potionPickups.Length} (Cegar: {blindCount}, Hipnotizar: {hypnoCount}, Dormir: {sleepCount})");
-        Assert("Recursos de Corazones", heartPickups.Length >= 3, $"Corazones coleccionables: {heartPickups.Length}");
+        // 9. Recursos de Pociones y Corazones (en cofres Level2Chest)
+        Level2.Level2Chest[] chests = Object.FindObjectsByType<Level2.Level2Chest>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        int blindCount = 0, hypnoCount = 0, sleepCount = 0, heartCount = 0;
+        foreach (var ch in chests)
+        {
+            if (ch == null || ch.Contents == null) continue;
+            foreach (var entry in ch.Contents)
+            {
+                if (entry == null) continue;
+                if (entry.itemKind == Level2.ChestItemKind.Potion)
+                {
+                    if (entry.potionType == PotionType.Blind) blindCount += entry.amount;
+                    else if (entry.potionType == PotionType.Hypnotize) hypnoCount += entry.amount;
+                    else if (entry.potionType == PotionType.Sleep) sleepCount += entry.amount;
+                }
+                else if (entry.itemKind == Level2.ChestItemKind.Heart)
+                {
+                    heartCount += entry.amount;
+                }
+            }
+        }
+        int totalPotions = blindCount + hypnoCount + sleepCount;
+        Assert("Recursos de Pociones", totalPotions >= 5 && blindCount >= 1 && hypnoCount >= 1 && sleepCount >= 1, $"Pociones en cofres: {totalPotions} (Cegar: {blindCount}, Hipnotizar: {hypnoCount}, Dormir: {sleepCount})");
+        Assert("Recursos de Corazones", heartCount >= 3, $"Corazones en cofres: {heartCount}");
 
         // 10. Soluciones de Sigilo Documentadas por Zona
         // Zona 1: Sin enemigos (calibración)

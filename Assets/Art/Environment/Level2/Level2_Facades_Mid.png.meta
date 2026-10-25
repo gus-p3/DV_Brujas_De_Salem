@@ -1,0 +1,1820 @@
+fileFormatVersion: 2
+guid: 4162f1e206a45d543b7603b5b5430226
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2074279229782639542
+    second: Level2_Facades_Mid_0
+  - first:
+      213: 3060292447345330160
+    second: Level2_Facades_Mid_1
+  - first:
+      213: 641869253593680984
+    second: Level2_Facades_Mid_2
+  - first:
+      213: -5920437410972342837
+    second: Level2_Facades_Mid_3
+  - first:
+      213: 8108474180688773067
+    second: Level2_Facades_Mid_4
+  - first:
+      213: -5477451886744196268
+    second: Level2_Facades_Mid_5
+  - first:
+      213: -6706767237747445253
+    second: Level2_Facades_Mid_6
+  - first:
+      213: 419854169793395384
+    second: Level2_Facades_Mid_7
+  - first:
+      213: -3405204392529713807
+    second: Level2_Facades_Mid_8
+  - first:
+      213: -5897151122297381530
+    second: Level2_Facades_Mid_9
+  - first:
+      213: -1390238558779199782
+    second: Level2_Facades_Mid_10
+  - first:
+      213: -4638806356860521159
+    second: Level2_Facades_Mid_11
+  - first:
+      213: 2616181359372213359
+    second: Level2_Facades_Mid_12
+  - first:
+      213: -9057283246516996070
+    second: Level2_Facades_Mid_13
+  - first:
+      213: -6765677722968052813
+    second: Level2_Facades_Mid_14
+  - first:
+      213: 6825318988685834903
+    second: Level2_Facades_Mid_15
+  - first:
+      213: -4102414159889937182
+    second: Level2_Facades_Mid_16
+  - first:
+      213: 8991298033314972239
+    second: Level2_Facades_Mid_17
+  - first:
+      213: -3565424373677295538
+    second: Level2_Facades_Mid_18
+  - first:
+      213: 6690623660775456272
+    second: Level2_Facades_Mid_19
+  - first:
+      213: 5815357754254449190
+    second: Level2_Facades_Mid_20
+  - first:
+      213: -2183247950676863341
+    second: Level2_Facades_Mid_21
+  - first:
+      213: -2140106364050690810
+    second: Level2_Facades_Mid_22
+  - first:
+      213: -2025596169158636773
+    second: Level2_Facades_Mid_23
+  - first:
+      213: -8889005256534407723
+    second: Level2_Facades_Mid_24
+  - first:
+      213: -3229485591174212718
+    second: Level2_Facades_Mid_25
+  - first:
+      213: -308477625981252000
+    second: Level2_Facades_Mid_26
+  - first:
+      213: -4493887453447444653
+    second: Level2_Facades_Mid_27
+  - first:
+      213: -6866541727185132170
+    second: Level2_Facades_Mid_28
+  - first:
+      213: 272190060424065279
+    second: Level2_Facades_Mid_29
+  - first:
+      213: -461498067910634327
+    second: Level2_Facades_Mid_30
+  - first:
+      213: 323430017511974217
+    second: Level2_Facades_Mid_31
+  - first:
+      213: -2792860716803340501
+    second: Level2_Facades_Mid_32
+  - first:
+      213: -3050585554941220218
+    second: Level2_Facades_Mid_33
+  - first:
+      213: 216260632411603085
+    second: Level2_Facades_Mid_34
+  - first:
+      213: -8292795948560630263
+    second: Level2_Facades_Mid_35
+  - first:
+      213: -6252542994600284389
+    second: Level2_Facades_Mid_36
+  - first:
+      213: 3445051333330649120
+    second: Level2_Facades_Mid_37
+  - first:
+      213: 6056337303390721022
+    second: Level2_Facades_Mid_38
+  - first:
+      213: -6483329856543126463
+    second: Level2_Facades_Mid_39
+  - first:
+      213: -5550853243254898187
+    second: Level2_Facades_Mid_40
+  - first:
+      213: -2492435601350847925
+    second: Level2_Facades_Mid_41
+  - first:
+      213: 7458491014485035009
+    second: Level2_Facades_Mid_42
+  - first:
+      213: 5940213690529794324
+    second: Level2_Facades_Mid_43
+  - first:
+      213: -4983479046844969763
+    second: Level2_Facades_Mid_44
+  - first:
+      213: 4240419661665797352
+    second: Level2_Facades_Mid_45
+  - first:
+      213: 4922371537570957825
+    second: Level2_Facades_Mid_46
+  - first:
+      213: 8114594619181667746
+    second: Level2_Facades_Mid_47
+  - first:
+      213: -7903539721171212207
+    second: Level2_Facades_Mid_48
+  - first:
+      213: 9179782039548351338
+    second: Level2_Facades_Mid_49
+  - first:
+      213: 3345384711831769548
+    second: Level2_Facades_Mid_50
+  - first:
+      213: -5795294428627166855
+    second: Level2_Facades_Mid_51
+  - first:
+      213: 9154118364012878746
+    second: Level2_Facades_Mid_52
+  - first:
+      213: 5916620483257999465
+    second: Level2_Facades_Mid_53
+  - first:
+      213: -8534298839873803210
+    second: Level2_Facades_Mid_54
+  - first:
+      213: -6876384237230492460
+    second: Level2_Facades_Mid_55
+  - first:
+      213: 278894839548022455
+    second: Level2_Facades_Mid_56
+  - first:
+      213: -3959098689862363483
+    second: Level2_Facades_Mid_57
+  - first:
+      213: -3333778231229508109
+    second: Level2_Facades_Mid_58
+  - first:
+      213: -7557109629329611341
+    second: Level2_Facades_Mid_59
+  - first:
+      213: 781291370940675355
+    second: Level2_Facades_Mid_60
+  - first:
+      213: 1189300929717428976
+    second: Level2_Facades_Mid_61
+  - first:
+      213: 8253119139326623593
+    second: Level2_Facades_Mid_62
+  - first:
+      213: 4369282107230150648
+    second: Level2_Facades_Mid_63
+  - first:
+      213: 7550318317147212534
+    second: Level2_Facades_Mid_64
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 1
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_0
+      rect:
+        serializedVersion: 2
+        x: 77
+        y: 612
+        width: 73
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b34a2038f159cc10800000000000000
+      internalID: 2074279229782639542
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_1
+      rect:
+        serializedVersion: 2
+        x: 81
+        y: 665
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f744d844c7587a20800000000000000
+      internalID: 3060292447345330160
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_2
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 663
+        width: 15
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 85c42b47fa068e800800000000000000
+      internalID: 641869253593680984
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_3
+      rect:
+        serializedVersion: 2
+        x: 785
+        y: 638
+        width: 137
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc56f04ea8166dda0800000000000000
+      internalID: -5920437410972342837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_4
+      rect:
+        serializedVersion: 2
+        x: 1713
+        y: 516
+        width: 109
+        height: 168
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bcf716a8e46178070800000000000000
+      internalID: 8108474180688773067
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_5
+      rect:
+        serializedVersion: 2
+        x: 1932
+        y: 562
+        width: 142
+        height: 113
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 45ba150a78e2cf3b0800000000000000
+      internalID: -5477451886744196268
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_6
+      rect:
+        serializedVersion: 2
+        x: 109
+        y: 567
+        width: 69
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf1f5d23bb6cce2a0800000000000000
+      internalID: -6706767237747445253
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_7
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 588
+        width: 29
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ba7008942f93d500800000000000000
+      internalID: 419854169793395384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_8
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 584
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 175aaa385a84eb0d0800000000000000
+      internalID: -3405204392529713807
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_9
+      rect:
+        serializedVersion: 2
+        x: 261
+        y: 508
+        width: 141
+        height: 107
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66d1ba87c4c192ea0800000000000000
+      internalID: -5897151122297381530
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_10
+      rect:
+        serializedVersion: 2
+        x: 1566
+        y: 503
+        width: 26
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ade2ae68561e4bce0800000000000000
+      internalID: -1390238558779199782
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_11
+      rect:
+        serializedVersion: 2
+        x: 210
+        y: 531
+        width: 75
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 93531852236af9fb0800000000000000
+      internalID: -4638806356860521159
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_12
+      rect:
+        serializedVersion: 2
+        x: 211
+        y: 573
+        width: 15
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f6c1161d51b8e4420800000000000000
+      internalID: 2616181359372213359
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_13
+      rect:
+        serializedVersion: 2
+        x: 131
+        y: 562
+        width: 11
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a18f145ffd01e4280800000000000000
+      internalID: -9057283246516996070
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_14
+      rect:
+        serializedVersion: 2
+        x: 230
+        y: 526
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3bb27b105fb7b12a0800000000000000
+      internalID: -6765677722968052813
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_15
+      rect:
+        serializedVersion: 2
+        x: 595
+        y: 503
+        width: 43
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79af857457768be50800000000000000
+      internalID: 6825318988685834903
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_16
+      rect:
+        serializedVersion: 2
+        x: 1105
+        y: 535
+        width: 36
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ec4a3e9e0c4117c0800000000000000
+      internalID: -4102414159889937182
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_17
+      rect:
+        serializedVersion: 2
+        x: 1145
+        y: 522
+        width: 16
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f4248616ce187cc70800000000000000
+      internalID: 8991298033314972239
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_18
+      rect:
+        serializedVersion: 2
+        x: 1157
+        y: 531
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e48f17d2c61158ec0800000000000000
+      internalID: -3565424373677295538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_19
+      rect:
+        serializedVersion: 2
+        x: 1176
+        y: 516
+        width: 31
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01e385265ced9dc50800000000000000
+      internalID: 6690623660775456272
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_20
+      rect:
+        serializedVersion: 2
+        x: 1280
+        y: 520
+        width: 16
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 62a5620011d44b050800000000000000
+      internalID: 5815357754254449190
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_21
+      rect:
+        serializedVersion: 2
+        x: 1309
+        y: 475
+        width: 71
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3965e436e8b83b1e0800000000000000
+      internalID: -2183247950676863341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_22
+      rect:
+        serializedVersion: 2
+        x: 1165
+        y: 519
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60da435c990dc42e0800000000000000
+      internalID: -2140106364050690810
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_23
+      rect:
+        serializedVersion: 2
+        x: 1744
+        y: 516
+        width: 13
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b1b48e62403a3e3e0800000000000000
+      internalID: -2025596169158636773
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_24
+      rect:
+        serializedVersion: 2
+        x: 456
+        y: 485
+        width: 39
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5d5cfada0d8e3a480800000000000000
+      internalID: -8889005256534407723
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_25
+      rect:
+        serializedVersion: 2
+        x: 520
+        y: 499
+        width: 10
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29391d227ff8e23d0800000000000000
+      internalID: -3229485591174212718
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_26
+      rect:
+        serializedVersion: 2
+        x: 524
+        y: 491
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06e4b3acb3118bbf0800000000000000
+      internalID: -308477625981252000
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_27
+      rect:
+        serializedVersion: 2
+        x: 597
+        y: 473
+        width: 60
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3572ea4bb2182a1c0800000000000000
+      internalID: -4493887453447444653
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_28
+      rect:
+        serializedVersion: 2
+        x: 1229
+        y: 490
+        width: 60
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 675abbbfda425b0a0800000000000000
+      internalID: -6866541727185132170
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_29
+      rect:
+        serializedVersion: 2
+        x: 1300
+        y: 484
+        width: 18
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ff0f7f6fa6307c300800000000000000
+      internalID: 272190060424065279
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_30
+      rect:
+        serializedVersion: 2
+        x: 1449
+        y: 464
+        width: 40
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9a458adc3fd6899f0800000000000000
+      internalID: -461498067910634327
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_31
+      rect:
+        serializedVersion: 2
+        x: 1568
+        y: 434
+        width: 25
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 945ef7723ed0d7400800000000000000
+      internalID: 323430017511974217
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_32
+      rect:
+        serializedVersion: 2
+        x: 2030
+        y: 464
+        width: 54
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b274bcba9f3cd39d0800000000000000
+      internalID: -2792860716803340501
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_33
+      rect:
+        serializedVersion: 2
+        x: 2065
+        y: 486
+        width: 14
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68a6ac8b9942aa5d0800000000000000
+      internalID: -3050585554941220218
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_34
+      rect:
+        serializedVersion: 2
+        x: 2135
+        y: 482
+        width: 37
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d808bcd36ef400300800000000000000
+      internalID: 216260632411603085
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_35
+      rect:
+        serializedVersion: 2
+        x: 339
+        y: 476
+        width: 51
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 90ebe3b95021aec80800000000000000
+      internalID: -8292795948560630263
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_36
+      rect:
+        serializedVersion: 2
+        x: 394
+        y: 474
+        width: 14
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b1f2ef716418a39a0800000000000000
+      internalID: -6252542994600284389
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_37
+      rect:
+        serializedVersion: 2
+        x: 412
+        y: 481
+        width: 17
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 020c82c5fe74fcf20800000000000000
+      internalID: 3445051333330649120
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_38
+      rect:
+        serializedVersion: 2
+        x: 528
+        y: 480
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ef31d8880be6c0450800000000000000
+      internalID: 6056337303390721022
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_39
+      rect:
+        serializedVersion: 2
+        x: 554
+        y: 481
+        width: 10
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 14c001b78d59606a0800000000000000
+      internalID: -6483329856543126463
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_40
+      rect:
+        serializedVersion: 2
+        x: 571
+        y: 480
+        width: 29
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5f1877b826867f2b0800000000000000
+      internalID: -5550853243254898187
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_41
+      rect:
+        serializedVersion: 2
+        x: 653
+        y: 474
+        width: 48
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4212fba607196dd0800000000000000
+      internalID: -2492435601350847925
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_42
+      rect:
+        serializedVersion: 2
+        x: 1184
+        y: 463
+        width: 27
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 108c2d69f02e18760800000000000000
+      internalID: 7458491014485035009
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_43
+      rect:
+        serializedVersion: 2
+        x: 1362
+        y: 469
+        width: 19
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 419c0f101e0ef6250800000000000000
+      internalID: 5940213690529794324
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_44
+      rect:
+        serializedVersion: 2
+        x: 1392
+        y: 466
+        width: 23
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ddc0433e53027dab0800000000000000
+      internalID: -4983479046844969763
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_45
+      rect:
+        serializedVersion: 2
+        x: 1992
+        y: 470
+        width: 20
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e40c20373ff8da30800000000000000
+      internalID: 4240419661665797352
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_46
+      rect:
+        serializedVersion: 2
+        x: 2011
+        y: 469
+        width: 15
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 10a096565d6cf4440800000000000000
+      internalID: 4922371537570957825
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_47
+      rect:
+        serializedVersion: 2
+        x: 2085
+        y: 462
+        width: 52
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a59e9c20d4dc9070800000000000000
+      internalID: 8114594619181667746
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_48
+      rect:
+        serializedVersion: 2
+        x: 2141
+        y: 479
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 15866639f7cf05290800000000000000
+      internalID: -7903539721171212207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_49
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 2172
+        height: 475
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a635aced023256f70800000000000000
+      internalID: 9179782039548351338
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_50
+      rect:
+        serializedVersion: 2
+        x: 729
+        y: 473
+        width: 19
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc151c9bba13d6e20800000000000000
+      internalID: 3345384711831769548
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_51
+      rect:
+        serializedVersion: 2
+        x: 1210
+        y: 464
+        width: 17
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 97990e40c6af29fa0800000000000000
+      internalID: -5795294428627166855
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_52
+      rect:
+        serializedVersion: 2
+        x: 1413
+        y: 473
+        width: 9
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9b1ed6c626f90f70800000000000000
+      internalID: 9154118364012878746
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_53
+      rect:
+        serializedVersion: 2
+        x: 970
+        y: 462
+        width: 12
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 960a46f5bfe0c1250800000000000000
+      internalID: 5916620483257999465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_54
+      rect:
+        serializedVersion: 2
+        x: 980
+        y: 462
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 63c2b4afb64109980800000000000000
+      internalID: -8534298839873803210
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_55
+      rect:
+        serializedVersion: 2
+        x: 1000
+        y: 451
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d4f7c808fc2290a0800000000000000
+      internalID: -6876384237230492460
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_56
+      rect:
+        serializedVersion: 2
+        x: 1216
+        y: 462
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7be03f00165ded300800000000000000
+      internalID: 278894839548022455
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_57
+      rect:
+        serializedVersion: 2
+        x: 1230
+        y: 452
+        width: 19
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5a61a00c7b47e09c0800000000000000
+      internalID: -3959098689862363483
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_58
+      rect:
+        serializedVersion: 2
+        x: 1455
+        y: 440
+        width: 8
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f592af9c5a0cb1d0800000000000000
+      internalID: -3333778231229508109
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_59
+      rect:
+        serializedVersion: 2
+        x: 1704
+        y: 448
+        width: 15
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3b5ef17d4d0cf1790800000000000000
+      internalID: -7557109629329611341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_60
+      rect:
+        serializedVersion: 2
+        x: 1915
+        y: 456
+        width: 20
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b153ff6cc54b7da00800000000000000
+      internalID: 781291370940675355
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_61
+      rect:
+        serializedVersion: 2
+        x: 1939
+        y: 458
+        width: 9
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f269d6f4ee318010800000000000000
+      internalID: 1189300929717428976
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_62
+      rect:
+        serializedVersion: 2
+        x: 1962
+        y: 462
+        width: 25
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96f7a8c5128f88270800000000000000
+      internalID: 8253119139326623593
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_63
+      rect:
+        serializedVersion: 2
+        x: 225
+        y: 374
+        width: 18
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ff5ce45deec2ac30800000000000000
+      internalID: 4369282107230150648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Level2_Facades_Mid_64
+      rect:
+        serializedVersion: 2
+        x: 986
+        y: 451
+        width: 12
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6fa4fa2918e18c860800000000000000
+      internalID: 7550318317147212534
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Level2_Facades_Mid_0: 2074279229782639542
+      Level2_Facades_Mid_1: 3060292447345330160
+      Level2_Facades_Mid_10: -1390238558779199782
+      Level2_Facades_Mid_11: -4638806356860521159
+      Level2_Facades_Mid_12: 2616181359372213359
+      Level2_Facades_Mid_13: -9057283246516996070
+      Level2_Facades_Mid_14: -6765677722968052813
+      Level2_Facades_Mid_15: 6825318988685834903
+      Level2_Facades_Mid_16: -4102414159889937182
+      Level2_Facades_Mid_17: 8991298033314972239
+      Level2_Facades_Mid_18: -3565424373677295538
+      Level2_Facades_Mid_19: 6690623660775456272
+      Level2_Facades_Mid_2: 641869253593680984
+      Level2_Facades_Mid_20: 5815357754254449190
+      Level2_Facades_Mid_21: -2183247950676863341
+      Level2_Facades_Mid_22: -2140106364050690810
+      Level2_Facades_Mid_23: -2025596169158636773
+      Level2_Facades_Mid_24: -8889005256534407723
+      Level2_Facades_Mid_25: -3229485591174212718
+      Level2_Facades_Mid_26: -308477625981252000
+      Level2_Facades_Mid_27: -4493887453447444653
+      Level2_Facades_Mid_28: -6866541727185132170
+      Level2_Facades_Mid_29: 272190060424065279
+      Level2_Facades_Mid_3: -5920437410972342837
+      Level2_Facades_Mid_30: -461498067910634327
+      Level2_Facades_Mid_31: 323430017511974217
+      Level2_Facades_Mid_32: -2792860716803340501
+      Level2_Facades_Mid_33: -3050585554941220218
+      Level2_Facades_Mid_34: 216260632411603085
+      Level2_Facades_Mid_35: -8292795948560630263
+      Level2_Facades_Mid_36: -6252542994600284389
+      Level2_Facades_Mid_37: 3445051333330649120
+      Level2_Facades_Mid_38: 6056337303390721022
+      Level2_Facades_Mid_39: -6483329856543126463
+      Level2_Facades_Mid_4: 8108474180688773067
+      Level2_Facades_Mid_40: -5550853243254898187
+      Level2_Facades_Mid_41: -2492435601350847925
+      Level2_Facades_Mid_42: 7458491014485035009
+      Level2_Facades_Mid_43: 5940213690529794324
+      Level2_Facades_Mid_44: -4983479046844969763
+      Level2_Facades_Mid_45: 4240419661665797352
+      Level2_Facades_Mid_46: 4922371537570957825
+      Level2_Facades_Mid_47: 8114594619181667746
+      Level2_Facades_Mid_48: -7903539721171212207
+      Level2_Facades_Mid_49: 9179782039548351338
+      Level2_Facades_Mid_5: -5477451886744196268
+      Level2_Facades_Mid_50: 3345384711831769548
+      Level2_Facades_Mid_51: -5795294428627166855
+      Level2_Facades_Mid_52: 9154118364012878746
+      Level2_Facades_Mid_53: 5916620483257999465
+      Level2_Facades_Mid_54: -8534298839873803210
+      Level2_Facades_Mid_55: -6876384237230492460
+      Level2_Facades_Mid_56: 278894839548022455
+      Level2_Facades_Mid_57: -3959098689862363483
+      Level2_Facades_Mid_58: -3333778231229508109
+      Level2_Facades_Mid_59: -7557109629329611341
+      Level2_Facades_Mid_6: -6706767237747445253
+      Level2_Facades_Mid_60: 781291370940675355
+      Level2_Facades_Mid_61: 1189300929717428976
+      Level2_Facades_Mid_62: 8253119139326623593
+      Level2_Facades_Mid_63: 4369282107230150648
+      Level2_Facades_Mid_64: 7550318317147212534
+      Level2_Facades_Mid_7: 419854169793395384
+      Level2_Facades_Mid_8: -3405204392529713807
+      Level2_Facades_Mid_9: -5897151122297381530
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

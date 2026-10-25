@@ -108,12 +108,12 @@ namespace Level2
                 bool hasKey = KeyInventory.Instance != null && KeyInventory.Instance.HasKey(requiredKeyId);
                 if (hasKey)
                 {
-                    return $"E — Abrir {chestTitle} (Usar {requiredKeyName})";
+                    return $"Q: Abrir {chestTitle} (Usar {requiredKeyName})";
                 }
-                return $"E — {chestTitle} (Requiere {requiredKeyName})";
+                return $"Q: {chestTitle} (Requiere {requiredKeyName})";
             }
 
-            return $"E — Abrir {chestTitle}";
+            return $"Q: Abrir {chestTitle}";
         }
 
         public void Interact(GameObject interactor)

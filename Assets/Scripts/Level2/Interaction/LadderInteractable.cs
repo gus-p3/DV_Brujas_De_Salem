@@ -125,8 +125,6 @@ namespace Level2
         public bool CanInteract(GameObject interactor)
         {
             if (interactor == null) return false;
-            TransformationManager tm = interactor.GetComponent<TransformationManager>();
-            if (tm != null && tm.IsCatForm) return false;
             return true;
         }
 
