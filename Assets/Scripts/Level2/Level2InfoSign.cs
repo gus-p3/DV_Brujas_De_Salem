@@ -57,8 +57,9 @@ namespace Level2
             Canvas canvas = canvasGO.GetComponent<Canvas>();
             if (canvas == null) canvas = canvasGO.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.WorldSpace;
-            canvas.sortingLayerName = "Foreground";
-            canvas.sortingOrder = 20;
+            // Delante de fachadas (-4..-1) y detrás de la bruja y los NPC (≥1): nunca tapa al personaje
+            canvas.sortingLayerName = "Gameplay";
+            canvas.sortingOrder = 0;
             ((RectTransform)canvasGO.transform).sizeDelta = panelSize * PixelsPerUnit;
 
             canvasGroup = canvasGO.GetComponent<CanvasGroup>();

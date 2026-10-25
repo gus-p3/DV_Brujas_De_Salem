@@ -18,7 +18,7 @@ namespace Level2
     {
         [Header("Configuración de Meta")]
         [Tooltip("Mensaje de advertencia si intenta salir sin los ingredientes requeridos.")]
-        [SerializeField] private string missingIngredientsMessage = "Aún te faltan ingredientes para el aquelarre.";
+        [SerializeField] private string missingIngredientsMessage = "Aún te faltan ingredientes. Revisa los cofres de las casas y de la calle.";
 
         [Tooltip("Enfriamiento entre avisos (s).")]
         [SerializeField] private float messageCooldown = 2.0f;

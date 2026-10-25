@@ -74,17 +74,22 @@ namespace Level2
 
         private void Update()
         {
-            if (!Input.GetKeyDown(Level2Controls.InteractKey)) return;
-            if (Time.unscaledTime - lastEmptyNotice < emptyChestCooldown) return;
+            if (Input.GetKeyDown(Level2Controls.InteractKey)) TryNotifyEmptyChest();
+        }
+
+        /// <summary>Lo que hace Q junto a un cofre vaciado. Devuelve true si mostró el aviso.</summary>
+        public bool TryNotifyEmptyChest()
+        {
+            if (Time.unscaledTime - lastEmptyNotice < emptyChestCooldown) return false;
             if (player == null)
             {
                 PlayerController pc = Object.FindFirstObjectByType<PlayerController>();
-                if (pc == null) return;
+                if (pc == null) return false;
                 player = pc.transform;
                 interactor = pc.GetComponent<PlayerInteractor>();
             }
             // Si hay otra interacción enfocada (puerta, escalera, otro cofre), Q le pertenece a ella
-            if (interactor != null && interactor.CurrentFocus != null) return;
+            if (interactor != null && interactor.CurrentFocus != null) return false;
 
             foreach (Level2Chest chest in chests)
             {
@@ -92,8 +97,9 @@ namespace Level2
                 if (Vector2.Distance(chest.transform.position, player.position) > emptyChestRadius) continue;
                 lastEmptyNotice = Time.unscaledTime;
                 ShowMessage(EmptyChestMessage);
-                return;
+                return true;
             }
+            return false;
         }
 
         private static void ShowMessage(string message)

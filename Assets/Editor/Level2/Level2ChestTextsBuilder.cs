@@ -59,7 +59,7 @@ public static class Level2ChestTextsBuilder
         // 3a. Letrero de calle junto al spawn, señalando al cofre del primer puesto
         Transform zone1 = GameObject.Find("Environment/Zone_1_Entrada").transform;
         Transform post = Level2StallsDoorsFixer.Child(zone1, "Sign_Z1_ChestsStreet");
-        Level2StallsDoorsFixer.SetSprite(post, AssetDatabase.LoadAllAssetsAtPath("Assets/Art/Environment/Env_Sign.png").OfType<Sprite>().First(), 0, true);
+        Level2StallsDoorsFixer.SetSprite(post, AssetDatabase.LoadAllAssetsAtPath("Assets/Art/Environment/Env_Sign.png").OfType<Sprite>().First(), -1, true);
         post.localScale = new Vector3(0.55f, 0.55f, 1f);
         post.position = new Vector3(4.3f, 1.3f, 0f);
         Physics2D.SyncTransforms();
@@ -90,6 +90,15 @@ public static class Level2ChestTextsBuilder
             so.FindProperty("lockedMessage").stringValue = GateLockedText;
             so.ApplyModifiedPropertiesWithoutUndo();
             log.AppendLine("  IngredientGate: recuerda revisar los cofres de las casas y de la calle");
+        }
+        // La meta comparte la zona del portón: su aviso dice lo mismo para no pisarlo con otro texto
+        Level2Goal goal = Object.FindFirstObjectByType<Level2Goal>(FindObjectsInactive.Include);
+        if (goal != null)
+        {
+            SerializedObject so = new SerializedObject(goal);
+            so.FindProperty("missingIngredientsMessage").stringValue = GateLockedText;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            log.AppendLine("  Level2Goal: mismo aviso que el portón");
         }
     }
 

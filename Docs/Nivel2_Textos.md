@@ -23,11 +23,11 @@ Para aplicar los textos se usa **Tools > Nivel 2 > Puestos y puertas > 5. Textos
 | «Necesitas forma humana para abrir esto» | Banner del HUD. | Al pulsar Q junto a un cofre en forma de gato. Tiene un enfriamiento de 2 s para no repetirse. | `Level2Chest` (ya existía) |
 | «Obtuviste: Hongo x1, Poción de Dormir x1» | Banner del HUD. | Al abrir un cofre. | `Level2Chest` (ya existía) |
 | «Este cofre ya está vacío» | Banner del HUD. | Al pulsar Q junto a un cofre ya vaciado, siempre que no haya otra interacción enfocada. Tiene un enfriamiento de 1.5 s. | `Level2ChestGuideHUD` |
-| «Aún te faltan ingredientes. Revisa los cofres de las casas y de la calle.» | Banner del HUD, en el portón de salida (Zona 6). | Al llegar sin los 8 ingredientes. Tiene un enfriamiento de 2 s. | `IngredientGate` (propio del Nivel 2) |
+| «Aún te faltan ingredientes. Revisa los cofres de las casas y de la calle.» | Banner del HUD, en el portón de salida y la meta (Zona 6). | Al llegar sin los 8 ingredientes. Tiene un enfriamiento de 2 s. | `IngredientGate` y `Level2Goal` (propios del Nivel 2), con el mismo texto para que uno no pise al otro |
 | «Sello arcano activo (x/8). Revisa los cofres de las casas y de la calle.» | Banner del HUD, en la puerta del Santuario (Zona 6). | Al pulsar Q sin los ingredientes. | `HouseDoor` (propio del Nivel 2) |
 | «Q: interactuar · 1/2/3: elegir poción · E: lanzar» | HUD propio, en la guía de controles. | Siempre. | `Level2Controls` (ya existía) |
 
 ## Legibilidad
 
-- **Letreros en el mundo:** son un tablón de madera oscura semitransparente con borde dorado, como los indicadores de puertas. El texto es crema, en negrita y con contorno oscuro para leerse sobre el atardecer. Se dibujan en la capa `Foreground` y no tapan puertas, cofres, puestos ni la patrulla del guardia del tejado del callejón.
+- **Letreros en el mundo:** son un tablón de madera oscura semitransparente con borde dorado, como los indicadores de puertas. El texto es crema, en negrita y con contorno oscuro para leerse sobre el atardecer. Se dibujan en la capa `Gameplay` con orden 0: quedan delante de las fachadas pero detrás de la bruja y de los NPC, así que nunca tapan al personaje. Tampoco tapan puertas, cofres, puestos ni la patrulla del guardia del tejado del callejón.
 - **Fuente:** `LiberationSans SDF` incluye tildes, ñ, ¿ y ¡. La flecha → sale de su fuente de respaldo. El verificador comprueba que no falte ningún glifo.
