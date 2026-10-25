@@ -77,14 +77,13 @@ def rail(d, x0, x1, y0, y1):
 
 
 def create_ladder():
-    # 54 x 96 px finales a 64 PPU: remate inferior 16 px, tramo central 64 px (1 peldaño cada 1 u), remate superior 16 px
+    # 54 x 64 px finales a 64 PPU: remate inferior 16 px, tramo central 32 px (1 peldaño cada 0.5 u), remate superior 16 px
     s = 2  # se dibuja al doble y se reduce con antialias
-    w, h = 54 * s, 96 * s
+    w, h = 54 * s, 64 * s
     img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     lx0, lx1 = 4 * s, 13 * s
     rx0, rx1 = w - 13 * s, w - 4 * s
-    cap = 16 * s
 
     # Largueros: recorren todo el sprite; los remates redondeados quedan en las zonas de borde (no se repiten)
     rail(d, lx0, lx1, 0, h - 1)

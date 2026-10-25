@@ -94,6 +94,11 @@ namespace Level2
                     player.GetComponent<LadderClimber>().StopClimbing(restoreVelocityZero: true);
                 }
 
+                if (player.GetComponent<LadderClimbAnimator>() == null)
+                {
+                    player.gameObject.AddComponent<LadderClimbAnimator>();
+                }
+
                 if (player.GetComponent<PlayerInteractor>() == null)
                 {
                     player.gameObject.AddComponent<PlayerInteractor>();
