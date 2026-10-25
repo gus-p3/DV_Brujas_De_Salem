@@ -47,7 +47,7 @@ namespace Level2
 
         public string GetPromptText(GameObject interactor)
         {
-            return $"E — {promptLabel} (o W / ↑ para trepar)";
+            return $"Q: {promptLabel} (o W / ↑ para trepar)";
         }
 
         public void Interact(GameObject interactor)

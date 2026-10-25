@@ -43,11 +43,21 @@ namespace Level2
 
         public string GetPromptText(GameObject interactor)
         {
-            return $"E — Examinar {objectTitle}";
+            return $"Q: Examinar {objectTitle}";
         }
 
         public void Interact(GameObject interactor)
         {
+            if (interactor != null)
+            {
+                TransformationManager tm = interactor.GetComponent<TransformationManager>();
+                if (tm != null && tm.IsCatForm)
+                {
+                    Level2CatPickupGuard.NotifyCatBlocked(forceShow: true);
+                    return;
+                }
+            }
+
             bool firstTime = KeyInventory.Instance != null && KeyInventory.Instance.MarkSecretDiscovered(loreId);
             if (firstTime && GameManager.Instance != null && firstReadBonusScore > 0)
             {

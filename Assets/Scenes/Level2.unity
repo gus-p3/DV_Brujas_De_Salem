@@ -68833,7 +68833,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Level2.PlayerInteractor
   detectionBoxSize: {x: 1.45, y: 1.85}
   detectionBoxOffset: {x: 0, y: 0.85}
-  interactKey: 101
+  interactKey: 113
   interactionCooldown: 0.35
 --- !u!114 &1986901634
 MonoBehaviour:

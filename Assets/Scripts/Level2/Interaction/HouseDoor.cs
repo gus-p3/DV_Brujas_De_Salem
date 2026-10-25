@@ -106,38 +106,48 @@ namespace Level2
             return true;
         }
 
+        private static float lastGlobalDoorUseTime = -10f;
+        private const float DoorUseCooldown = 0.35f;
+
         public string GetPromptText(GameObject interactor)
         {
             if (permanentlyBarred)
             {
-                return $"E — Examinar puerta ({actionLabel})";
+                return $"Q: Examinar puerta ({actionLabel})";
             }
 
             if (requiresAllIngredients && (IngredientInventory.Instance == null || !IngredientInventory.Instance.AreAllRequiredCollected))
             {
-                return $"E — {actionLabel} (Sello de Ingredientes)";
+                return $"Q: {actionLabel} (Sello de Ingredientes)";
             }
 
             if (isLocked)
             {
                 if (!string.IsNullOrEmpty(requiredKeyId) && KeyInventory.Instance != null && KeyInventory.Instance.HasKey(requiredKeyId))
                 {
-                    return $"E — Desbloquear con {requiredKeyDisplayName}";
+                    return $"Q: Desbloquear con {requiredKeyDisplayName}";
                 }
-                return $"E — Cerrada (Requiere {requiredKeyDisplayName})";
+                return $"Q: Cerrada (Requiere {requiredKeyDisplayName})";
             }
 
-            return $"E — {actionLabel}";
+            return $"Q: {actionLabel}";
         }
 
         public void Interact(GameObject interactor)
         {
             if (interactor == null) return;
 
-            TransformationManager tm = interactor.GetComponent<TransformationManager>();
-            if (tm != null && tm.IsCatForm)
+            if (Application.isPlaying && Time.unscaledTime - lastGlobalDoorUseTime < DoorUseCooldown)
             {
-                ShowFeedback("Necesitas forma humana para abrir puertas");
+                return;
+            }
+
+            TransformationManager tm = interactor.GetComponent<TransformationManager>();
+            // Si está en el exterior y la puerta está cerrada con llave o sellada, requiere forma humana;
+            // desde el interior siempre puede salir para nunca quedar atrapado en forma de gato.
+            if (tm != null && tm.IsCatForm && owningInterior == null && (isLocked || permanentlyBarred || requiresAllIngredients))
+            {
+                ShowFeedback("Necesitas forma humana para abrir esta puerta");
                 return;
             }
 
@@ -174,6 +184,8 @@ namespace Level2
                 ShowFeedback("La puerta no conduce a ningún sitio accesible.");
                 return;
             }
+
+            lastGlobalDoorUseTime = Time.unscaledTime;
 
             // Abrir visualmente ambas puertas conectadas
             SetOpenVisual(true);

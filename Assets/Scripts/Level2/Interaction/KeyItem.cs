@@ -57,7 +57,7 @@ namespace Level2
         public string GetPromptText(GameObject interactor)
         {
             if (collected) return string.Empty;
-            return $"E — Recoger {keyDisplayName}";
+            return $"Q: Recoger {keyDisplayName}";
         }
 
         public void Interact(GameObject interactor)
@@ -80,10 +80,10 @@ namespace Level2
             if (collected || interactor == null) return;
 
             TransformationManager tm = interactor.GetComponent<TransformationManager>();
+            if (tm == null) tm = Object.FindFirstObjectByType<TransformationManager>();
             if (tm != null && tm.IsCatForm)
             {
-                HUDController hud = UnityEngine.Object.FindFirstObjectByType<HUDController>();
-                if (hud != null) hud.ShowMessage("Necesitas forma humana para recoger esta llave", 1.8f);
+                Level2CatPickupGuard.NotifyCatBlocked(forceShow: true);
                 return;
             }
 

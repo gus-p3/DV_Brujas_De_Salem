@@ -19,8 +19,8 @@ namespace Level2
         [SerializeField] private Vector2 detectionBoxSize = new Vector2(1.45f, 1.85f);
         [Tooltip("Desplazamiento vertical del centro de detección.")]
         [SerializeField] private Vector2 detectionBoxOffset = new Vector2(0f, 0.85f);
-        [Tooltip("Tecla principal para interactuar con puertas, cofres y objetos.")]
-        [SerializeField] private KeyCode interactKey = KeyCode.E;
+        [Tooltip("Tecla principal para interactuar con puertas, cofres y objetos del Nivel 2 (Q para no colisionar con E de lanzar pociones).")]
+        [SerializeField] private KeyCode interactKey = KeyCode.Q;
         [Tooltip("Enfriamiento mínimo entre interacciones (s) para evitar dobles activaciones.")]
         [SerializeField] private float interactionCooldown = 0.35f;
 
@@ -33,9 +33,11 @@ namespace Level2
         private bool potionInventorySuppressed;
 
         public IInteractable CurrentFocus => currentFocus;
+        public KeyCode InteractKey => interactKey;
 
         private void Awake()
         {
+            interactKey = KeyCode.Q;
             potionInventory = GetComponent<PotionInventory>();
         }
 
@@ -70,10 +72,9 @@ namespace Level2
 
             RefreshFocus();
 
-            // Si estamos frente a un objeto que usa la tecla E (puerta, cofre, grimorio),
-            // suspendemos temporalmente PotionInventory para que pulsar E no lance una poción,
-            // manteniendo activas las teclas 1, 2, 3 de selección de poción.
-            bool shouldSuppressPotionThrow = currentFocus != null && currentFocus.UsesInteractKey;
+            // Como la tecla de interacción en Nivel 2 es Q y la de pociones es E,
+            // ambas acciones están completamente separadas y E conserva su función normal.
+            bool shouldSuppressPotionThrow = interactKey == KeyCode.E && currentFocus != null && currentFocus.UsesInteractKey;
             SetPotionThrowSuppressed(shouldSuppressPotionThrow);
 
             if (shouldSuppressPotionThrow && potionInventory != null)
@@ -88,6 +89,17 @@ namespace Level2
                     TriggerCurrentInteraction();
                 }
             }
+        }
+
+        /// <summary>
+        /// Simula la pulsación de una tecla sobre el interactor (para pruebas automatizadas Q vs E).
+        /// Devuelve true solo si la tecla coincide con interactKey (Q) y ejecuta la interacción.
+        /// </summary>
+        public bool TryProcessKey(KeyCode pressedKey, bool ignoreCooldown = false)
+        {
+            if (pressedKey != interactKey) return false;
+            if (!ignoreCooldown && Time.unscaledTime < lastInteractTime + interactionCooldown) return false;
+            return TriggerCurrentInteraction();
         }
 
         /// <summary>
