@@ -601,50 +601,8 @@ public static class Level2CompleteFixer
     [MenuItem("Tools/Nivel 2/5. Aplicar Bloque E (Nuevo Fondo con Parallax >= 3 Capas)")]
     public static void ApplyBlockE_NewParallaxBackground()
     {
-        EnsureLevel2Open();
-
-        EnsureSinglePanoramaTextureImport(SKY_CLEAN_PATH);
-        EnsureSinglePanoramaTextureImport(FAR_CLEAN_PATH);
-        EnsureSinglePanoramaTextureImport(MID_CLEAN_PATH);
-
-        Sprite skySprite = LoadSingleSprite(SKY_CLEAN_PATH);
-        if (skySprite == null) skySprite = LoadSingleSprite(SKY_FONDO_PATH);
-        Sprite farSprite = LoadSingleSprite(FAR_CLEAN_PATH);
-        Sprite midSprite = LoadSingleSprite(MID_CLEAN_PATH);
-
-        if (skySprite == null || farSprite == null || midSprite == null)
-        {
-            Debug.LogError($"[Level2CompleteFixer] Faltan sprites de fondo: sky={skySprite}, far={farSprite}, mid={midSprite}");
-            return;
-        }
-
-        GameObject parallaxRoot = GameObject.Find("Environment/Parallax");
-        if (parallaxRoot == null)
-        {
-            GameObject env = GameObject.Find("Environment");
-            parallaxRoot = new GameObject("Parallax");
-            if (env != null) parallaxRoot.transform.SetParent(env.transform, false);
-        }
-        parallaxRoot.transform.position = Vector3.zero;
-        parallaxRoot.transform.localScale = Vector3.one;
-
-        // Eliminar capas antiguas si tuvieran otro nombre (p. ej. Trees_Mid o Village_Mid)
-        List<GameObject> oldLayers = new List<GameObject>();
-        foreach (Transform ch in parallaxRoot.transform)
-        {
-            if (ch.name != "Sky_Far" && ch.name != "Village_Far" && ch.name != "Facades_Mid")
-            {
-                oldLayers.Add(ch.gameObject);
-            }
-        }
-        foreach (var go in oldLayers) Object.DestroyImmediate(go);
-
-        BuildParallaxLayer(parallaxRoot.transform, "Sky_Far",     skySprite, new Vector2(0.90f, 0.95f), -20, 5.2f, 2.00f, Color.white);
-        BuildParallaxLayer(parallaxRoot.transform, "Village_Far", farSprite, new Vector2(0.72f, 0.88f), -15, 4.3f, 2.00f, new Color(0.92f, 0.94f, 1.0f, 0.96f));
-        BuildParallaxLayer(parallaxRoot.transform, "Facades_Mid", midSprite, new Vector2(0.42f, 0.75f), -10, 3.7f, 2.00f, Color.white);
-
-        SaveLevel2();
-        Debug.Log("[Level2CompleteFixer] Bloque E (Fondo continuo sin costuras con 3 capas de Parallax) aplicado correctamente.");
+        Level2BackgroundProcessor.ImportAndProcessSourceImage();
+        Level2BackgroundProcessor.ApplyBackgroundToLevel2();
     }
 
     private static void BuildParallaxLayer(Transform parent, string layerName, Sprite sprite, Vector2 factor, int sortingOrder, float posY, float uniformScale, Color tint)
@@ -1617,42 +1575,8 @@ public static class Level2CompleteFixer
     [MenuItem("Tools/Nivel 2/Cofres y Controles/4. Recomponer Fondo Continuo de Aldea")]
     public static void ApplyTaskBlock4_RecomposedBackground()
     {
-        EnsureLevel2Open();
-
-        string varBPath = "Assets/Art/Environment/Level2/Level2_Village_Far_VarB.png";
-        EnsureSeamlessBackgroundImport(SKY_CLEAN_PATH);
-        EnsureSeamlessBackgroundImport(FAR_CLEAN_PATH);
-        EnsureSeamlessBackgroundImport(varBPath);
-        EnsureSeamlessBackgroundImport(MID_CLEAN_PATH);
-
-        Sprite skySprite = LoadSingleSprite(SKY_CLEAN_PATH);
-        Sprite farSpriteA = LoadSingleSprite(FAR_CLEAN_PATH);
-        Sprite farSpriteB = LoadSingleSprite(varBPath);
-        Sprite midSprite = LoadSingleSprite(MID_CLEAN_PATH);
-
-        GameObject envRoot = GameObject.Find("Environment") ?? new GameObject("Environment");
-        Transform parallaxTr = envRoot.transform.Find("Parallax");
-        GameObject parallaxRoot = parallaxTr != null ? parallaxTr.gameObject : new GameObject("Parallax");
-        parallaxRoot.transform.SetParent(envRoot.transform, false);
-        parallaxRoot.transform.position = Vector3.zero;
-
-        List<GameObject> toClear = new List<GameObject>();
-        foreach (Transform ch in parallaxRoot.transform)
-        {
-            if (ch.name != "Sky_Far" && ch.name != "Village_Far" && ch.name != "Facades_Mid")
-            {
-                toClear.Add(ch.gameObject);
-            }
-        }
-        foreach (var g in toClear) Object.DestroyImmediate(g);
-
-        // 3 capas continuas que cubren x = -108.6 a +282.36 (y = -3.8 a +20.0) sin huecos (gap = 0.000 u)
-        BuildContinuousLayer(parallaxRoot.transform, "Sky_Far", skySprite, skySprite, new Vector2(0.88f, 0.95f), -20, 6.2f, 2.00f, Color.white);
-        BuildContinuousLayer(parallaxRoot.transform, "Village_Far", farSpriteA, farSpriteB != null ? farSpriteB : farSpriteA, new Vector2(0.70f, 0.88f), -15, 4.4f, 2.00f, Color.white);
-        BuildContinuousLayer(parallaxRoot.transform, "Facades_Mid", midSprite, midSprite, new Vector2(0.42f, 0.78f), -10, 3.6f, 2.00f, Color.white);
-
-        SaveLevel2();
-        Debug.Log("[Level2CompleteFixer] Task Block 4 aplicado: Fondo continuo de aldea medieval al atardecer con 3 capas sin costuras.");
+        Level2BackgroundProcessor.ImportAndProcessSourceImage();
+        Level2BackgroundProcessor.ApplyBackgroundToLevel2();
     }
 
     private static void BuildContinuousLayer(
