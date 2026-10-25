@@ -85,12 +85,11 @@ namespace Level2
                 return;
             }
 
-            // Si la bruja se transforma en gato o activa el vuelo, cancelar escalada limpiamente
+            // Si la bruja activa el vuelo con escoba, cancelar escalada limpiamente (se permite escalar tanto en forma humana como de gato)
             if (isClimbing)
             {
-                bool isCat = transformationManager != null && transformationManager.IsCatForm;
                 bool isFlying = playerController != null && playerController.IsFlying;
-                if (isCat || isFlying)
+                if (isFlying)
                 {
                     StopClimbing(restoreVelocityZero: false);
                     return;
@@ -232,7 +231,6 @@ namespace Level2
         {
             if (Mathf.Abs(verticalInput) < 0.25f) return;
 
-            if (transformationManager != null && transformationManager.IsCatForm) return;
             if (playerController != null && playerController.IsFlying) return;
 
             LadderInteractable ladder = GetBestOverlappingLadder();

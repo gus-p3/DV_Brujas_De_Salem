@@ -3,13 +3,6 @@ using UnityEngine;
 /// <summary>
 /// Controla el efecto de desplazamiento en paralaje de una capa de fondo o entorno.
 /// Se ejecuta tras la cámara (DefaultExecutionOrder = 100) para evitar tirones visuales.
-///
-/// CORRECCIÓN (fix/nivel2 parallax-drift):
-///   - spriteWidth ahora se calcula en world-space usando Renderer.bounds (incluye scale).
-///   - startX se almacena en world-space una sola vez en Awake; no se recalcula en Start.
-///   - El wrap infinito mueve startX en pasos exactos de spriteWidth sin drift acumulativo.
-///   - lastCamX registra la posición previa de la cámara; el desplazamiento es incremental
-///     para que el bucle while nunca salte más de un ancho por frame aunque haya lag.
 /// </summary>
 [DefaultExecutionOrder(100)]
 public class ParallaxLayer : MonoBehaviour
@@ -19,88 +12,87 @@ public class ParallaxLayer : MonoBehaviour
     [SerializeField] private Transform cameraTransform;
 
     [Header("Paralaje")]
-    [Tooltip("Factor de paralaje (0 = fijo al mundo, 1 = pegado a la cámara).")]
+    [Tooltip("Factor de paralaje (0.0 = primer plano se mueve con el mundo, 1.0 = fondo infinitamente lejano pegado a la cámara).")]
     [Range(0f, 1f)]
     [SerializeField] private float parallaxFactor = 0.5f;
 
-    [Tooltip("Repite la capa infinitamente en horizontal.")]
+    [Tooltip("Permite que la capa se desplace y repita infinitamente en el eje horizontal.")]
     [SerializeField] private bool infiniteHorizontal = true;
 
-    [Tooltip("Bloquea Y para evitar oscilación vertical.")]
+    [Tooltip("Bloquea la posición vertical para que el fondo no oscile al saltar.")]
     [SerializeField] private bool lockY = true;
 
-    // Estado interno
-    private float startX;          // posición world-X de referencia (se ajusta con wrap)
-    private float startY;          // posición world-Y fija
-    private float spriteWidth;     // ancho en world-units incluyendo scale del objeto
-    private float lastCamX;        // posición X de la cámara en el frame anterior
-    private bool  initialized;
+    private float startX;
+    private float startY;
+    private float spriteWidth;
 
-    // ---------------------------------------------------------------
     private void Awake()
     {
-        ResolveCamera();
-        CaptureStart();
+        if (cameraTransform == null && Camera.main != null)
+        {
+            cameraTransform = Camera.main.transform;
+        }
+
+        startX = transform.position.x;
+        startY = transform.position.y;
+
+        CalculateSpriteWidth();
     }
 
     private void Start()
     {
-        ResolveCamera();
-        if (!initialized) CaptureStart();
-    }
-
-    private void ResolveCamera()
-    {
         if (cameraTransform == null && Camera.main != null)
-            cameraTransform = Camera.main.transform;
-    }
-
-    private void CaptureStart()
-    {
-        // Tomar posición world actual como origen
-        startX = transform.position.x;
-        startY = transform.position.y;
-        lastCamX = cameraTransform != null ? cameraTransform.position.x : 0f;
-        CalculateSpriteWidth();
-        initialized = true;
-    }
-
-    // ---------------------------------------------------------------
-    private void LateUpdate()
-    {
-        ResolveCamera();
-        if (cameraTransform == null) return;
-
-        float camX  = cameraTransform.position.x;
-        float delta = camX - lastCamX;           // cuánto se movió la cámara este frame
-        lastCamX    = camX;
-
-        // Mover la capa proporcionalmente al movimiento de la cámara
-        startX += delta * parallaxFactor;
-
-        // Wrap horizontal: mantener startX dentro de un rango de un ancho de sprite
-        if (infiniteHorizontal && spriteWidth > 0.01f)
         {
-            // Distancia entre la cámara y el origen de la capa
-            float diff = camX - startX;
-            if (diff > spriteWidth)
-                startX += Mathf.Floor(diff / spriteWidth) * spriteWidth;
-            else if (diff < -spriteWidth)
-                startX -= Mathf.Floor(-diff / spriteWidth) * spriteWidth;
+            cameraTransform = Camera.main.transform;
         }
 
-        float targetY = lockY ? startY : transform.position.y;
-        transform.position = new Vector3(startX, targetY, transform.position.z);
+        if (spriteWidth <= 0.01f)
+        {
+            CalculateSpriteWidth();
+        }
     }
 
-    // ---------------------------------------------------------------
+    private void LateUpdate()
+    {
+        if (cameraTransform == null)
+        {
+            if (Camera.main != null)
+            {
+                cameraTransform = Camera.main.transform;
+            }
+            else
+            {
+                return;
+            }
+        }
+
+        float camX = cameraTransform.position.x;
+        float distance = camX * parallaxFactor;
+        float temp = camX * (1f - parallaxFactor);
+
+        if (infiniteHorizontal && spriteWidth > 0.01f)
+        {
+            while (temp > startX + spriteWidth)
+            {
+                startX += spriteWidth;
+            }
+            while (temp < startX - spriteWidth)
+            {
+                startX -= spriteWidth;
+            }
+        }
+
+        float targetX = startX + distance;
+        float targetY = lockY ? startY : startY + (cameraTransform.position.y * parallaxFactor);
+
+        transform.position = new Vector3(targetX, targetY, transform.position.z);
+    }
+
     /// <summary>
-    /// Calcula el ancho en world-units del sprite (o primer hijo con sprite).
-    /// Usa Renderer.bounds que ya incorpora el scale del Transform.
+    /// Calcula el ancho del sprite ya sea en el objeto actual o en sus hijos.
     /// </summary>
     public void CalculateSpriteWidth()
     {
-        // Probar en este mismo GameObject
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         if (sr != null && sr.sprite != null)
         {
@@ -108,33 +100,34 @@ public class ParallaxLayer : MonoBehaviour
             return;
         }
 
-        // Buscar en hijos directos
-        foreach (var cr in GetComponentsInChildren<SpriteRenderer>())
+        // Buscar en hijos
+        SpriteRenderer[] childRenderers = GetComponentsInChildren<SpriteRenderer>();
+        foreach (var cr in childRenderers)
         {
-            if (cr.sprite != null)
+            if (cr.gameObject != gameObject && cr.sprite != null)
             {
                 spriteWidth = cr.bounds.size.x;
                 return;
             }
         }
-
-        // Fallback: estimar desde el tamaño del sprite sin renderizador encontrado
-        spriteWidth = 0f;
     }
 
-    /// <summary>Asigna manualmente la cámara si no es Camera.main.</summary>
+    /// <summary>
+    /// Asigna manualmente la cámara si no es Camera.main.
+    /// </summary>
     public void SetCamera(Transform cam)
     {
         cameraTransform = cam;
-        lastCamX = cam != null ? cam.position.x : 0f;
     }
 
-    /// <summary>Configura factor de paralaje y modo de repetición en runtime.</summary>
+    /// <summary>
+    /// Configura el factor de paralaje y ancho de repetición.
+    /// </summary>
     public void Setup(float factor, bool infinite, bool lockVertical)
     {
-        parallaxFactor    = factor;
+        parallaxFactor = factor;
         infiniteHorizontal = infinite;
-        lockY             = lockVertical;
+        lockY = lockVertical;
         CalculateSpriteWidth();
     }
 
@@ -143,9 +136,7 @@ public class ParallaxLayer : MonoBehaviour
         if (spriteWidth > 0.01f)
         {
             Gizmos.color = new Color(0.2f, 0.8f, 1f, 0.4f);
-            Gizmos.DrawWireCube(
-                new Vector3(startX, transform.position.y, transform.position.z),
-                new Vector3(spriteWidth, 5f, 0.1f));
+            Gizmos.DrawWireCube(new Vector3(startX, transform.position.y, transform.position.z), new Vector3(spriteWidth, 5f, 0.1f));
         }
     }
 }
