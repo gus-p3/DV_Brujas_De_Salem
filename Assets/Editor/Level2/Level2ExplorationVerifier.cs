@@ -649,24 +649,52 @@ namespace Level2.Editor
             InvokePrivateUpdate(interactor);
             bool potionRestoredAway = potionInv == null || potionInv.enabled;
 
-            // 4) Escalera rechaza interacción si la bruja está en forma de gato
-            GameObject ladderGo = GameObject.Find("Ladder_Ext_Z1_Balcony");
-            LadderInteractable ladder = ladderGo != null ? ladderGo.GetComponent<LadderInteractable>() : null;
-            bool catBlockedOnLadder = true;
-            if (tm != null && ladder != null)
+            // 4) Escalera del sótano permite salir 3 veces seguidas tanto en forma humana como en forma de gato
+            GameObject cellarLadderGo = GameObject.Find("Ladder_Int_House2_CellarToF1");
+            LadderInteractable cellarLadder = cellarLadderGo != null ? cellarLadderGo.GetComponent<LadderInteractable>() : null;
+            bool cellarExit3xHumanAndCat = cellarLadder != null;
+            if (cellarLadder != null && tm != null)
             {
                 FieldInfo stateField = typeof(TransformationManager).GetField("currentState", BindingFlags.Instance | BindingFlags.NonPublic);
-                if (stateField != null)
+                object prevState = stateField != null ? stateField.GetValue(tm) : null;
+
+                for (int mode = 0; mode < 2; mode++)
                 {
-                    object prevState = stateField.GetValue(tm);
-                    object catValue = Enum.ToObject(stateField.FieldType, 1);
-                    stateField.SetValue(tm, catValue);
-                    catBlockedOnLadder = !ladder.CanInteract(witch);
+                    if (stateField != null)
+                    {
+                        stateField.SetValue(tm, Enum.ToObject(stateField.FieldType, mode)); // 0 = Human, 1 = Cat
+                    }
+                    for (int attempt = 0; attempt < 3; attempt++)
+                    {
+                        witch.transform.position = new Vector3(cellarLadder.CenterX, cellarLadder.BottomY + 0.2f, 0f);
+                        Physics2D.SyncTransforms();
+                        if (!cellarLadder.CanInteract(witch)) { cellarExit3xHumanAndCat = false; break; }
+
+                        climber.SetScriptedClimbInput(0f, 1f, false);
+                        climber.StartClimbing(cellarLadder, 1f);
+                        for (int step = 0; step < 45 && climber.IsClimbing; step++)
+                        {
+                            climber.SetScriptedClimbInput(0f, 1f, false);
+                            witch.transform.position += new Vector3(0f, 0.15f, 0f);
+                            Physics2D.SyncTransforms();
+                            InvokePrivateFixedUpdate(climber);
+                        }
+                        climber.EnableScriptedClimbInput(false);
+                        if (climber.IsClimbing || witch.transform.position.y < cellarLadder.TopY - 0.15f)
+                        {
+                            cellarExit3xHumanAndCat = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (stateField != null && prevState != null)
+                {
                     stateField.SetValue(tm, prevState);
                 }
             }
 
-            return nullOutOfRange && potionSuppressedOnDoor && potionRestoredAway && catBlockedOnLadder;
+            return nullOutOfRange && potionSuppressedOnDoor && potionRestoredAway && cellarExit3xHumanAndCat;
         }
 
         private static void CaptureVerificationScreenshots()
