@@ -151,7 +151,9 @@ public static class Level2GameplayFixer
         float bottom = roof.bounds.min.y;
         float scaleY = roof.transform.lossyScale.y;
         roof.size = new Vector2(roof.size.x, (AlleyRoofTop - bottom) / scaleY);
-        roof.offset = new Vector2(roof.offset.x, ((AlleyRoofTop + bottom) * 0.5f - roof.transform.position.y) / scaleY);
+        // Centro en el transform y offset vertical 0: Level2Verifier mide la altura libre con la posición del transform
+        roof.transform.position = new Vector3(roof.transform.position.x, (AlleyRoofTop + bottom) * 0.5f, roof.transform.position.z);
+        roof.offset = new Vector2(roof.offset.x, 0f);
         Physics2D.SyncTransforms();
         log.AppendLine($"  Alley_LowCeiling: techo transitable a y={roof.bounds.max.y:F3} (antes 3.220), altura libre {bottom - 0.17f:F2} u");
 
@@ -248,9 +250,9 @@ public static class Level2GameplayFixer
         log.AppendLine("  Flores: vuelo + pociones · Raíces: túnel de gato + ático por la gatera · Hongos 4 · Arañas 4");
 
         // Letreros que explican cada reto
-        Sign(zone3, "Sign_Z3_FlightChest", new Vector2(74.2f, 3.4f), new Vector2(2.2f, 0.62f),
+        Sign(zone3, "Sign_Z3_FlightChest", new Vector2(74.6f, 3.45f), new Vector2(2.6f, 0.8f),
             "Ese cofre flota sobre el canal: vuela con la escoba (F) para alcanzarlo.");
-        Sign(GameObject.Find("Environment/Zone_5_GranMercado").transform, "Sign_Z5_GuardedChest", new Vector2(128.6f, 2.75f), new Vector2(2.4f, 0.62f),
+        Sign(GameObject.Find("Environment/Zone_5_GranMercado").transform, "Sign_Z5_GuardedChest", new Vector2(128.6f, 2.85f), new Vector2(3.0f, 0.8f),
             "Un guardia vigila este cofre: duérmelo o ciégalo. Elige poción con 1, 2 o 3 y lánzala con E.");
         log.AppendLine("  Letreros de vuelo y de pociones");
     }

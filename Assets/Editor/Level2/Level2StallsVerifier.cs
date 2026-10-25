@@ -65,6 +65,7 @@ public static class Level2StallsVerifier
         CheckDoors(findings, sb);
         CheckAnimation(stalls, findings);
         CheckTexts(findings);
+        CheckGameplay(findings);
 
         Level2SceneFixes.VerifyRoute(out int routeFailures);
         if (routeFailures > 0) findings.Add($"[RUTA] El BoxCast humano (0.6×1.6) de spawn a salida encontró {routeFailures} bloqueo(s) no saltables");
@@ -400,6 +401,47 @@ public static class Level2StallsVerifier
             if (font != null && !font.HasCharacters(text, out uint[] missing, true, false))
                 findings.Add($"[GLIFOS] '{text}' ({where}) sin glifos para: {new string(missing.Distinct().Select(c => (char)c).ToArray())}");
         }
+    }
+
+    // ------------------------------------------------------------------ Jugabilidad: formas, escaleras, guardias, lector
+
+    private static void CheckGameplay(List<string> findings)
+    {
+        Level2Chest[] chests = Object.FindObjectsByType<Level2Chest>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        int Count(IngredientType t) => chests.Sum(c => c.Contents.Count(e => e.itemKind == ChestItemKind.Ingredient && e.ingredientType == t));
+        bool Has(string chest, IngredientType t) => chests.Any(c => c.name == chest && c.Contents.Any(e => e.itemKind == ChestItemKind.Ingredient && e.ingredientType == t));
+
+        // Las 2 flores y las 2 raíces requeridas obligan a volar, usar pociones y pasar como gato
+        if (Count(IngredientType.WitheredFlower) != 2 || Count(IngredientType.Root) != 2)
+            findings.Add($"[FORMAS] Debe haber exactamente 2 flores y 2 raíces (hay {Count(IngredientType.WitheredFlower)} y {Count(IngredientType.Root)}): si sobran, un reto se puede saltar");
+        Level2Chest fly = chests.FirstOrDefault(c => c.name == "Chest_Fly_Z3_CanalPerch");
+        if (fly == null || !Has(fly.name, IngredientType.WitheredFlower) || fly.GetComponent<SpriteRenderer>().bounds.min.y < 7f)
+            findings.Add("[FORMAS] Falta la flor en el cofre que solo se alcanza volando (sobre el canal, base y >= 7)");
+
+        PatrolRoute keeper = GameObject.Find("NPCs/Zona_5/Guard_Z5_Street")?.GetComponent<PatrolRoute>();
+        Level2Chest guarded = chests.FirstOrDefault(c => c.name == "Chest_Z5_MarketPlaza");
+        if (keeper == null || guarded == null || !Has(guarded.name, IngredientType.WitheredFlower) ||
+            !(keeper.Waypoints.Min(w => w.position.x) < guarded.transform.position.x && guarded.transform.position.x < keeper.Waypoints.Max(w => w.position.x)))
+            findings.Add("[FORMAS] La flor del Gran Mercado debe estar en un cofre vigilado de cerca por un guardia (reto de pociones)");
+
+        HouseDoor flap = GameObject.Find("Environment/Village_Exterior_Structures/Door_Ext_House3_Ground")?.GetComponent<HouseDoor>();
+        HouseDoor roofDoor = GameObject.Find("Environment/Village_Exterior_Structures/Door_Ext_House3_Roof")?.GetComponent<HouseDoor>();
+        if (flap == null || !new SerializedObject(flap).FindProperty("catOnly").boolValue || roofDoor == null ||
+            !new SerializedObject(roofDoor).FindProperty("permanentlyBarred").boolValue || !Has("Chest_Int_House3_Attic", IngredientType.Root))
+            findings.Add("[FORMAS] La raíz del ático de la Casa Abandonada debe quedar tras la gatera (solo gato) con el tejado atrancado");
+
+        foreach (LadderInteractable li in Object.FindObjectsByType<LadderInteractable>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            SpriteRenderer sr = li.GetComponent<SpriteRenderer>();
+            if (sr != null && (sr.drawMode != SpriteDrawMode.Tiled || sr.tileMode != SpriteTileMode.Adaptive || sr.sprite == null || sr.sprite.border.y <= 0f))
+                findings.Add($"[ESCALERA CORTADA] {li.name}: debe usar remates de 9-slice y tramo adaptable");
+        }
+
+        foreach (Level2GroundingTool.Entry e in Level2GroundingTool.Collect().Where(e => e.kind == Level2GroundingTool.Kind.NPC && !e.Ok))
+            findings.Add($"[NPC FLOTANDO/HUNDIDO] {e.path}: pies y={e.bottom:F3}, suelo y={e.surface:F3}");
+
+        if (Object.FindFirstObjectByType<Level2LoreReader>(FindObjectsInactive.Include) == null)
+            findings.Add("[LECTOR] Falta el lector de crónicas en pergamino (LoreReader_Canvas)");
     }
 
     // ------------------------------------------------------------------ Geometría

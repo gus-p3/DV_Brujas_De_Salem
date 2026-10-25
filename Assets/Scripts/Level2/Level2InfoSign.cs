@@ -88,8 +88,11 @@ namespace Level2
             TextMeshProUGUI tmp = txt.GetComponent<TextMeshProUGUI>();
             if (tmp == null) tmp = txt.AddComponent<TextMeshProUGUI>();
             tmp.text = message;
+            // Reduce la letra hasta un 70 % si el texto no cabe en el tablón
             tmp.fontSize = fontSize * PixelsPerUnit;
-            tmp.enableAutoSizing = false;
+            tmp.fontSizeMax = fontSize * PixelsPerUnit;
+            tmp.fontSizeMin = fontSize * PixelsPerUnit * 0.7f;
+            tmp.enableAutoSizing = true;
             tmp.textWrappingMode = TextWrappingModes.Normal;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.color = new Color(1f, 0.93f, 0.74f, 1f);

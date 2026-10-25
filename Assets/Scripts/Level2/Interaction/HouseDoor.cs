@@ -30,6 +30,10 @@ namespace Level2
         [SerializeField] private bool requiresAllIngredients = false;
         [SerializeField] private bool permanentlyBarred = false;
         [SerializeField] private string barredMessage = "Esta puerta está tapiada desde dentro por la cuarentena.";
+        [Tooltip("Gatera: desde la calle solo se cruza en forma de gato (dentro siempre se puede salir).")]
+        [SerializeField] private bool catOnly = false;
+
+        public const string CatFlapMessage = "La puerta está atrancada. Solo un gato cabe por la gatera";
 
         [Header("Visuales")]
         [SerializeField] private SpriteRenderer doorRenderer;
@@ -116,6 +120,11 @@ namespace Level2
                 return $"Q: Examinar puerta ({actionLabel})";
             }
 
+            if (catOnly && owningInterior == null)
+            {
+                return "Q: Entrar por la gatera (forma de gato)";
+            }
+
             if (requiresAllIngredients && (IngredientInventory.Instance == null || !IngredientInventory.Instance.AreAllRequiredCollected))
             {
                 return $"Q: {actionLabel} (Sello de Ingredientes)";
@@ -154,6 +163,12 @@ namespace Level2
             if (permanentlyBarred)
             {
                 ShowFeedback(barredMessage);
+                return;
+            }
+
+            if (catOnly && owningInterior == null && (tm == null || !tm.IsCatForm))
+            {
+                ShowFeedback(CatFlapMessage);
                 return;
             }
 

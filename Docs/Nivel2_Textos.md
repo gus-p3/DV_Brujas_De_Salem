@@ -19,6 +19,11 @@ Para aplicar los textos se usa **Tools > Nivel 2 > Puestos y puertas > 5. Textos
 | «Aquí dentro hay un cofre» | Junto a la puerta de calle de las 4 casas que guardan un cofre: Botica (x = 15.28), Posada del Cuervo (x = 46.45), Casa Abandonada (x = 108.3, bajo los banderines del callejón) y Mansión (x = 148.0). | De lejos se ve al 35 %; a 4.5 u o menos se ve completo, con fundido. | `Level2InfoSign` (`Sign_House1..4_Chest`) |
 | Sin letrero | La Casa en Cuarentena y el Santuario. | Nunca: no tienen cofre, así que el aviso siempre es fiable. | No aplica |
 | Sin letrero de cofre | Los sótanos (Bodega de la Posada y Cripta de la Mansión). | Nunca: guardan llaves (`KeyItem`), no cofres. | No aplica |
+| «Aquí dentro hay un cofre. Entra por la gatera en forma de gato» | Junto a la gatera de la Casa Abandonada (x = 108.05, bajo los banderines del callejón). | De lejos se ve al 35 %; cerca, completo. | `Level2InfoSign` (`Sign_House3_Chest`) |
+| «Ese cofre flota sobre el canal: vuela con la escoba (F) para alcanzarlo.» | Borde del canal, Zona 3 (x = 74.6). | De lejos se ve al 60 %; cerca, completo. | `Level2InfoSign` (`Sign_Z3_FlightChest`) |
+| «Un guardia vigila este cofre: duérmelo o ciégalo. Elige poción con 1, 2 o 3 y lánzala con E.» | Entrada del Gran Mercado, Zona 5 (x = 128.6). | De lejos se ve al 60 %; cerca, completo. | `Level2InfoSign` (`Sign_Z5_GuardedChest`) |
+| «Q: Entrar por la gatera (forma de gato)» / «La puerta está atrancada. Solo un gato cabe por la gatera» | Puerta de calle de la Casa Abandonada. | Al acercarse / al pulsar Q en forma humana. | `HouseDoor` (`catOnly`) |
+| Diarios, grimorios y actas (título y texto completos) | Hoja de pergamino quemado en el centro de la pantalla. | Al pulsar Q sobre la crónica. **Pausa el juego** hasta pulsar Q, Enter o clic. | `Level2LoreReader` (`LoreReader_Canvas`) |
 | «Q: Abrir cofre», «Q: Abrir cofre (Llave…)», «Q: Cofre cerrado (Requiere…)», «Q: Abrir cofre (Contenido pendiente)» | Sobre cada cofre. | Al acercarse. | `Level2Chest` + `Level2DoorIndicator` / `InteractionPromptUI` (ya existían) |
 | «Necesitas forma humana para abrir esto» | Banner del HUD. | Al pulsar Q junto a un cofre en forma de gato. Tiene un enfriamiento de 2 s para no repetirse. | `Level2Chest` (ya existía) |
 | «Obtuviste: Hongo x1, Poción de Dormir x1» | Banner del HUD. | Al abrir un cofre. | `Level2Chest` (ya existía) |
@@ -29,5 +34,6 @@ Para aplicar los textos se usa **Tools > Nivel 2 > Puestos y puertas > 5. Textos
 
 ## Legibilidad
 
+- **Avisos:** todos los mensajes del nivel salen en **un solo banner abajo al centro**, con contorno oscuro. Antes cofres, portón y gato mostraban dos banners a la vez y el del centro tapaba el indicador «Q: …» sobre la bruja. El indicador de cada puerta o cofre ya no se dibuja cuando el aviso «Q: …» de pantalla muestra ese mismo objeto.
 - **Letreros en el mundo:** son un tablón de madera oscura semitransparente con borde dorado, como los indicadores de puertas. El texto es crema, en negrita y con contorno oscuro para leerse sobre el atardecer. Se dibujan en la capa `Gameplay` con orden 0: quedan delante de las fachadas pero detrás de la bruja y de los NPC, así que nunca tapan al personaje. Tampoco tapan puertas, cofres, puestos ni la patrulla del guardia del tejado del callejón.
 - **Fuente:** `LiberationSans SDF` incluye tildes, ñ, ¿ y ¡. La flecha → sale de su fuente de respaldo. El verificador comprueba que no falte ningún glifo.

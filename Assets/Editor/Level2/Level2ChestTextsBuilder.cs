@@ -15,6 +15,7 @@ public static class Level2ChestTextsBuilder
     public const string StartTipBody = "Los ingredientes y las pociones están guardados dentro de cofres, tanto en las casas como en la calle. Acércate a un cofre y pulsa Q para abrirlo. Solo puedes abrirlos en forma humana.";
     public const string StreetSignText = "Los cofres de la calle guardan ingredientes y pociones. →";
     public const string HouseSignText = "Aquí dentro hay un cofre";
+    public const string CatFlapSignText = "Aquí dentro hay un cofre. Entra por la gatera en forma de gato";
     public const string GateLockedText = "Aún te faltan ingredientes. Revisa los cofres de las casas y de la calle.";
 
     // Casas con cofre en su interior: letrero junto a la puerta de calle, sin tapar la puerta ni su aviso "Q: Entrar"
@@ -22,7 +23,7 @@ public static class Level2ChestTextsBuilder
     {
         ("Sign_House1_Chest", "Door_Ext_House1_Ground", new Vector2(15.28f, 1.45f)),
         ("Sign_House2_Chest", "Door_Ext_House2_Ground", new Vector2(46.45f, 1.45f)),
-        ("Sign_House3_Chest", "Door_Ext_House3_Ground", new Vector2(108.3f, 0.6f)),  // bajo los banderines del callejón, lejos del guardia del tejado
+        ("Sign_House3_Chest", "Door_Ext_House3_Ground", new Vector2(108.05f, 0.56f)), // bajo los banderines del callejón, lejos del guardia del tejado
         ("Sign_House4_Chest", "Door_Ext_House4_Ground", new Vector2(148.0f, 1.45f)),
     };
 
@@ -78,7 +79,9 @@ public static class Level2ChestTextsBuilder
             Transform sign = Level2StallsDoorsFixer.Child(ext, signName);
             sign.localScale = Vector3.one;
             sign.position = pos;
-            ConfigureSign(sign, HouseSignText, new Vector2(1.5f, 0.62f), 0.17f, 0.35f);
+            // La Casa Abandonada solo se entra por la gatera (misión de forma de gato)
+            bool catFlap = signName == "Sign_House3_Chest";
+            ConfigureSign(sign, catFlap ? CatFlapSignText : HouseSignText, catFlap ? new Vector2(2.3f, 0.78f) : new Vector2(1.5f, 0.62f), 0.17f, 0.35f);
             log.AppendLine($"  {signName} junto a {doorName} en ({pos.x:F2}, {pos.y:F2})");
         }
 
