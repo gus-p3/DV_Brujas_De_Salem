@@ -24,9 +24,9 @@ En el Nivel 2 (`Assets/Scenes/Level2.unity`), **todos los ingredientes del ritua
 | # | Objeto en Escena | `chestId` (`L2_Chest_<ID>`) | Zona / Ubicación | Coordenadas `(x, y)` | Contenido Exacto | Requisito Especial |
 | :-: | :--- | :--- | :--- | :---: | :--- | :--- |
 | **1** | `Chest_Z1_Intro` | `chest_z1_intro` | Zona 1 — Entrada al Pueblo (calle frente a la Botica) | `(18.5, 0.17)` | • **Hongo** (`L2_Ing_Mushroom_Z1`) ×1<br>• **Corazón** ×1 | Ninguno |
-| **2** | `Chest_Z1_StallRoof` | `chest_z1_stall_roof` | Zona 1 — Sobre el toldo del puesto `Stall_Z1_1` | `(13.0, 2.75)` | • **Poción de Dormir** ×1 | Salto al toldo |
+| **2** | `Chest_Z1_StallRoof` | `chest_z1_stall_roof` | Zona 1 — Sobre el toldo del puesto `Stall_Z1_1` | `(9.7, 2.70)` | • **Poción de Dormir** ×1 | Salto al toldo |
 | **3** | `Chest_Int_House1_Upper` | `chest_int_house1_upper` | Interior Casa 1 (Botica de Herbolaria, 2º piso) | `(20.6, 32.75)` | • **Hongo** (`L2_Ing_Mushroom_H1`) ×1<br>• **Poción de Cegar** ×1 | Subir escalera interior |
-| **4** | `Chest_Z2_MarketStreet` | `chest_z2_market_street` | Zona 2 — Sobre el toldo del puesto `Stall_Z2_2` | `(38.8, 2.75)` | • **Araña** (`L2_Ing_Spider_Z2`) ×1<br>• **Flor Marchita** (`L2_Ing_Flower_Z2`) ×1 | Ruta de toldos en Zona 2 |
+| **4** | `Chest_Z2_MarketStreet` | `chest_z2_market_street` | Zona 2 — Sobre el toldo del puesto `Stall_Z2_2` | `(50.9, 2.70)` | • **Araña** (`L2_Ing_Spider_Z2`) ×1<br>• **Flor Marchita** (`L2_Ing_Flower_Z2`) ×1 | Ruta de toldos en Zona 2 |
 | **5** | `Chest_Ext_Z2_Balcony` | `chest_ext_z2_balcony` | Zona 2 — Balcón / Pasarela exterior de la Posada (`RoofWalk_Z2`) | `(46.4, 4.02)` | • **Poción de Cegar** ×1<br>• **Corazón** ×1 | Salir al balcón 2º piso o escalera exterior |
 | **6** | `Chest_Int_House2_Locked` | `chest_int_house2_locked` | Interior Casa 2 (Posada del Cuervo, 2º piso) | `(52.4, 32.75)` | • **Poción de Dormir** ×1<br>• **Corazón** ×1 | Requiere `key_tavern_chest` (Bodega subterránea) |
 | **7** | `Chest_Z3_PlazaStreet` | `chest_z3_plaza_street` | Zona 3 — Entrada de la Plaza Central | `(67.5, 0.17)` | • **Araña** (`L2_Ing_Spider_Z3`) ×1<br>• **Poción de Cegar** ×1 | Ninguno |
@@ -36,10 +36,12 @@ En el Nivel 2 (`Assets/Scenes/Level2.unity`), **todos los ingredientes del ritua
 | **11** | `Chest_Z4_CatTunnelExit` | `chest_z4_cat_tunnel_exit` | Zona 4 — Salida del pasaje exclusivo de gato | `(115.2, 0.17)` | • **Raíz** (`L2_Ing_Root_Z4`) ×1 | Cruzar el túnel en forma de gato y volver a forma humana para abrir con `Q` |
 | **12** | `Chest_Int_House3_Attic` | `chest_int_house3_attic` | Interior Casa 3 (Casa Abandonada, Ático Secreto 3er piso) | `(112.2, 36.75)` | • **Raíz** (`L2_Ing_Root_H3`) ×1<br>• **Poción de Hipnotizar** ×1 | Subir al ático secreto de Casa 3 |
 | **13** | `Chest_Z5_MarketPlaza` | `chest_z5_market_plaza` | Zona 5 — Calle del Gran Mercado | `(133.2, 0.17)` | • **Hongo** (`L2_Ing_Mushroom_Z5`) ×1<br>• **Poción de Hipnotizar** ×1<br>• **Corazón** ×1 | Sigilo entre aldeanos y guardia callejero |
-| **14** | `Chest_Z5_HighTower` | `chest_z5_high_tower` | Zona 5 — Pasarela superior del Gran Mercado (`Roof_Z5_HighWalk`) | `(142.5, 6.42)` | • **Hongo** (`L2_Ing_Mushroom_Z5_Bonus`) ×1<br>• **Araña** (`L2_Ing_Spider_Z5_Bonus`) ×1 | Subir por `Ladder_Ext_Z5_West` y `Ladder_Ext_Z5_HighTower` |
+| **14** | `Chest_Z5_HighTower` | `chest_z5_high_tower` | Zona 5 — Pasarela superior del Gran Mercado (`Roof_Z5_HighWalk`) | `(143.5, 5.99)` | • **Hongo** (`L2_Ing_Mushroom_Z5_Bonus`) ×1<br>• **Araña** (`L2_Ing_Spider_Z5_Bonus`) ×1 | Subir por `Ladder_Ext_Z5_West` y `Ladder_Ext_Z5_HighTower` |
 | **15** | `Chest_Int_House4_Royal` | `chest_int_house4_royal` | Interior Casa 4 (Mansión del Magistrado, Altillo de Biblioteca) | `(142.5, 34.55)` | • **Poción de Hipnotizar** ×1<br>• **Corazón** ×1 | Requiere `key_manor_master` (Sótano de Archivos) |
 
 ---
+
+> Los cofres 2 y 4 acompañan a su puesto, que se reubicó para que no se empalmara con otros. Todos los cofres apoyan su base en el suelo, el toldo o la plataforma (±0.02 u). Los textos que avisan que los objetos están en cofres se describen en `Docs/Nivel2_Textos.md`.
 
 ## 3. Balance Total de Recursos en Cofres
 
