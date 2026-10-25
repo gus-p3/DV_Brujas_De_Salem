@@ -178,12 +178,14 @@ public static class Level2StallsDoorsFixer
             posts.localPosition = Vector3.zero;
             posts.localScale = Vector3.one;
             CopyComponentsIfMissing(templatePosts.gameObject, posts.gameObject);
+            posts.gameObject.layer = LayerMask.NameToLayer("Ground"); // la bruja solo detecta suelo en esta capa
 
             Transform roof = Child(stall.transform, "AwningRoof");
             SetSprite(roof, Awning(spec.awning), 2, false); // el dibujo lo hace Awning_Sway_Visual
             roof.localPosition = new Vector3(0f, AwningLocalY, 0f);
             roof.localScale = Vector3.one;
             CopyComponentsIfMissing(templateRoof.gameObject, roof.gameObject);
+            roof.gameObject.layer = LayerMask.NameToLayer("Ground");
 
             BuildStallDressing(stall.transform, 0f, 0f, 1f, spec, templateLantern);
             DestroyChild(stall.transform, "SupportColumns_Base");
@@ -230,7 +232,7 @@ public static class Level2StallsDoorsFixer
             chest.transform.position = new Vector3(roof.bounds.center.x, chest.transform.position.y, 0f);
             chest.GetComponent<SpriteRenderer>().sortingOrder = 3; // por delante del borde del toldo sobre el que descansa
             Physics2D.SyncTransforms();
-            Ground(chest.transform, chest.GetComponent<SpriteRenderer>(), log);
+            Ground(chest.transform, chest.GetComponent<SpriteRenderer>(), log, splitPadding: true);
             log.AppendLine($"  {chest.name} acompaña a su puesto (x={roof.bounds.center.x:F2})");
         }
 
@@ -409,8 +411,8 @@ public static class Level2StallsDoorsFixer
         float s = height / sr.sprite.bounds.size.y;
         door.transform.localScale = new Vector3(s, s, 1f);
         door.transform.position = new Vector3(x, surface + height * 0.5f, 0f);
-        // La base visible (fila opaca más baja) apoya en el piso aunque el PNG tenga margen transparente
-        if (Level2GroundingTool.TryOpaqueBottom(sr, out float bottom)) door.transform.position += new Vector3(0f, surface - bottom, 0f);
+        Physics2D.SyncTransforms();
+        door.transform.position += new Vector3(0f, PaddedBaseOffset(sr, surface), 0f);
         so.FindProperty("floorSurfaceY").floatValue = surface;
         so.ApplyModifiedPropertiesWithoutUndo();
     }
@@ -438,7 +440,7 @@ public static class Level2StallsDoorsFixer
         // Cofres sobre su suelo, toldo o plataforma
         foreach (Level2Chest chest in Object.FindObjectsByType<Level2Chest>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
-            Ground(chest.transform, chest.GetComponent<SpriteRenderer>(), log);
+            Ground(chest.transform, chest.GetComponent<SpriteRenderer>(), log, splitPadding: true);
         }
 
         foreach (var (name, bottomPath, topPath) in Ladders)
@@ -452,15 +454,26 @@ public static class Level2StallsDoorsFixer
         }
     }
 
-    internal static void Ground(Transform t, SpriteRenderer sr, StringBuilder log)
+    internal static void Ground(Transform t, SpriteRenderer sr, StringBuilder log, bool splitPadding = false)
     {
         if (sr == null || !Level2GroundingTool.TryOpaqueBottom(sr, out float bottom)) return;
         if (!Level2GroundingTool.TryFindSurface(sr.bounds.center.x, bottom, t, out float surface)) return;
-        float dy = surface - bottom;
+        float dy = splitPadding ? PaddedBaseOffset(sr, surface) : surface - bottom;
         if (Mathf.Abs(dy) < 0.0005f) return;
         t.position += new Vector3(0f, dy, 0f);
         Physics2D.SyncTransforms();
         log.AppendLine($"  {PathOf(t)}: {(dy > 0 ? "subido" : "bajado")} {Mathf.Abs(dy):F3} u hasta y={surface:F3}");
+    }
+
+    /// <summary>
+    /// Cofres y puertas tienen ~0.03 u de margen transparente bajo la madera. Los verificadores previos del Nivel 2
+    /// miden el borde del rect y Level2GroundingTool la fila opaca: centrar la superficie entre ambos deja los dos
+    /// criterios dentro de ±0.02 u (la madera queda a ≤1 px del suelo).
+    /// </summary>
+    private static float PaddedBaseOffset(SpriteRenderer sr, float surface)
+    {
+        if (!Level2GroundingTool.TryOpaqueBottom(sr, out float opaque)) return surface - sr.bounds.min.y;
+        return surface - (opaque + sr.bounds.min.y) * 0.5f;
     }
 
     /// <summary>Misma construcción que las escaleras exteriores de Level2CompleteFixer, con el tope sobre su plataforma.</summary>
