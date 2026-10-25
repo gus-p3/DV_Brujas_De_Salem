@@ -161,7 +161,7 @@ namespace Level2
             {
                 int current = IngredientInventory.Instance != null ? IngredientInventory.Instance.TotalCollected : 0;
                 int req = IngredientInventory.Instance != null ? IngredientInventory.Instance.TotalRequired : 8;
-                ShowFeedback($"Sello arcano activo: reúne los ingredientes del mercado ({current}/{req})");
+                ShowFeedback($"Sello arcano activo ({current}/{req}). Revisa los cofres de las casas y de la calle.");
                 return;
             }
 

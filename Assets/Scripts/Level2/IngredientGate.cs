@@ -37,7 +37,7 @@ namespace Level2
         [SerializeField] private AudioClip lockedSound;
 
         [Header("Mensajes de HUD")]
-        [SerializeField] private string lockedMessage = "El portón está cerrado por un sello mágico. Aún te faltan ingredientes.";
+        [SerializeField] private string lockedMessage = "Aún te faltan ingredientes. Revisa los cofres de las casas y de la calle.";
         [SerializeField] private string openedMessage = "¡Sello roto! El portón hacia la iglesia está abierto.";
         [SerializeField] private float messageCooldown = 2.0f;
 
