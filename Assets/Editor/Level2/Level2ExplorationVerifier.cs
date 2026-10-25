@@ -406,7 +406,7 @@ namespace Level2.Editor
 
             LadderInteractable atticLadder = atticLadderGo.GetComponent<LadderInteractable>();
             HouseDoor roofExitDoor = roofExitDoorGo.GetComponent<HouseDoor>();
-            TreasureChest secretChest = secretChestGo.GetComponent<TreasureChest>();
+            Level2Chest secretChest = secretChestGo.GetComponent<Level2Chest>();
 
             return atticLadder != null && atticLadder.TopY > atticLadder.BottomY + 2f
                 && roofExitDoor != null && roofExitDoor.TargetDoor != null
@@ -559,7 +559,7 @@ namespace Level2.Editor
 
         private static bool VerifyChestsAndRewards(GameObject witch)
         {
-            TreasureChest[] chests = UnityEngine.Object.FindObjectsByType<TreasureChest>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            Level2Chest[] chests = UnityEngine.Object.FindObjectsByType<Level2Chest>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             if (chests.Length < 5) return false;
 
             KeyInventory inv = KeyInventory.Instance;
@@ -568,18 +568,20 @@ namespace Level2.Editor
 
             GameObject lockedChestGo = GameObject.Find("Chest_Int_House2_Locked");
             if (lockedChestGo == null) return false;
-            TreasureChest lockedChest = lockedChestGo.GetComponent<TreasureChest>();
+            Level2Chest lockedChest = lockedChestGo.GetComponent<Level2Chest>();
+            if (lockedChest == null) return false;
+            lockedChest.ResetChestState();
 
             // 1) Intentar abrir sin llave -> debe permanecer cerrado
             lockedChest.Interact(witch);
-            bool stayedClosedWithoutKey = !lockedChest.IsOpened;
+            bool stayedClosedWithoutKey = !lockedChest.HasBeenOpened;
 
             // 2) Otorgar llave y abrir -> debe abrirse y entregar recompensa
             inv.AddKey("key_tavern_chest", "Llave de Hierro de la Posada");
             int scoreBefore = GameManager.Instance != null ? GameManager.Instance.Score : 0;
             lockedChest.Interact(witch);
-            bool openedWithKey = lockedChest.IsOpened;
-            int scoreAfterFirst = GameManager.Instance != null ? GameManager.Instance.Score : scoreBefore + 350;
+            bool openedWithKey = lockedChest.HasBeenOpened;
+            int scoreAfterFirst = GameManager.Instance != null ? GameManager.Instance.Score : scoreBefore + 250;
 
             // 3) Intentar interactuar de nuevo -> no debe duplicar recompensa
             lockedChest.Interact(witch);
@@ -587,10 +589,7 @@ namespace Level2.Editor
             bool noDuplicateReward = scoreAfterSecond == scoreAfterFirst;
 
             // Resetear estado del cofre para dejar la escena limpia
-            FieldInfo openedField = typeof(TreasureChest).GetField("isOpened", BindingFlags.Instance | BindingFlags.NonPublic);
-            openedField?.SetValue(lockedChest, false);
-            MethodInfo updateVisual = typeof(TreasureChest).GetMethod("UpdateVisual", BindingFlags.Instance | BindingFlags.NonPublic);
-            updateVisual?.Invoke(lockedChest, null);
+            lockedChest.ResetChestState();
             inv.ResetExplorationProgress();
 
             return stayedClosedWithoutKey && openedWithKey && noDuplicateReward;

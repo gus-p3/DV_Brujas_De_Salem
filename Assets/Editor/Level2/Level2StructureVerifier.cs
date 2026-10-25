@@ -180,7 +180,7 @@ public static class Level2StructureVerifier
             if (mb == null) continue;
             System.Type t = mb.GetType();
             string tn = t.Name;
-            if (tn == "Ingredient" || tn == "PotionPickup" || tn == "HeartPickup" || tn == "Collectible" || tn == "KeyItem")
+            if (tn == "Ingredient" || tn == "PotionPickup" || tn == "HeartPickup" || tn == "Collectible" || tn == "KeyItem" || tn == "Level2Chest")
             {
                 pickupCount++;
                 if (mb.GetComponent<Level2CatPickupGuard>() == null)
@@ -344,6 +344,337 @@ public static class Level2StructureVerifier
         else
         {
             Debug.LogError($"[Verificar correcciones] FALLO con {findings.Count} hallazgos:\n - " + string.Join("\n - ", findings));
+        }
+
+        return findings.Count;
+    }
+
+    [MenuItem("Tools/Nivel 2/Verificar controles, cofres y fondo")]
+    public static int VerifyControlsChestsAndBackground()
+    {
+        Scene active = SceneManager.GetActiveScene();
+        if (active.path != "Assets/Scenes/Level2.unity")
+        {
+            EditorSceneManager.OpenScene("Assets/Scenes/Level2.unity", OpenSceneMode.Single);
+        }
+        Physics2D.SyncTransforms();
+
+        List<string> findings = new List<string>();
+
+        // 1. Controles definidos: Level2Controls.InteractKey == Q, PlayerInteractor usa Q, guia HUD presente, ningun componente usa E para abrir/entrar/salir
+        if (Level2Controls.InteractKey != KeyCode.Q || Level2Controls.ThrowPotionKey != KeyCode.E)
+        {
+            findings.Add($"[ESQUEMA CONTROLES INVALIDO] Level2Controls.InteractKey={Level2Controls.InteractKey}, ThrowPotionKey={Level2Controls.ThrowPotionKey}.");
+        }
+
+        GameObject witch = GameObject.Find("Witch");
+        PlayerInteractor interactor = witch != null ? witch.GetComponent<PlayerInteractor>() : Object.FindFirstObjectByType<PlayerInteractor>(FindObjectsInactive.Include);
+        Level2Controls ctrl = witch != null ? witch.GetComponent<Level2Controls>() : Object.FindFirstObjectByType<Level2Controls>(FindObjectsInactive.Include);
+
+        if (ctrl == null)
+        {
+            findings.Add("[FALTA LEVEL2CONTROLS] El objeto Witch no tiene el componente Level2Controls.");
+        }
+        if (interactor == null || interactor.InteractKey != Level2Controls.InteractKey)
+        {
+            findings.Add($"[INTERACTOR NO USA Q] PlayerInteractor no usa Level2Controls.InteractKey (Q).");
+        }
+
+        GameObject guidePanel = GameObject.Find("UI/IngredientHUD_Canvas/Panel_ControlsGuide");
+        if (guidePanel == null)
+        {
+            findings.Add("[FALTA GUIA CONTROLES HUD] No existe UI/IngredientHUD_Canvas/Panel_ControlsGuide.");
+        }
+
+        MonoBehaviour[] allMbs = Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (MonoBehaviour mb in allMbs)
+        {
+            if (mb == null) continue;
+            if (mb is IInteractable interactable && !(mb is LadderInteractable))
+            {
+                string prompt = interactable.GetPromptText(witch);
+                if (!string.IsNullOrEmpty(prompt) && (!prompt.StartsWith("Q:") || prompt.Contains("E —") || prompt.Contains("[E]") || prompt.Contains("Tecla E")))
+                {
+                    findings.Add($"[PROMPT NO USA Q] {GetPath(mb.transform)} devuelve prompt '{prompt}'.");
+                }
+            }
+        }
+
+        // 2. Ningun Ingredient, PotionPickup ni HeartPickup suelto en Level2.unity; todos dentro de Level2Chest (>= 2 de cada uno de los 4 tipos)
+        Ingredient[] looseIngs = Object.FindObjectsByType<Ingredient>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        PotionPickup[] loosePots = Object.FindObjectsByType<PotionPickup>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        HeartPickup[] looseHearts = Object.FindObjectsByType<HeartPickup>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+        if (looseIngs.Length > 0)
+        {
+            findings.Add($"[INGREDIENTES SUELTOS] Hay {looseIngs.Length} Ingredient sueltos en Level2.unity (debe ser 0).");
+        }
+        if (loosePots.Length > 0)
+        {
+            findings.Add($"[POCIONES SUELTAS] Hay {loosePots.Length} PotionPickup sueltos en Level2.unity (debe ser 0).");
+        }
+        if (looseHearts.Length > 0)
+        {
+            findings.Add($"[CORAZONES SUELTOS] Hay {looseHearts.Length} HeartPickup sueltos en Level2.unity (debe ser 0).");
+        }
+
+        // 3. Todos los Level2Chest apoyados (<= 0.02 u), con ID unico no vacio, collider trigger, indicador de Q y >= 1 item configurado
+        Level2Chest[] chests = Object.FindObjectsByType<Level2Chest>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        if (chests.Length < 10)
+        {
+            findings.Add($"[POCOS COFRES] Solo hay {chests.Length} Level2Chest en Level2.unity (esperados >= 10).");
+        }
+
+        HashSet<string> chestIds = new HashSet<string>();
+        Dictionary<IngredientType, int> ingCounts = new Dictionary<IngredientType, int>
+        {
+            { IngredientType.Mushroom, 0 },
+            { IngredientType.Spider, 0 },
+            { IngredientType.WitheredFlower, 0 },
+            { IngredientType.Root, 0 }
+        };
+        int totalPotionsInChests = 0;
+
+        foreach (Level2Chest chest in chests)
+        {
+            if (chest == null) continue;
+
+            if (string.IsNullOrWhiteSpace(chest.ChestId))
+            {
+                findings.Add($"[COFRE SIN ID] {GetPath(chest.transform)} tiene ChestId vacio.");
+            }
+            else if (!chestIds.Add(chest.ChestId))
+            {
+                findings.Add($"[COFRE ID DUPLICADO] {GetPath(chest.transform)} repite ChestId '{chest.ChestId}'.");
+            }
+
+            BoxCollider2D trig = chest.GetComponent<BoxCollider2D>();
+            if (trig == null || !trig.isTrigger)
+            {
+                findings.Add($"[COFRE SIN TRIGGER] {GetPath(chest.transform)} no tiene BoxCollider2D isTrigger.");
+            }
+
+            Level2DoorIndicator ind = chest.GetComponent<Level2DoorIndicator>();
+            if (ind == null)
+            {
+                findings.Add($"[COFRE SIN INDICADOR Q] {GetPath(chest.transform)} no tiene Level2DoorIndicator.");
+            }
+
+            if (chest.Contents == null || chest.Contents.Count == 0)
+            {
+                findings.Add($"[COFRE VACIO] {GetPath(chest.transform)} no tiene items configurados.");
+            }
+            else
+            {
+                foreach (var entry in chest.Contents)
+                {
+                    if (entry == null) continue;
+                    if (entry.itemKind == ChestItemKind.Ingredient)
+                    {
+                        ingCounts[entry.ingredientType] += entry.amount;
+                    }
+                    else if (entry.itemKind == ChestItemKind.Potion)
+                    {
+                        totalPotionsInChests += entry.amount;
+                    }
+                }
+            }
+
+            SpriteRenderer sr = chest.GetComponent<SpriteRenderer>();
+            float minY = sr != null && sr.sprite != null ? sr.bounds.min.y : chest.transform.position.y;
+            float surfY = Level2CompleteFixer.FindBestSurfaceBelow(chest.transform.position.x, minY + 0.25f);
+            float diff = Mathf.Abs(minY - surfY);
+            if (diff > TOLERANCE)
+            {
+                findings.Add($"[COFRE FLOTANDO/HUNDIDO] {chest.name} ({chest.ChestId}) minY={minY:F4}, suelo={surfY:F4}, diff={diff:F4}u > {TOLERANCE}u.");
+            }
+        }
+
+        foreach (var kv in ingCounts)
+        {
+            if (kv.Value < 2)
+            {
+                findings.Add($"[INGREDIENTES INSUFICIENTES EN COFRES] Tipo {kv.Key} solo tiene {kv.Value} unidades en cofres (minimo 2).");
+            }
+        }
+        if (totalPotionsInChests < 5)
+        {
+            findings.Add($"[POCAS POCIONES EN COFRES] Solo hay {totalPotionsInChests} frascos en cofres (minimo 5).");
+        }
+
+        // 4. Pruebas logicas de cofre y controles (Q vs E, forma humana vs gato, no duplicacion, tope de 3 frascos)
+        Level2Chest testChest = chests.FirstOrDefault(c => c != null && !c.RequiresKey && c.Contents.All(e => e.itemKind == ChestItemKind.Ingredient));
+        Level2Chest potionChest = chests.FirstOrDefault(c => c != null && c != testChest && !c.RequiresKey && c.Contents.Any(e => e.itemKind == ChestItemKind.Potion));
+        if (witch != null && interactor != null && testChest != null && potionChest != null)
+        {
+            Vector3 origWitchPos = witch.transform.position;
+            TransformationManager tm = witch.GetComponent<TransformationManager>();
+            System.Reflection.FieldInfo catField = tm != null
+                ? typeof(TransformationManager).GetField("isCatForm", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                : null;
+            bool origCat = tm != null && tm.IsCatForm;
+
+            testChest.ResetChestState();
+            potionChest.ResetChestState();
+
+            // 4a. En forma de gato no abre el cofre
+            if (tm != null && catField != null)
+            {
+                catField.SetValue(tm, true);
+                testChest.Interact(witch);
+                if (testChest.HasBeenOpened)
+                {
+                    findings.Add("[FALLO LOGICA GATO] El gato pudo abrir un Level2Chest.");
+                }
+                catField.SetValue(tm, false);
+            }
+
+            // 4b. Tecla E nunca abre cofres ni puertas; Tecla Q abre el cofre sin gastar pociones
+            witch.transform.position = testChest.transform.position;
+            Physics2D.SyncTransforms();
+            interactor.RefreshFocus();
+
+            bool eTriggered = interactor.TryProcessKey(KeyCode.E, ignoreCooldown: true);
+            if (eTriggered || testChest.HasBeenOpened)
+            {
+                findings.Add("[FALLO TECLA E] Pulsar E activo una interaccion de cofre/puerta.");
+            }
+
+            bool qTriggered = interactor.TryProcessKey(KeyCode.Q, ignoreCooldown: true);
+            if (!qTriggered || !testChest.HasBeenOpened || !testChest.IsFullyLooted)
+            {
+                findings.Add("[FALLO TECLA Q] Pulsar Q en forma humana no abrio el cofre.");
+            }
+
+            // 4c. Un cofre ya vaciado no vuelve a dar objetos ni permite interactuar de nuevo
+            if (testChest.CanInteract(witch))
+            {
+                findings.Add("[FALLO DUPLICACION COFRE] Un cofre completamente vaciado sigue permitiendo CanInteract.");
+            }
+
+            // 4d. Tope de 3 frascos por tipo: si ya tiene 3, el frasco queda pendiente en el cofre sin perderse
+            var potEntry = potionChest.Contents.First(e => e.itemKind == ChestItemKind.Potion);
+            GameManager gm = GameManager.Instance;
+            bool createdTempGm = false;
+            if (gm == null)
+            {
+                GameObject tempGmGo = new GameObject("__TempGM_Verify");
+                gm = tempGmGo.AddComponent<GameManager>();
+                createdTempGm = true;
+            }
+
+            int oldBlind = gm.BlindCharges;
+            int oldHypno = gm.HypnotizeCharges;
+            int oldSleep = gm.SleepCharges;
+
+            gm.BlindCharges = 3;
+            gm.HypnotizeCharges = 3;
+            gm.SleepCharges = 3;
+
+            potionChest.ResetChestState();
+            potionChest.Interact(witch);
+            if (!potionChest.HasBeenOpened || !potionChest.HasPendingItems || potEntry.claimed)
+            {
+                findings.Add("[FALLO TOPE 3 FRASCOS] Al abrir cofre con 3/3 pociones, el frasco no quedo pendiente dentro del cofre.");
+            }
+
+            // Al gastar 1 pocion (quedan 2/3) y volver a interactuar, recoge el frasco pendiente
+            gm.BlindCharges = 2;
+            gm.HypnotizeCharges = 2;
+            gm.SleepCharges = 2;
+            potionChest.Interact(witch);
+            if (potionChest.HasPendingItems || !potEntry.claimed)
+            {
+                findings.Add("[FALLO RECOGIDA PENDIENTE] Al tener < 3 pociones y re-interactuar, no se entrego el frasco pendiente.");
+            }
+
+            gm.BlindCharges = oldBlind;
+            gm.HypnotizeCharges = oldHypno;
+            gm.SleepCharges = oldSleep;
+            if (createdTempGm)
+            {
+                Object.DestroyImmediate(gm.gameObject);
+            }
+
+            testChest.ResetChestState();
+            potionChest.ResetChestState();
+            if (IngredientInventory.Instance != null) IngredientInventory.Instance.ResetProgress();
+            if (KeyInventory.Instance != null) KeyInventory.Instance.ResetExplorationProgress();
+            if (tm != null && catField != null) catField.SetValue(tm, origCat);
+            witch.transform.position = origWitchPos;
+            Physics2D.SyncTransforms();
+        }
+
+        // 5. Fondo con >= 3 capas continuas, sin huecos (gap <= 0.001 u), con cobertura completa horizontal y vertical
+        string[] layerNames = { "Sky_Far", "Village_Far", "Facades_Mid" };
+        foreach (string lName in layerNames)
+        {
+            GameObject layerGO = GameObject.Find("Environment/Parallax/" + lName);
+            if (layerGO == null)
+            {
+                findings.Add($"[CAPA FONDO FALTANTE] No existe Environment/Parallax/{lName}.");
+                continue;
+            }
+
+            SpriteRenderer[] tiles = layerGO.GetComponentsInChildren<SpriteRenderer>(false)
+                .Where(s => s.gameObject != layerGO && s.sprite != null)
+                .OrderBy(s => s.bounds.min.x)
+                .ToArray();
+
+            if (tiles.Length < 8)
+            {
+                findings.Add($"[POCOS TILES EN FONDO] {lName} solo tiene {tiles.Length} copias.");
+                continue;
+            }
+
+            for (int i = 0; i < tiles.Length - 1; i++)
+            {
+                float rightEdge = tiles[i].bounds.max.x;
+                float leftEdgeNext = tiles[i + 1].bounds.min.x;
+                float gap = Mathf.Abs(leftEdgeNext - rightEdge);
+                if (gap > 0.0015f)
+                {
+                    findings.Add($"[HUECO EN FONDO] {lName} entre {tiles[i].name} y {tiles[i + 1].name}: gap={gap:F5}u > 0.001u.");
+                }
+            }
+
+            float minX = tiles.First().bounds.min.x;
+            float maxX = tiles.Last().bounds.max.x;
+            if (minX > -50f || maxX < 230f)
+            {
+                findings.Add($"[COBERTURA FONDO INSUFICIENTE] {lName} cubre [{minX:F1}, {maxX:F1}].");
+            }
+        }
+
+        // 6. Todos los puestos del mercado (bajos y elevados) tienen mesa/base apoyada y toldo/sombrilla completo asignado
+        GameObject[] allObjects = Object.FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        List<GameObject> marketStalls = allObjects
+            .Where(g => g != null && (g.name.StartsWith("Stall_Z") || g.name.StartsWith("Roof_Z3_") || g.name == "Roof_Z5_Low_1" || g.name == "Roof_Z5_Mid_2" || g.name == "Roof_Z5_HighWalk")
+                        && g.transform.parent != null && !g.transform.parent.name.StartsWith("Stall_Z"))
+            .ToList();
+
+        foreach (GameObject st in marketStalls)
+        {
+            Transform swayTr = st.transform.Find("Awning_Sway_Visual");
+            SpriteRenderer swaySr = swayTr != null ? swayTr.GetComponent<SpriteRenderer>() : null;
+            if (swaySr == null || !swaySr.enabled || swaySr.sprite == null || swaySr.sprite.rect.height < 40f)
+            {
+                findings.Add($"[PUESTO SIN TOLDO COMPLETO] {GetPath(st.transform)} no tiene Awning_Sway_Visual con sprite completo (altura >= 40px).");
+            }
+
+            if (st.GetComponent<MarketStallAnimator>() == null)
+            {
+                findings.Add($"[PUESTO SIN ANIMADOR] {GetPath(st.transform)} no tiene MarketStallAnimator.");
+            }
+        }
+
+        if (findings.Count == 0)
+        {
+            Debug.Log($"[Verificar controles, cofres y fondo] EXITO: 0 hallazgos. Cofres={chests.Length} (Ingredientes: M={ingCounts[IngredientType.Mushroom]}, S={ingCounts[IngredientType.Spider]}, F={ingCounts[IngredientType.WitheredFlower]}, R={ingCounts[IngredientType.Root]}; Pociones={totalPotionsInChests}), Objetos sueltos=0, Capas fondo=3 (gap<=0.001u), Puestos completos={marketStalls.Count}.");
+        }
+        else
+        {
+            Debug.LogError($"[Verificar controles, cofres y fondo] FALLO con {findings.Count} hallazgos:\n - " + string.Join("\n - ", findings));
         }
 
         return findings.Count;

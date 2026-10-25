@@ -34,6 +34,11 @@ public static class Level2CompleteFixer
     {
         if (EditorApplication.isCompiling || EditorApplication.isUpdating) return;
         if (!System.IO.File.Exists(CMD_FILE)) return;
+        if (EditorApplication.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode)
+        {
+            EditorApplication.isPlaying = false;
+            return;
+        }
 
         string cmd = System.IO.File.ReadAllText(CMD_FILE).Trim();
         System.IO.File.Delete(CMD_FILE);
@@ -72,6 +77,36 @@ public static class Level2CompleteFixer
                     break;
                 case "MEGA_E":
                     ApplyBlockE_NewParallaxBackground();
+                    break;
+                case "TASK_1":
+                    ApplyTaskBlock1_Controls();
+                    break;
+                case "TASK_2":
+                    ApplyTaskBlock2_ChestsSystemAndPrefab();
+                    break;
+                case "TASK_3":
+                    ApplyTaskBlock3_PlaceItemsInChests();
+                    break;
+                case "TASK_4":
+                    ApplyTaskBlock4_RecomposedBackground();
+                    break;
+                case "TASK_5":
+                    ApplyTaskBlock5_CompleteElevatedStalls();
+                    break;
+                case "CAPTURE_TASK_BEFORE":
+                    CaptureTaskBeforeEvidences();
+                    break;
+                case "CAPTURE_TASK_AFTER":
+                    CaptureTaskAfterEvidences();
+                    break;
+                case "VERIFY_TASK":
+                    int tCount = Level2StructureVerifier.VerifyControlsChestsAndBackground();
+                    int m2Count = Level2StructureVerifier.VerifyMegaCorrections();
+                    int s2Count = Level2StructureVerifier.VerifyAllStructures();
+                    bool ingOk = Level2IngredientVerifier.RunAllTests();
+                    Level2StealthVerifier.RunVerification();
+                    var exp2Report = Level2.Editor.Level2ExplorationVerifier.RunAllExplorationTests();
+                    logResult = $"VERIFY_TASK_DONE: TaskFindings={tCount}, MegaFindings={m2Count}, StructureFindings={s2Count}, IngOk={ingOk}, Exploration={exp2Report.passed}/{exp2Report.total}";
                     break;
                 case "CAPTURE_MEGA_BEFORE":
                     CaptureMegaBeforeEvidences();
@@ -1204,6 +1239,846 @@ public static class Level2CompleteFixer
         Scene active = SceneManager.GetActiveScene();
         EditorSceneManager.MarkSceneDirty(active);
         EditorSceneManager.SaveScene(active);
+    }
+
+    // =========================================================================
+    // BLOQUES DE CORRECCION: CONTROLES Q/1-2-3/E, COFRES, FONDO Y PUESTOS
+    // =========================================================================
+
+    [MenuItem("Tools/Nivel 2/Cofres y Controles/1. Esquema de Controles Q Interactuar / E Lanzar Pocion")]
+    public static void ApplyTaskBlock1_Controls()
+    {
+        EnsureLevel2Open();
+
+        GameObject witch = GameObject.Find("Witch");
+        if (witch != null)
+        {
+            Level2Controls ctrl = witch.GetComponent<Level2Controls>();
+            if (ctrl == null) ctrl = witch.AddComponent<Level2Controls>();
+            Level2Controls.EnsureHUDControlsGuide();
+            EditorUtility.SetDirty(ctrl);
+
+            PlayerInteractor pi = witch.GetComponent<PlayerInteractor>();
+            if (pi == null) pi = witch.AddComponent<PlayerInteractor>();
+            SerializedObject soPi = new SerializedObject(pi);
+            soPi.FindProperty("interactKey").intValue = (int)Level2Controls.InteractKey;
+            soPi.FindProperty("interactionCooldown").floatValue = Level2Controls.DefaultInteractCooldown;
+            soPi.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(pi);
+        }
+
+        // Actualizar textos de tutoriales en Nivel 2 para reflejar Q (cofres/puertas) y 1/2/3 + E (pociones)
+        TutorialTrigger[] triggers = Object.FindObjectsByType<TutorialTrigger>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (TutorialTrigger tt in triggers)
+        {
+            if (tt == null) continue;
+            SerializedObject soTt = new SerializedObject(tt);
+            SerializedProperty msgProp = soTt.FindProperty("message");
+            if (msgProp != null && !string.IsNullOrEmpty(msgProp.stringValue))
+            {
+                msgProp.stringValue = "Abre cofres y puertas con Q para reunir 2 ingredientes de cada tipo (Hongos, Arañas, Flores y Raíces). Elige poción con 1, 2 o 3 y lánzala con E.";
+                soTt.ApplyModifiedPropertiesWithoutUndo();
+                EditorUtility.SetDirty(tt);
+            }
+        }
+
+        SaveLevel2();
+        Debug.Log("[Level2CompleteFixer] Task Block 1 aplicado: Level2Controls activo, Panel_ControlsGuide creado y textos actualizados.");
+    }
+
+    [MenuItem("Tools/Nivel 2/Cofres y Controles/2. Crear Prefab Level2_Chest")]
+    public static void ApplyTaskBlock2_ChestsSystemAndPrefab()
+    {
+        EnsureLevel2Open();
+        System.IO.Directory.CreateDirectory("Assets/Prefabs/Level2");
+
+        EnsureSingleSpriteImport("Assets/Art/Environment/Level2/Interactive_Chest_Closed.png", 64f);
+        EnsureSingleSpriteImport("Assets/Art/Environment/Level2/Interactive_Chest_Open.png", 64f);
+
+        Sprite closedSp = LoadSingleSprite("Assets/Art/Environment/Level2/Interactive_Chest_Closed.png");
+        Sprite openSp = LoadSingleSprite("Assets/Art/Environment/Level2/Interactive_Chest_Open.png");
+
+        GameObject prefabRoot = new GameObject("Level2_Chest");
+        SpriteRenderer sr = prefabRoot.AddComponent<SpriteRenderer>();
+        sr.sprite = closedSp;
+        sr.sortingLayerName = "Gameplay";
+        sr.sortingOrder = 2;
+
+        BoxCollider2D col = prefabRoot.AddComponent<BoxCollider2D>();
+        col.isTrigger = true;
+        col.size = new Vector2(1.45f, 1.35f);
+        col.offset = new Vector2(0f, 0.25f);
+
+        Level2Chest chest = prefabRoot.AddComponent<Level2Chest>();
+        chest.ConfigureChest(
+            "chest_template",
+            "Cofre del Mercado",
+            closedSp,
+            openSp,
+            new List<ChestContentEntry>
+            {
+                new ChestContentEntry
+                {
+                    itemKind = ChestItemKind.Ingredient,
+                    ingredientType = IngredientType.Mushroom,
+                    ingredientUniqueId = "L2_Ing_Template",
+                    amount = 1
+                }
+            });
+
+        Level2DoorIndicator ind = prefabRoot.AddComponent<Level2DoorIndicator>();
+        ind.Configure(false, 1.15f);
+
+        PrefabUtility.SaveAsPrefabAsset(prefabRoot, "Assets/Prefabs/Level2/Level2_Chest.prefab");
+        Object.DestroyImmediate(prefabRoot);
+        AssetDatabase.SaveAssets();
+        Debug.Log("[Level2CompleteFixer] Task Block 2 aplicado: Prefab Assets/Prefabs/Level2/Level2_Chest.prefab creado.");
+    }
+
+    [MenuItem("Tools/Nivel 2/Cofres y Controles/3. Mover Ingredientes y Pociones Dentro de Cofres")]
+    public static void ApplyTaskBlock3_PlaceItemsInChests()
+    {
+        EnsureLevel2Open();
+
+        EnsureSingleSpriteImport("Assets/Art/Environment/Level2/Interactive_Chest_Closed.png", 64f);
+        EnsureSingleSpriteImport("Assets/Art/Environment/Level2/Interactive_Chest_Open.png", 64f);
+        Sprite closedSp = LoadSingleSprite("Assets/Art/Environment/Level2/Interactive_Chest_Closed.png");
+        Sprite openSp = LoadSingleSprite("Assets/Art/Environment/Level2/Interactive_Chest_Open.png");
+
+        // 1. Eliminar todos los Ingredient, PotionPickup y HeartPickup sueltos de Level2.unity
+        Ingredient[] looseIngs = Object.FindObjectsByType<Ingredient>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var ing in looseIngs)
+        {
+            if (ing != null) Object.DestroyImmediate(ing.gameObject);
+        }
+
+        PotionPickup[] loosePots = Object.FindObjectsByType<PotionPickup>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var pot in loosePots)
+        {
+            if (pot != null) Object.DestroyImmediate(pot.gameObject);
+        }
+
+        HeartPickup[] looseHearts = Object.FindObjectsByType<HeartPickup>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var h in looseHearts)
+        {
+            if (h != null) Object.DestroyImmediate(h.gameObject);
+        }
+
+        // 2. Eliminar cualquier TreasureChest antiguo o Level2Chest previo para regenerar los 15 cofres limpios
+        TreasureChest[] oldChests = Object.FindObjectsByType<TreasureChest>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var oc in oldChests)
+        {
+            if (oc != null) Object.DestroyImmediate(oc.gameObject);
+        }
+
+        Level2Chest[] prevChests = Object.FindObjectsByType<Level2Chest>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var pc in prevChests)
+        {
+            if (pc != null) Object.DestroyImmediate(pc.gameObject);
+        }
+
+        GameObject gameplay = GameObject.Find("Gameplay") ?? new GameObject("Gameplay");
+        Transform chestsRootTr = gameplay.transform.Find("Chests");
+        if (chestsRootTr != null) Object.DestroyImmediate(chestsRootTr.gameObject);
+        GameObject chestsRoot = new GameObject("Chests");
+        chestsRoot.transform.SetParent(gameplay.transform, false);
+
+        Transform h1Root = GameObject.Find("Environment/Interiors/Interior_House1_Apothecary")?.transform ?? chestsRoot.transform;
+        Transform h2Root = GameObject.Find("Environment/Interiors/Interior_House2_Tavern")?.transform ?? chestsRoot.transform;
+        Transform h3Root = GameObject.Find("Environment/Interiors/Interior_House3_Abandoned")?.transform ?? chestsRoot.transform;
+        Transform h4Root = GameObject.Find("Environment/Interiors/Interior_House4_Manor")?.transform ?? chestsRoot.transform;
+
+        // 3. Instanciar y apoyar a ras de suelo (<= 0.02 u) los 15 cofres del Nivel 2
+        // Cofre 1: Zona 1 - Calle de entrada
+        SpawnGroundedChest(chestsRoot.transform, "Chest_Z1_Intro", "chest_z1_intro", "Cofre de la Entrada",
+            18.5f, 1.0f, closedSp, openSp, new List<ChestContentEntry>
+            {
+                MakeIngredientEntry(IngredientType.Mushroom, "L2_Ing_Mushroom_Z1"),
+                MakeHeartEntry(1)
+            });
+
+        // Cofre 2: Zona 1 - Sobre el toldo del primer puesto (Stall_Z1_1)
+        SpawnGroundedChest(chestsRoot.transform, "Chest_Z1_StallRoof", "chest_z1_stall_roof", "Cofre del Toldo de Entrada",
+            13.0f, 3.3f, closedSp, openSp, new List<ChestContentEntry>
+            {
+                MakePotionEntry(PotionType.Sleep, 1)
+            });
+
+        // Cofre 3: Interior Casa 1 (Botica, 2º piso)
+        SpawnGroundedChest(h1Root, "Chest_Int_House1_Upper", "chest_int_house1_upper", "Cofre del Boticario",
+            20.6f, 33.6f, closedSp, openSp, new List<ChestContentEntry>
+            {
+                MakeIngredientEntry(IngredientType.Mushroom, "L2_Ing_Mushroom_H1"),
+                MakePotionEntry(PotionType.Blind, 1)
+            });
+
+        // Cofre 4: Zona 2 - Sobre el puesto Stall_Z2_2 (x = 38.8)
+        SpawnGroundedChest(chestsRoot.transform, "Chest_Z2_MarketStreet", "chest_z2_market_street", "Cofre de los Puestos Bajos",
+            38.8f, 3.3f, closedSp, openSp, new List<ChestContentEntry>
+            {
+                MakeIngredientEntry(IngredientType.Spider, "L2_Ing_Spider_Z2"),
+                MakeIngredientEntry(IngredientType.WitheredFlower, "L2_Ing_Flower_Z2")
+            });
+
+        // Cofre 5: Zona 2 - Pasarela / Balcón de la Posada (RoofWalk_Z2)
+        SpawnGroundedChest(chestsRoot.transform, "Chest_Ext_Z2_Balcony", "chest_ext_z2_balcony", "Cofre del Balcón de la Posada",
+            46.4f, 4.8f, closedSp, openSp, new List<ChestContentEntry>
+            {
+                MakePotionEntry(PotionType.Blind, 1),
+                MakeHeartEntry(1)
+            });
+
+        // Cofre 6: Interior Casa 2 (Posada, 2º piso - requiere llave de la bodega)
+        SpawnGroundedChest(h2Root, "Chest_Int_House2_Locked", "chest_int_house2_locked", "Cofre del Posadero",
+            52.4f, 33.6f, closedSp, openSp, new List<ChestContentEntry>
+            {
+                MakePotionEntry(PotionType.Sleep, 1),
+                MakeHeartEntry(1)
+            },
+            needsKey: true, keyId: "key_tavern_chest", keyName: "Llave de Hierro de la Posada");
+
+        // Cofre 7: Zona 3 - Entrada de la Plaza Central
+        SpawnGroundedChest(chestsRoot.transform, "Chest_Z3_PlazaStreet", "chest_z3_plaza_street", "Cofre de la Plaza Central",
+            67.5f, 1.0f, closedSp, openSp, new List<ChestContentEntry>
+            {
+                MakeIngredientEntry(IngredientType.Spider, "L2_Ing_Spider_Z3"),
+                MakePotionEntry(PotionType.Blind, 1)
+            });
+
+        // Cofre 8: Zona 3 - Mirador izquierdo sobre el canal (Roof_Z3_LeftHigh)
+        SpawnGroundedChest(chestsRoot.transform, "Chest_Ext_Z3_CanalOverlook", "chest_ext_z3_canal_overlook", "Cofre del Mirador del Canal",
+            71.2f, 5.0f, closedSp, openSp, new List<ChestContentEntry>
+            {
+                MakePotionEntry(PotionType.Sleep, 1)
+            });
+
+        // Cofre 9: Zona 3 - Mirador derecho tras el canal (Roof_Z3_RightHigh)
+        SpawnGroundedChest(chestsRoot.transform, "Chest_Z3_EastOverlook", "chest_z3_east_overlook", "Cofre del Mirador Oriental",
+            87.0f, 5.2f, closedSp, openSp, new List<ChestContentEntry>
+            {
+                MakeIngredientEntry(IngredientType.Root, "L2_Ing_Root_Z3"),
+                MakeHeartEntry(1)
+            });
+
+        // Cofre 10: Zona 4 - Entrada del Callejón (en la calle antes del puesto elevado)
+        SpawnGroundedChest(chestsRoot.transform, "Chest_Z4_AlleyEntry", "chest_z4_alley_entry", "Cofre del Callejón",
+            97.5f, 0.8f, closedSp, openSp, new List<ChestContentEntry>
+            {
+                MakeIngredientEntry(IngredientType.WitheredFlower, "L2_Ing_Flower_Z4"),
+                MakePotionEntry(PotionType.Sleep, 1)
+            });
+
+        // Cofre 11: Zona 4 - Salida del Pasaje Felino (requiere cruzar como gato y volver a forma humana)
+        SpawnGroundedChest(chestsRoot.transform, "Chest_Z4_CatTunnelExit", "chest_z4_cat_tunnel_exit", "Cofre del Pasaje Felino",
+            115.2f, 0.8f, closedSp, openSp, new List<ChestContentEntry>
+            {
+                MakeIngredientEntry(IngredientType.Root, "L2_Ing_Root_Z4")
+            });
+
+        // Cofre 12: Interior Casa 3 (Casa Abandonada, Ático Secreto 3er piso)
+        SpawnGroundedChest(h3Root, "Chest_Int_House3_Attic", "chest_int_house3_attic", "Cofre Oculto del Ático",
+            112.2f, 37.6f, closedSp, openSp, new List<ChestContentEntry>
+            {
+                MakeIngredientEntry(IngredientType.Root, "L2_Ing_Root_H3"),
+                MakePotionEntry(PotionType.Hypnotize, 1)
+            });
+
+        // Cofre 13: Zona 5 - Calle del Gran Mercado
+        SpawnGroundedChest(chestsRoot.transform, "Chest_Z5_MarketPlaza", "chest_z5_market_plaza", "Cofre del Gran Mercado",
+            133.2f, 1.0f, closedSp, openSp, new List<ChestContentEntry>
+            {
+                MakeIngredientEntry(IngredientType.Mushroom, "L2_Ing_Mushroom_Z5"),
+                MakePotionEntry(PotionType.Hypnotize, 1),
+                MakeHeartEntry(1)
+            });
+
+        // Cofre 14: Zona 5 - Pasarela alta del Gran Mercado (Roof_Z5_HighWalk)
+        SpawnGroundedChest(chestsRoot.transform, "Chest_Z5_HighTower", "chest_z5_high_tower", "Cofre de la Torre del Mercado",
+            142.5f, 7.2f, closedSp, openSp, new List<ChestContentEntry>
+            {
+                MakeIngredientEntry(IngredientType.Mushroom, "L2_Ing_Mushroom_Z5_Bonus"),
+                MakeIngredientEntry(IngredientType.Spider, "L2_Ing_Spider_Z5_Bonus")
+            });
+
+        // Cofre 15: Interior Casa 4 (Mansión del Magistrado, Altillo de Biblioteca - requiere Llave Maestra)
+        SpawnGroundedChest(h4Root, "Chest_Int_House4_Royal", "chest_int_house4_royal", "Cofre Real del Magistrado",
+            142.5f, 35.4f, closedSp, openSp, new List<ChestContentEntry>
+            {
+                MakePotionEntry(PotionType.Hypnotize, 1),
+                MakeHeartEntry(1)
+            },
+            needsKey: true, keyId: "key_manor_master", keyName: "Llave Maestra del Magistrado");
+
+        SaveLevel2();
+        Debug.Log("[Level2CompleteFixer] Task Block 3 aplicado: 0 objetos sueltos y 15 cofres Level2Chest colocados a ras de suelo.");
+    }
+
+    private static ChestContentEntry MakeIngredientEntry(IngredientType type, string uniqueId)
+    {
+        return new ChestContentEntry
+        {
+            itemKind = ChestItemKind.Ingredient,
+            ingredientType = type,
+            ingredientUniqueId = uniqueId,
+            amount = 1,
+            claimed = false
+        };
+    }
+
+    private static ChestContentEntry MakePotionEntry(PotionType type, int count)
+    {
+        return new ChestContentEntry
+        {
+            itemKind = ChestItemKind.Potion,
+            potionType = type,
+            amount = count,
+            claimed = false
+        };
+    }
+
+    private static ChestContentEntry MakeHeartEntry(int count)
+    {
+        return new ChestContentEntry
+        {
+            itemKind = ChestItemKind.Heart,
+            amount = count,
+            claimed = false
+        };
+    }
+
+    private static Level2Chest SpawnGroundedChest(
+        Transform parent,
+        string objectName,
+        string chestId,
+        string title,
+        float x,
+        float rayStartY,
+        Sprite closedSp,
+        Sprite openSp,
+        List<ChestContentEntry> entries,
+        bool needsKey = false,
+        string keyId = "",
+        string keyName = "")
+    {
+        Physics2D.SyncTransforms();
+        float surfaceY = FindBestSurfaceBelow(x, rayStartY);
+
+        GameObject go = new GameObject(objectName);
+        go.transform.SetParent(parent, true);
+        go.transform.localScale = Vector3.one;
+        go.transform.rotation = Quaternion.identity;
+
+        SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = closedSp;
+        sr.sortingLayerName = "Gameplay";
+        sr.sortingOrder = 2;
+
+        // Colocar el borde inferior del sprite exactamente sobre surfaceY (gap = 0.000 u <= 0.02 u)
+        go.transform.position = new Vector3(x, surfaceY + 0.5f, 0f);
+        SnapSpriteBottomToY(go, surfaceY);
+
+        BoxCollider2D trig = go.AddComponent<BoxCollider2D>();
+        trig.isTrigger = true;
+        trig.size = new Vector2(1.45f, 1.35f);
+        trig.offset = new Vector2(0f, 0.25f);
+
+        Level2Chest chest = go.AddComponent<Level2Chest>();
+        chest.ConfigureChest(chestId, title, closedSp, openSp, entries, needsKey, keyId, keyName);
+
+        Level2DoorIndicator ind = go.AddComponent<Level2DoorIndicator>();
+        ind.Configure(false, 1.05f);
+
+        Level2CatPickupGuard guard = go.AddComponent<Level2CatPickupGuard>();
+        EditorUtility.SetDirty(go);
+        return chest;
+    }
+
+    public static float FindBestSurfaceBelow(float x, float rayStartY)
+    {
+        int groundMask = 1 << LayerMask.NameToLayer("Ground");
+        RaycastHit2D[] hits = Physics2D.RaycastAll(new Vector2(x, rayStartY), Vector2.down, 4.5f, groundMask);
+        float bestY = GROUND_SURFACE_Y;
+        float bestDist = float.MaxValue;
+        foreach (var h in hits)
+        {
+            if (h.collider != null && !h.collider.isTrigger)
+            {
+                float d = rayStartY - h.point.y;
+                if (d >= -0.05f && d < bestDist)
+                {
+                    bestDist = d;
+                    bestY = h.point.y;
+                }
+            }
+        }
+        return bestY;
+    }
+
+    [MenuItem("Tools/Nivel 2/Cofres y Controles/4. Recomponer Fondo Continuo de Aldea")]
+    public static void ApplyTaskBlock4_RecomposedBackground()
+    {
+        EnsureLevel2Open();
+
+        string varBPath = "Assets/Art/Environment/Level2/Level2_Village_Far_VarB.png";
+        EnsureSeamlessBackgroundImport(SKY_CLEAN_PATH);
+        EnsureSeamlessBackgroundImport(FAR_CLEAN_PATH);
+        EnsureSeamlessBackgroundImport(varBPath);
+        EnsureSeamlessBackgroundImport(MID_CLEAN_PATH);
+
+        Sprite skySprite = LoadSingleSprite(SKY_CLEAN_PATH);
+        Sprite farSpriteA = LoadSingleSprite(FAR_CLEAN_PATH);
+        Sprite farSpriteB = LoadSingleSprite(varBPath);
+        Sprite midSprite = LoadSingleSprite(MID_CLEAN_PATH);
+
+        GameObject envRoot = GameObject.Find("Environment") ?? new GameObject("Environment");
+        Transform parallaxTr = envRoot.transform.Find("Parallax");
+        GameObject parallaxRoot = parallaxTr != null ? parallaxTr.gameObject : new GameObject("Parallax");
+        parallaxRoot.transform.SetParent(envRoot.transform, false);
+        parallaxRoot.transform.position = Vector3.zero;
+
+        List<GameObject> toClear = new List<GameObject>();
+        foreach (Transform ch in parallaxRoot.transform)
+        {
+            if (ch.name != "Sky_Far" && ch.name != "Village_Far" && ch.name != "Facades_Mid")
+            {
+                toClear.Add(ch.gameObject);
+            }
+        }
+        foreach (var g in toClear) Object.DestroyImmediate(g);
+
+        // 3 capas continuas que cubren x = -108.6 a +282.36 (y = -3.8 a +20.0) sin huecos (gap = 0.000 u)
+        BuildContinuousLayer(parallaxRoot.transform, "Sky_Far", skySprite, skySprite, new Vector2(0.88f, 0.95f), -20, 6.2f, 2.00f, Color.white);
+        BuildContinuousLayer(parallaxRoot.transform, "Village_Far", farSpriteA, farSpriteB != null ? farSpriteB : farSpriteA, new Vector2(0.70f, 0.88f), -15, 4.4f, 2.00f, Color.white);
+        BuildContinuousLayer(parallaxRoot.transform, "Facades_Mid", midSprite, midSprite, new Vector2(0.42f, 0.78f), -10, 3.6f, 2.00f, Color.white);
+
+        SaveLevel2();
+        Debug.Log("[Level2CompleteFixer] Task Block 4 aplicado: Fondo continuo de aldea medieval al atardecer con 3 capas sin costuras.");
+    }
+
+    private static void BuildContinuousLayer(
+        Transform parent,
+        string layerName,
+        Sprite spriteA,
+        Sprite spriteB,
+        Vector2 factor,
+        int sortingOrder,
+        float posY,
+        float uniformScale,
+        Color tint)
+    {
+        Transform layerTr = parent.Find(layerName);
+        GameObject layerGO = layerTr != null ? layerTr.gameObject : new GameObject(layerName);
+        layerGO.transform.SetParent(parent, false);
+        layerGO.transform.position = new Vector3(0f, posY, 0f);
+        layerGO.transform.localRotation = Quaternion.identity;
+        layerGO.transform.localScale = Vector3.one;
+
+        for (int i = layerGO.transform.childCount - 1; i >= 0; i--)
+        {
+            Object.DestroyImmediate(layerGO.transform.GetChild(i).gameObject);
+        }
+
+        SpriteRenderer parentSr = layerGO.GetComponent<SpriteRenderer>();
+        if (parentSr != null) Object.DestroyImmediate(parentSr);
+
+        ParallaxLayer pl = layerGO.GetComponent<ParallaxLayer>();
+        if (pl == null) pl = layerGO.AddComponent<ParallaxLayer>();
+        pl.Setup(factor.x, false, true);
+
+        float tileWorldWidth = (spriteA.rect.width / spriteA.pixelsPerUnit) * uniformScale;
+
+        for (int i = -3; i <= 10; i++)
+        {
+            GameObject copy = new GameObject($"Copy_{i + 3}");
+            copy.transform.SetParent(layerGO.transform, false);
+            copy.transform.localPosition = new Vector3(i * tileWorldWidth, 0f, 0f);
+            copy.transform.localRotation = Quaternion.identity;
+            copy.transform.localScale = new Vector3(uniformScale, uniformScale, 1f);
+
+            SpriteRenderer sr = copy.AddComponent<SpriteRenderer>();
+            sr.sprite = (Mathf.Abs(i) % 2 == 0) ? spriteA : spriteB;
+            sr.drawMode = SpriteDrawMode.Simple;
+            sr.color = tint;
+            sr.sortingLayerName = "Background";
+            sr.sortingOrder = sortingOrder;
+        }
+
+        EditorUtility.SetDirty(layerGO);
+    }
+
+    private static void EnsureSeamlessBackgroundImport(string assetPath)
+    {
+        TextureImporter ti = AssetImporter.GetAtPath(assetPath) as TextureImporter;
+        if (ti == null) return;
+        bool changed = false;
+        if (ti.textureType != TextureImporterType.Sprite) { ti.textureType = TextureImporterType.Sprite; changed = true; }
+        if (ti.spriteImportMode != SpriteImportMode.Single) { ti.spriteImportMode = SpriteImportMode.Single; changed = true; }
+        if (Mathf.Abs(ti.spritePixelsPerUnit - 100f) > 0.01f) { ti.spritePixelsPerUnit = 100f; changed = true; }
+        if (ti.maxTextureSize < 4096) { ti.maxTextureSize = 4096; changed = true; }
+        if (ti.filterMode != FilterMode.Bilinear) { ti.filterMode = FilterMode.Bilinear; changed = true; }
+        if (ti.wrapMode != TextureWrapMode.Repeat) { ti.wrapMode = TextureWrapMode.Repeat; changed = true; }
+
+        TextureImporterSettings settings = new TextureImporterSettings();
+        ti.ReadTextureSettings(settings);
+        if (settings.spriteMeshType != SpriteMeshType.FullRect)
+        {
+            settings.spriteMeshType = SpriteMeshType.FullRect;
+            ti.SetTextureSettings(settings);
+            changed = true;
+        }
+
+        if (changed)
+        {
+            ti.SaveAndReimport();
+        }
+    }
+
+    private static void EnsureSingleSpriteImport(string assetPath, float ppu)
+    {
+        TextureImporter ti = AssetImporter.GetAtPath(assetPath) as TextureImporter;
+        if (ti == null) return;
+        bool changed = false;
+        if (ti.textureType != TextureImporterType.Sprite) { ti.textureType = TextureImporterType.Sprite; changed = true; }
+        if (ti.spriteImportMode != SpriteImportMode.Single) { ti.spriteImportMode = SpriteImportMode.Single; changed = true; }
+        if (Mathf.Abs(ti.spritePixelsPerUnit - ppu) > 0.01f) { ti.spritePixelsPerUnit = ppu; changed = true; }
+        if (ti.filterMode != FilterMode.Bilinear) { ti.filterMode = FilterMode.Bilinear; changed = true; }
+
+        TextureImporterSettings settings = new TextureImporterSettings();
+        ti.ReadTextureSettings(settings);
+        if (settings.spriteMeshType != SpriteMeshType.FullRect)
+        {
+            settings.spriteMeshType = SpriteMeshType.FullRect;
+            ti.SetTextureSettings(settings);
+            changed = true;
+        }
+
+        if (changed)
+        {
+            ti.SaveAndReimport();
+        }
+    }
+
+    [MenuItem("Tools/Nivel 2/Cofres y Controles/5. Completar Puestos Elevados con Toldo Completo")]
+    public static void ApplyTaskBlock5_CompleteElevatedStalls()
+    {
+        EnsureLevel2Open();
+
+        string[] awningPaths =
+        {
+            "Assets/Art/Environment/Level2/Placeholder_MarketStall_Awning_Red.png",
+            "Assets/Art/Environment/Level2/Placeholder_MarketStall_Awning_Gold.png",
+            "Assets/Art/Environment/Level2/Placeholder_MarketStall_Awning_Orange.png",
+            "Assets/Art/Environment/Level2/Placeholder_MarketStall_Awning_Olive.png",
+            "Assets/Art/Environment/Level2/Placeholder_MarketStall_Awning_Large.png",
+            "Assets/Art/Environment/Level2/Placeholder_MarketStall_WoodPosts.png"
+        };
+
+        foreach (string p in awningPaths)
+        {
+            EnsureSingleSpriteImport(p, 64f);
+        }
+
+        Sprite[] awningVariants =
+        {
+            LoadSingleSprite("Assets/Art/Environment/Level2/Placeholder_MarketStall_Awning_Red.png"),
+            LoadSingleSprite("Assets/Art/Environment/Level2/Placeholder_MarketStall_Awning_Gold.png"),
+            LoadSingleSprite("Assets/Art/Environment/Level2/Placeholder_MarketStall_Awning_Orange.png"),
+            LoadSingleSprite("Assets/Art/Environment/Level2/Placeholder_MarketStall_Awning_Olive.png")
+        };
+        Sprite awningLarge = LoadSingleSprite("Assets/Art/Environment/Level2/Placeholder_MarketStall_Awning_Large.png");
+        Sprite woodPostsSprite = LoadSingleSprite("Assets/Art/Environment/Level2/Placeholder_MarketStall_WoodPosts.png");
+        Sprite lanternSprite = LoadSingleSprite("Assets/Art/Environment/Level2/Placeholder_Market_Lantern.png");
+        Sprite crateSprite = LoadSingleSprite("Assets/Art/Environment/Level2/Placeholder_Market_Crate.png");
+        Sprite barrelSprite = LoadSingleSprite("Assets/Art/Environment/Level2/Placeholder_Market_Barrel.png");
+        Sprite herbSprite1 = LoadSingleSprite("Assets/Art/Environment/Level2/Placeholder_Ingredient_WitheredFlower.png");
+        Sprite herbSprite2 = LoadSingleSprite("Assets/Art/Environment/Level2/Placeholder_Ingredient_Root.png");
+
+        // 1. Completar todos los puestos Stall_Z* (incluyendo Stall_Z4_Entry elevado en x=101, y=2.5)
+        GameObject[] allObjects = Object.FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        List<GameObject> stalls = allObjects
+            .Where(g => g != null && g.name.StartsWith("Stall_Z") && g.transform.parent != null && !g.transform.parent.name.StartsWith("Stall_Z"))
+            .OrderBy(g => g.transform.position.x)
+            .ToList();
+
+        int idx = 0;
+        foreach (GameObject stall in stalls)
+        {
+            Sprite chosenAwning = awningVariants[idx % awningVariants.Length];
+
+            // Asegurar que PostsAndCounter apoye a ras de suelo o tenga columnas hasta el suelo si es elevado
+            Transform postsTr = stall.transform.Find("PostsAndCounter");
+            if (postsTr != null)
+            {
+                SpriteRenderer psr = postsTr.GetComponent<SpriteRenderer>();
+                if (psr != null && woodPostsSprite != null)
+                {
+                    psr.sprite = woodPostsSprite;
+                    psr.sortingLayerName = "Gameplay";
+                    psr.sortingOrder = 1;
+                }
+
+                float postsBottomY = psr != null ? psr.bounds.min.y : stall.transform.position.y - 1.0f;
+                float groundY = RaycastGroundY(stall.transform.position.x, GROUND_SURFACE_Y);
+                if (postsBottomY - groundY > 0.02f)
+                {
+                    // Si es un puesto de calle normal (y < 1.6), bajarlo exactamente a ras de suelo;
+                    // si es un puesto elevado sobre callejón (Stall_Z4_Entry en y=2.5), crear pilares de soporte hasta groundY
+                    if (stall.transform.position.y < 1.8f)
+                    {
+                        stall.transform.position -= new Vector3(0f, postsBottomY - groundY, 0f);
+                    }
+                    else
+                    {
+                        EnsureSupportColumnsToGround(stall.transform, groundY, postsBottomY + 0.15f, 2.4f, woodPostsSprite);
+                    }
+                }
+            }
+
+            // Configurar AwningRoof (colisionador físico de techo) y Awning_Sway_Visual (toldo completo que se mece)
+            Transform awningRoofTr = stall.transform.Find("AwningRoof");
+            if (awningRoofTr != null)
+            {
+                awningRoofTr.localPosition = new Vector3(0f, 1.25f, 0f);
+                SpriteRenderer roofSr = awningRoofTr.GetComponent<SpriteRenderer>();
+                if (roofSr != null)
+                {
+                    roofSr.sprite = chosenAwning;
+                    roofSr.enabled = false; // El visual completo lo dibuja Awning_Sway_Visual en la misma posición
+                }
+            }
+
+            Transform swayTr = stall.transform.Find("Awning_Sway_Visual");
+            GameObject swayGO = swayTr != null ? swayTr.gameObject : new GameObject("Awning_Sway_Visual");
+            swayGO.transform.SetParent(stall.transform, false);
+            swayGO.transform.localPosition = new Vector3(0f, 1.25f, 0f);
+            swayGO.transform.localRotation = Quaternion.identity;
+            swayGO.transform.localScale = Vector3.one;
+
+            SpriteRenderer swaySr = swayGO.GetComponent<SpriteRenderer>();
+            if (swaySr == null) swaySr = swayGO.AddComponent<SpriteRenderer>();
+            swaySr.sprite = chosenAwning;
+            swaySr.sortingLayerName = "Gameplay";
+            swaySr.sortingOrder = 2;
+            swaySr.color = Color.white;
+            swaySr.enabled = true;
+
+            // Mercancía sobre el mostrador (cajas/barriles/hierbas)
+            Transform counterWaresTr = stall.transform.Find("Counter_Wares_Visual");
+            GameObject counterWaresGO = counterWaresTr != null ? counterWaresTr.gameObject : new GameObject("Counter_Wares_Visual");
+            counterWaresGO.transform.SetParent(stall.transform, false);
+            counterWaresGO.transform.localPosition = new Vector3((idx % 2 == 0) ? -0.55f : 0.55f, 0.52f, 0f);
+            counterWaresGO.transform.localRotation = Quaternion.identity;
+            counterWaresGO.transform.localScale = new Vector3(0.48f, 0.48f, 1f);
+            SpriteRenderer cwSr = counterWaresGO.GetComponent<SpriteRenderer>();
+            if (cwSr == null) cwSr = counterWaresGO.AddComponent<SpriteRenderer>();
+            cwSr.sprite = (idx % 2 == 0) ? crateSprite : barrelSprite;
+            cwSr.sortingLayerName = "Gameplay";
+            cwSr.sortingOrder = 2;
+
+            // Farola colgante y hierbas
+            Transform lanternTr = stall.transform.Find("Hanging_Lantern_Visual");
+            GameObject lanternGO = lanternTr != null ? lanternTr.gameObject : new GameObject("Hanging_Lantern_Visual");
+            lanternGO.transform.SetParent(stall.transform, false);
+            lanternGO.transform.localPosition = new Vector3(-1.15f, 0.82f, 0f);
+            lanternGO.transform.localScale = new Vector3(0.72f, 0.72f, 1f);
+            if (lanternSprite != null)
+            {
+                SpriteRenderer lsr = lanternGO.GetComponent<SpriteRenderer>();
+                if (lsr == null) lsr = lanternGO.AddComponent<SpriteRenderer>();
+                lsr.sprite = lanternSprite;
+                lsr.sortingLayerName = "Gameplay";
+                lsr.sortingOrder = 2;
+            }
+            var l2d = lanternGO.GetComponent<UnityEngine.Rendering.Universal.Light2D>();
+            if (l2d == null) l2d = lanternGO.AddComponent<UnityEngine.Rendering.Universal.Light2D>();
+            l2d.color = new Color(1.0f, 0.78f, 0.38f, 1f);
+            l2d.intensity = 1.15f;
+            l2d.pointLightOuterRadius = 3.2f;
+            if (lanternGO.GetComponent<LanternFlicker>() == null) lanternGO.AddComponent<LanternFlicker>();
+
+            Transform herbsTr = stall.transform.Find("Hanging_Wares_Visual");
+            GameObject herbsGO = herbsTr != null ? herbsTr.gameObject : new GameObject("Hanging_Wares_Visual");
+            herbsGO.transform.SetParent(stall.transform, false);
+            herbsGO.transform.localPosition = new Vector3(1.15f, 0.85f, 0f);
+            herbsGO.transform.localScale = new Vector3(0.65f, 0.65f, 1f);
+            Sprite wareSp = (idx % 2 == 0) ? herbSprite1 : herbSprite2;
+            if (wareSp != null)
+            {
+                SpriteRenderer hsr = herbsGO.GetComponent<SpriteRenderer>();
+                if (hsr == null) hsr = herbsGO.AddComponent<SpriteRenderer>();
+                hsr.sprite = wareSp;
+                hsr.sortingLayerName = "Gameplay";
+                hsr.sortingOrder = 2;
+            }
+
+            MarketStallAnimator anim = stall.GetComponent<MarketStallAnimator>();
+            if (anim == null) anim = stall.AddComponent<MarketStallAnimator>();
+            anim.Configure(
+                swayGO.transform,
+                new Transform[] { lanternGO.transform, herbsGO.transform },
+                (idx + 1) * 1.23f,
+                0.90f + (idx % 5) * 0.05f);
+
+            EditorUtility.SetDirty(stall);
+            idx++;
+        }
+
+        // 2. Completar las plataformas de puestos elevados sobre la calle (Roof_Z3_LeftHigh, Roof_Z3_RightHigh,
+        //    Awning_CanalOverhead, Roof_Z5_Low_1, Roof_Z5_Mid_2, Roof_Z5_HighWalk) con su sombrilla/toldo completo y postes!
+        string[] elevatedPaths =
+        {
+            "Environment/Zone_3_PlazaCentral/Roof_Z3_LeftHigh",
+            "Environment/Zone_3_PlazaCentral/Awning_CanalOverhead",
+            "Environment/Zone_3_PlazaCentral/Roof_Z3_RightHigh",
+            "Environment/Zone_5_GranMercado/Roof_Z5_Low_1",
+            "Environment/Zone_5_GranMercado/Roof_Z5_Mid_2",
+            "Environment/Zone_5_GranMercado/Roof_Z5_HighWalk"
+        };
+
+        for (int eIdx = 0; eIdx < elevatedPaths.Length; eIdx++)
+        {
+            GameObject elev = GameObject.Find(elevatedPaths[eIdx]);
+            if (elev == null) continue;
+
+            Sprite chosenAwning = (eIdx % 3 == 0) ? awningLarge : awningVariants[(eIdx + 1) % awningVariants.Length];
+            SpriteRenderer baseSr = elev.GetComponent<SpriteRenderer>();
+            if (elev.name == "Awning_CanalOverhead" && baseSr != null && awningLarge != null)
+            {
+                baseSr.sprite = awningLarge;
+                baseSr.sortingLayerName = "Gameplay";
+                baseSr.sortingOrder = 2;
+            }
+
+            // Columnas de madera hasta el suelo/plataforma inferior para que nunca se vea como mesa flotante
+            float bottomY = baseSr != null ? baseSr.bounds.min.y : elev.transform.position.y - 0.2f;
+            float supportFloorY = FindBestSurfaceBelow(elev.transform.position.x, bottomY - 0.1f);
+            EnsureSupportColumnsToGround(elev.transform, supportFloorY, bottomY + 0.08f, 3.2f, woodPostsSprite);
+
+            // Si es una plataforma Roof_Z*, añadir sus postes superiores y su toldo/sombrilla completo encima
+            if (elev.name.StartsWith("Roof_Z"))
+            {
+                Transform canopyPostsTr = elev.transform.Find("Elevated_CanopyPosts");
+                GameObject canopyPostsGO = canopyPostsTr != null ? canopyPostsTr.gameObject : new GameObject("Elevated_CanopyPosts");
+                canopyPostsGO.transform.SetParent(elev.transform, false);
+                canopyPostsGO.transform.localPosition = new Vector3(0f, 0.95f, 0f);
+                canopyPostsGO.transform.localScale = new Vector3(1.35f, 0.95f, 1f);
+                SpriteRenderer cpsr = canopyPostsGO.GetComponent<SpriteRenderer>();
+                if (cpsr == null) cpsr = canopyPostsGO.AddComponent<SpriteRenderer>();
+                cpsr.sprite = woodPostsSprite;
+                cpsr.sortingLayerName = "Gameplay";
+                cpsr.sortingOrder = -1;
+
+                Transform swayTr = elev.transform.Find("Awning_Sway_Visual");
+                GameObject swayGO = swayTr != null ? swayTr.gameObject : new GameObject("Awning_Sway_Visual");
+                swayGO.transform.SetParent(elev.transform, false);
+                swayGO.transform.localPosition = new Vector3(0f, 2.05f, 0f);
+                swayGO.transform.localRotation = Quaternion.identity;
+                swayGO.transform.localScale = new Vector3(1.15f, 1.0f, 1f);
+
+                SpriteRenderer swaySr = swayGO.GetComponent<SpriteRenderer>();
+                if (swaySr == null) swaySr = swayGO.AddComponent<SpriteRenderer>();
+                swaySr.sprite = chosenAwning;
+                swaySr.sortingLayerName = "Gameplay";
+                swaySr.sortingOrder = 2;
+
+                Transform lanternTr = elev.transform.Find("Hanging_Lantern_Visual");
+                GameObject lanternGO = lanternTr != null ? lanternTr.gameObject : new GameObject("Hanging_Lantern_Visual");
+                lanternGO.transform.SetParent(elev.transform, false);
+                lanternGO.transform.localPosition = new Vector3(-1.45f, 1.55f, 0f);
+                lanternGO.transform.localScale = new Vector3(0.72f, 0.72f, 1f);
+                if (lanternSprite != null)
+                {
+                    SpriteRenderer lsr = lanternGO.GetComponent<SpriteRenderer>();
+                    if (lsr == null) lsr = lanternGO.AddComponent<SpriteRenderer>();
+                    lsr.sprite = lanternSprite;
+                    lsr.sortingLayerName = "Gameplay";
+                    lsr.sortingOrder = 2;
+                }
+
+                MarketStallAnimator anim = elev.GetComponent<MarketStallAnimator>();
+                if (anim == null) anim = elev.AddComponent<MarketStallAnimator>();
+                anim.Configure(
+                    swayGO.transform,
+                    new Transform[] { lanternGO.transform },
+                    (eIdx + 5) * 1.37f,
+                    0.92f + (eIdx % 4) * 0.05f);
+            }
+
+            EditorUtility.SetDirty(elev);
+        }
+
+        // Guardar prefabs propios de puestos completos en Assets/Prefabs/Level2/
+        if (stalls.Count > 0)
+        {
+            PrefabUtility.SaveAsPrefabAsset(stalls[0], "Assets/Prefabs/Level2/Market_Stall_Complete.prefab");
+        }
+        GameObject sampleElev = GameObject.Find("Environment/Zone_3_PlazaCentral/Roof_Z3_LeftHigh");
+        if (sampleElev != null)
+        {
+            PrefabUtility.SaveAsPrefabAsset(sampleElev, "Assets/Prefabs/Level2/Market_Stall_Elevated.prefab");
+        }
+
+        // Volver a alinear todos los cofres por si algún puesto ajustó su altura en milímetros
+        Level2Chest[] allChests = Object.FindObjectsByType<Level2Chest>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (Level2Chest c in allChests)
+        {
+            if (c == null) continue;
+            SpriteRenderer csr = c.GetComponent<SpriteRenderer>();
+            float curMinY = csr != null && csr.sprite != null ? csr.bounds.min.y : c.transform.position.y;
+            float surfY = FindBestSurfaceBelow(c.transform.position.x, curMinY + 0.25f);
+            SnapSpriteBottomToY(c.gameObject, surfY);
+            EditorUtility.SetDirty(c.gameObject);
+        }
+
+        SaveLevel2();
+        AssetDatabase.SaveAssets();
+        Debug.Log("[Level2CompleteFixer] Task Block 5 aplicado: Puestos bajos y elevados completados con toldo/sombrilla y columnas apoyadas.");
+    }
+
+    private static void EnsureSupportColumnsToGround(Transform parent, float bottomWorldY, float topWorldY, float spanWidth, Sprite woodPostsSprite)
+    {
+        float height = Mathf.Max(0.5f, topWorldY - bottomWorldY);
+        Transform suppTr = parent.Find("SupportColumns_Base");
+        GameObject suppGO = suppTr != null ? suppTr.gameObject : new GameObject("SupportColumns_Base");
+        suppGO.transform.SetParent(parent, true);
+        suppGO.transform.position = new Vector3(parent.position.x, bottomWorldY + height * 0.5f, 0f);
+        suppGO.transform.rotation = Quaternion.identity;
+
+        SpriteRenderer sr = suppGO.GetComponent<SpriteRenderer>();
+        if (sr == null) sr = suppGO.AddComponent<SpriteRenderer>();
+        sr.sprite = woodPostsSprite;
+        sr.sortingLayerName = "Gameplay";
+        sr.sortingOrder = -1;
+        sr.color = new Color(0.82f, 0.72f, 0.62f, 1f);
+
+        if (woodPostsSprite != null)
+        {
+            float baseW = woodPostsSprite.rect.width / woodPostsSprite.pixelsPerUnit;
+            float baseH = woodPostsSprite.rect.height / woodPostsSprite.pixelsPerUnit;
+            suppGO.transform.localScale = new Vector3(spanWidth / Mathf.Max(0.1f, baseW), height / Mathf.Max(0.1f, baseH), 1f);
+            SnapSpriteBottomToY(suppGO, bottomWorldY);
+        }
+    }
+
+    public static void CaptureTaskBeforeEvidences()
+    {
+        EnsureLevel2Open();
+        System.IO.Directory.CreateDirectory("Assets/Screenshots/NIVEL2/Evidencias");
+        CaptureCameraAt(new Vector3(16.0f, 3.2f, -10f), 5.0f, "Assets/Screenshots/NIVEL2/Evidencias/BEFORE_Objetos_Sueltos_Z1.png");
+        CaptureCameraAt(new Vector3(42.0f, 3.8f, -10f), 5.8f, "Assets/Screenshots/NIVEL2/Evidencias/BEFORE_Puestos_Sin_Toldo_Z2.png");
+        CaptureCameraAt(new Vector3(78.0f, 4.2f, -10f), 6.2f, "Assets/Screenshots/NIVEL2/Evidencias/BEFORE_Puestos_Elevados_Z3.png");
+        CaptureCameraAt(new Vector3(60.0f, 4.8f, -10f), 6.8f, "Assets/Screenshots/NIVEL2/Evidencias/BEFORE_Fondo_Fragmentado.png");
+    }
+
+    public static void CaptureTaskAfterEvidences()
+    {
+        EnsureLevel2Open();
+        System.IO.Directory.CreateDirectory("Assets/Screenshots/NIVEL2/Evidencias");
+        CaptureCameraAt(new Vector3(16.0f, 3.2f, -10f), 5.0f, "Assets/Screenshots/NIVEL2/Evidencias/AFTER_Cofres_Y_Guia_Controles_Z1.png");
+        CaptureCameraAt(new Vector3(42.0f, 3.8f, -10f), 5.8f, "Assets/Screenshots/NIVEL2/Evidencias/AFTER_Puestos_Con_Toldo_Completo_Z2.png");
+        CaptureCameraAt(new Vector3(78.0f, 4.2f, -10f), 6.2f, "Assets/Screenshots/NIVEL2/Evidencias/AFTER_Puestos_Elevados_Completos_Z3.png");
+        CaptureCameraAt(new Vector3(60.0f, 4.8f, -10f), 6.8f, "Assets/Screenshots/NIVEL2/Evidencias/AFTER_Fondo_Aldea_Continuo_1.png");
+        CaptureCameraAt(new Vector3(138.0f, 4.8f, -10f), 6.8f, "Assets/Screenshots/NIVEL2/Evidencias/AFTER_Fondo_Aldea_Continuo_2.png");
     }
 }
 #endif

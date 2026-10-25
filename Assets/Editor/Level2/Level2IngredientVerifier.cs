@@ -54,85 +54,96 @@ public static class Level2IngredientVerifier
             failed++;
         }
 
-        // Test 3: Conteo e IDs únicos de ingredientes en escena
-        Ingredient[] allIngs = Object.FindObjectsByType<Ingredient>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        if (allIngs.Length == 10)
-        {
-            Debug.Log($"[PASS] Total de ingredientes en escena correcto: {allIngs.Length} (8 requeridos + 2 bonus de exploración).");
-            passed++;
-        }
-        else
-        {
-            Debug.LogError($"[FAIL] Se esperaban 10 ingredientes, encontrados: {allIngs.Length}");
-            failed++;
-        }
+        // Test 3: Conteo e IDs únicos de ingredientes dentro de Level2Chest (0 sueltos)
+        Ingredient[] looseIngs = Object.FindObjectsByType<Ingredient>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        Level2Chest[] allChests = Object.FindObjectsByType<Level2Chest>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
         HashSet<string> seenIds = new HashSet<string>();
         bool duplicateFound = false;
         int mushroomCount = 0, spiderCount = 0, flowerCount = 0, rootCount = 0;
+        int totalIngInChests = 0;
+        Level2Chest catTunnelChest = null;
 
-        foreach (var ing in allIngs)
+        foreach (var ch in allChests)
         {
-            if (seenIds.Contains(ing.Id))
-            {
-                Debug.LogError($"[FAIL] ID de ingrediente duplicado: {ing.Id}");
-                duplicateFound = true;
-            }
-            seenIds.Add(ing.Id);
-
-            switch (ing.Type)
-            {
-                case IngredientType.Mushroom: mushroomCount++; break;
-                case IngredientType.Spider: spiderCount++; break;
-                case IngredientType.WitheredFlower: flowerCount++; break;
-                case IngredientType.Root: rootCount++; break;
-            }
-
-            Collider2D c = ing.GetComponent<Collider2D>();
+            if (ch == null || ch.Contents == null) continue;
+            Collider2D c = ch.GetComponent<Collider2D>();
             if (c == null || !c.isTrigger)
             {
-                Debug.LogError($"[FAIL] Ingrediente {ing.name} no tiene Collider2D trigger.");
+                Debug.LogError($"[FAIL] Cofre {ch.name} no tiene Collider2D trigger.");
                 duplicateFound = true;
             }
+
+            foreach (var entry in ch.Contents)
+            {
+                if (entry == null || entry.itemKind != ChestItemKind.Ingredient) continue;
+                totalIngInChests += entry.amount;
+
+                string id = string.IsNullOrWhiteSpace(entry.ingredientUniqueId)
+                    ? $"{ch.ChestId}_{entry.ingredientType}"
+                    : entry.ingredientUniqueId;
+
+                if (!seenIds.Add(id))
+                {
+                    Debug.LogError($"[FAIL] ID de ingrediente duplicado en cofre: {id}");
+                    duplicateFound = true;
+                }
+
+                switch (entry.ingredientType)
+                {
+                    case IngredientType.Mushroom: mushroomCount += entry.amount; break;
+                    case IngredientType.Spider: spiderCount += entry.amount; break;
+                    case IngredientType.WitheredFlower: flowerCount += entry.amount; break;
+                    case IngredientType.Root:
+                        rootCount += entry.amount;
+                        if (ch.name.Contains("CatTunnel") || Mathf.Abs(ch.transform.position.x - 113.2f) < 2.0f)
+                        {
+                            catTunnelChest = ch;
+                        }
+                        break;
+                }
+            }
+        }
+
+        if (looseIngs.Length == 0 && totalIngInChests >= 10)
+        {
+            Debug.Log($"[PASS] Total de ingredientes en cofres correcto: {totalIngInChests} (0 sueltos en escena).");
+            passed++;
+        }
+        else
+        {
+            Debug.LogError($"[FAIL] Se esperaban 0 ingredientes sueltos (encontrados {looseIngs.Length}) y >= 10 en cofres (encontrados {totalIngInChests}).");
+            failed++;
         }
 
         if (!duplicateFound)
         {
-            Debug.Log("[PASS] Todos los ingredientes poseen IDs únicos y triggers válidos.");
+            Debug.Log("[PASS] Todos los ingredientes en cofres poseen IDs únicos y triggers válidos.");
             passed++;
         }
         else failed++;
 
-        // Test 4: Distribución por tipo (3 Hongos, 3 Arañas, 2 Flores, 2 Raíces)
-        if (mushroomCount == 3 && spiderCount == 3 && flowerCount == 2 && rootCount == 2)
+        // Test 4: Distribución por tipo (>= 2 de cada uno de los 4 tipos)
+        if (mushroomCount >= 2 && spiderCount >= 2 && flowerCount >= 2 && rootCount >= 2)
         {
-            Debug.Log($"[PASS] Distribución por tipo validada: {mushroomCount} Hongos, {spiderCount} Arañas, {flowerCount} Flores, {rootCount} Raíces.");
+            Debug.Log($"[PASS] Distribución en cofres por tipo validada: {mushroomCount} Hongos, {spiderCount} Arañas, {flowerCount} Flores, {rootCount} Raíces.");
             passed++;
         }
         else
         {
-            Debug.LogError($"[FAIL] Distribución incorrecta: M={mushroomCount}, S={spiderCount}, F={flowerCount}, R={rootCount}");
+            Debug.LogError($"[FAIL] Distribución insuficiente en cofres: M={mushroomCount}, S={spiderCount}, F={flowerCount}, R={rootCount}");
             failed++;
         }
 
-        // Test 5: Ingrediente tras el túnel de gato
-        Ingredient catTunnelIng = null;
-        foreach (var ing in allIngs)
+        // Test 5: Cofre con ingrediente tras el túnel de gato
+        if (catTunnelChest != null && catTunnelChest.transform.position.x > 110.0f)
         {
-            if (ing.name.Contains("Root_Z4") || Mathf.Abs(ing.transform.position.x - 112.5f) < 1.0f)
-            {
-                catTunnelIng = ing;
-                break;
-            }
-        }
-        if (catTunnelIng != null && catTunnelIng.transform.position.x > 110.0f)
-        {
-            Debug.Log($"[PASS] Ingrediente tras pasaje felino verificado en {catTunnelIng.transform.position} (diseño sigilo/transformación).");
+            Debug.Log($"[PASS] Cofre con Raíz tras pasaje felino verificado en {catTunnelChest.transform.position} ({catTunnelChest.name}).");
             passed++;
         }
         else
         {
-            Debug.LogError("[FAIL] No se encontró el ingrediente del pasaje felino en Zona 4.");
+            Debug.LogError("[FAIL] No se encontró el cofre del pasaje felino en Zona 4.");
             failed++;
         }
 
