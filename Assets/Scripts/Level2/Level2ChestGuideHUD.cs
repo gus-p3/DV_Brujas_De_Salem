@@ -74,7 +74,7 @@ namespace Level2
 
         private void Update()
         {
-            if (Input.GetKeyDown(Level2Controls.InteractKey)) TryNotifyEmptyChest();
+            if (Input.GetKeyDown(Level2Controls.InteractKey) && !Level2LoreReader.IsOpen) TryNotifyEmptyChest();
         }
 
         /// <summary>Lo que hace Q junto a un cofre vaciado. Devuelve true si mostró el aviso.</summary>

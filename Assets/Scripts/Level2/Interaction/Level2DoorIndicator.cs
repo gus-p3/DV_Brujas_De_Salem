@@ -146,8 +146,9 @@ namespace Level2
             {
                 float dist = Vector2.Distance(playerTransform.position, transform.position);
                 bool canInteract = linkedInteractable == null || linkedInteractable.CanInteract(playerTransform.gameObject);
-                bool isFocused = playerInteractor != null && playerInteractor.CurrentFocus == linkedInteractable;
-                shouldShow = canInteract && (isFocused || (dist <= triggerRadius && (playerInteractor == null || playerInteractor.CurrentFocus == null)));
+                // Con foco, el aviso lo dibuja InteractionPromptUI: dibujarlo aquí también lo duplicaba encima
+                bool nothingFocused = playerInteractor == null || playerInteractor.CurrentFocus == null;
+                shouldShow = canInteract && dist <= triggerRadius && nothingFocused;
                 if (shouldShow)
                 {
                     RefreshText(playerTransform.gameObject);

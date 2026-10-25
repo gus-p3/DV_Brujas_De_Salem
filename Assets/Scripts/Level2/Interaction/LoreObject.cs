@@ -64,11 +64,15 @@ namespace Level2
                 GameManager.Instance.AddScore(firstReadBonusScore);
             }
 
-            HUDController hud = UnityEngine.Object.FindFirstObjectByType<HUDController>();
-            if (hud != null)
+            string suffix = firstTime && firstReadBonusScore > 0 ? $" (+{firstReadBonusScore} pts)" : "";
+            if (Level2LoreReader.Instance != null)
             {
-                string suffix = firstTime && firstReadBonusScore > 0 ? $" (+{firstReadBonusScore} pts)" : "";
-                hud.ShowMessage($"{objectTitle}: {loreMessage}{suffix}", 3.2f);
+                Level2LoreReader.Instance.Show(objectTitle, loreMessage + (suffix.Length > 0 ? "\n\n<size=75%>" + suffix.Trim() + "</size>" : ""));
+            }
+            else
+            {
+                HUDController hud = UnityEngine.Object.FindFirstObjectByType<HUDController>();
+                if (hud != null) hud.ShowMessage($"{objectTitle}: {loreMessage}{suffix}", 3.2f);
             }
 
             if (AudioManager.Instance != null)

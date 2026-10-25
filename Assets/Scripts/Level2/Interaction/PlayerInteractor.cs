@@ -62,7 +62,7 @@ namespace Level2
                 return;
             }
 
-            if (TutorialManager.Instance != null && TutorialManager.Instance.IsOpen)
+            if ((TutorialManager.Instance != null && TutorialManager.Instance.IsOpen) || Level2LoreReader.IsOpen)
             {
                 ClearFocus();
                 return;
