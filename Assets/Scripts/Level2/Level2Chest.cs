@@ -57,6 +57,9 @@ namespace Level2
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private Sprite closedSprite;
         [SerializeField] private Sprite openSprite;
+        [Tooltip("Cuadros de la tapa al abrirse (opcional); el último debería ser openSprite.")]
+        [SerializeField] private Sprite[] openFrames = new Sprite[0];
+        [SerializeField] private float openFrameTime = 0.06f;
 
         [Header("Enfriamiento Aviso Gato")]
         [SerializeField] private float catWarningCooldown = 2.0f;
@@ -568,6 +571,17 @@ namespace Level2
 
         private IEnumerator LidPopRoutine()
         {
+            // Tiempo sin escala: el banner del HUD o una pausa no congelan la tapa a medio abrir
+            if (openFrames != null && openFrames.Length > 0 && spriteRenderer != null)
+            {
+                foreach (Sprite frame in openFrames)
+                {
+                    if (frame != null) spriteRenderer.sprite = frame;
+                    yield return new WaitForSecondsRealtime(openFrameTime);
+                }
+                UpdateVisual();
+            }
+
             float duration = 0.22f;
             float elapsed = 0f;
             Vector3 peakScale = new Vector3(baseLocalScale.x * 1.15f, baseLocalScale.y * 1.18f, baseLocalScale.z);
