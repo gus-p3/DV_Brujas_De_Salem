@@ -28,6 +28,10 @@ namespace Level2
         private static float lastGlobalWarningTime = -10f;
         private static string lastWarningShown = string.Empty;
 
+        // Sin recarga de dominio el estático sobrevive entre partidas y el reloj vuelve a 0
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics() { lastGlobalWarningTime = -10f; lastWarningShown = string.Empty; }
+
         public static string LastWarningShown => lastWarningShown;
         public bool IsSuppressedForCat => collidersSuppressed;
 

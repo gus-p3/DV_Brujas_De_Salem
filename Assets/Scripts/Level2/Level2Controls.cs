@@ -88,10 +88,13 @@ namespace Level2
         /// <summary>
         /// Reinicia los contadores de enfriamiento (usado por suites de verificación en Editor).
         /// </summary>
+        // Sin recarga de dominio los estáticos sobreviven entre partidas y el reloj vuelve a 0: bloqueaba Q
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         public static void ResetCooldownForTests()
         {
             lastConsumedFrame = -10;
             lastConsumedTime = -10f;
+            _instance = null;
         }
 
         private void Awake()

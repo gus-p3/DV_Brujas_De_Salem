@@ -113,6 +113,10 @@ namespace Level2
         private static float lastGlobalDoorUseTime = -10f;
         private const float DoorUseCooldown = 0.35f;
 
+        // Sin recarga de dominio el estático sobrevive entre partidas y el reloj vuelve a 0: bloqueaba Q
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics() => lastGlobalDoorUseTime = -10f;
+
         public string GetPromptText(GameObject interactor)
         {
             if (permanentlyBarred)
