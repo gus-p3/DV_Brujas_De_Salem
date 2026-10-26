@@ -42,10 +42,6 @@ namespace Level2
         [Tooltip("Raíces necesarias para completar el acto.")]
         [SerializeField] private int requiredRoots = 2;
 
-        [Header("Persistencia")]
-        [Tooltip("Si está activo, carga el progreso de sesión al iniciar la escena.")]
-        [SerializeField] private bool persistAcrossCheckpoints = true;
-
         // Conteos en memoria
         private int currentMushrooms = 0;
         private int currentSpiders = 0;
@@ -117,10 +113,10 @@ namespace Level2
                 return;
             }
 
-            if (persistAcrossCheckpoints && PlayerPrefs.GetInt(KeySessionActive, 0) == 1)
-            {
-                LoadSessionProgress();
-            }
+            // Cargar la escena es empezar de nuevo (reintentar, menú o Play en el editor): los checkpoints reaparecen
+            // sin recargarla y el progreso en memoria ya los sobrevive. Recuperarlo de PlayerPrefs dejaba abiertos los
+            // cofres de partidas anteriores; al borrar la marca de sesión, Level2Chest tampoco los carga.
+            ResetProgress();
         }
 
         private void OnDestroy()
