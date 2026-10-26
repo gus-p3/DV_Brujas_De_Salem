@@ -42,6 +42,8 @@ En el Nivel 2 (`Assets/Scenes/Level2.unity`), **todos los ingredientes del ritua
 
 ---
 
+> **Aspecto:** los cofres usan el arte de Cainos (Pixel Art Platformer - Village Props) y se abren con una animación de 7 cuadros. El tipo de cofre indica lo que pide: los normales son de **madera**; el de la Posada, que requiere llave, es de **hierro**; los de los retos de vuelo (16) y pociones (13) son de **plata**; y el de la Mansión es de **oro**. El arte se aplica con **Tools > Nivel 2 > Arte > Usar props de Cainos**.
+>
 > Los cofres 2 y 4 acompañan a su puesto, que se reubicó para que no se empalmara con otros. Todos los cofres apoyan su base en el suelo, el toldo o la plataforma (±0.02 u). Los textos que avisan que los objetos están en cofres se describen en `Docs/Nivel2_Textos.md`.
 
 ## 3. Balance Total de Recursos en Cofres

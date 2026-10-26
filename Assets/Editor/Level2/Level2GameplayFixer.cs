@@ -122,9 +122,10 @@ public static class Level2GameplayFixer
 
     public static void FixLadders(StringBuilder log)
     {
-        // Remates de 16 px arriba y abajo: en modo Tiled solo se repite el tramo central (un peldaño por unidad)
-        ImportSprite(Art + "Village_Ladder.png", 64f, new Vector4(0f, 16f, 0f, 16f), SpriteMeshType.FullRect);
-        Sprite ladder = AssetDatabase.LoadAssetAtPath<Sprite>(Art + "Village_Ladder.png");
+        // "Ladder 01" de Cainos (cainos_level2_art.py): remates de 32 px arriba y abajo; en modo Tiled solo se
+        // repite el tramo central. 32 px de ancho a 0.85 u, el ancho de siempre de las escaleras del nivel
+        ImportSprite(Art + "Cainos_Ladder.png", 32f / 0.85f, new Vector4(0f, 32f, 0f, 32f), SpriteMeshType.FullRect, FilterMode.Point);
+        Sprite ladder = AssetDatabase.LoadAssetAtPath<Sprite>(Art + "Cainos_Ladder.png");
         int n = 0;
         foreach (LadderInteractable li in Object.FindObjectsByType<LadderInteractable>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
@@ -312,9 +313,10 @@ public static class Level2GameplayFixer
 
     // ------------------------------------------------------------------ Utilidades
 
-    private static void ImportSprite(string path, float ppu, Vector4 border, SpriteMeshType mesh)
+    private static void ImportSprite(string path, float ppu, Vector4 border, SpriteMeshType mesh, FilterMode? filter = null)
     {
         TextureImporter ti = (TextureImporter)AssetImporter.GetAtPath(path);
+        if (filter.HasValue) ti.filterMode = filter.Value;
         ti.textureType = TextureImporterType.Sprite;
         ti.spriteImportMode = SpriteImportMode.Single;
         ti.spritePixelsPerUnit = ppu;
