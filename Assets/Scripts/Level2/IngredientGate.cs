@@ -134,7 +134,7 @@ namespace Level2
                 if (AudioManager.Instance != null)
                 {
                     if (openSound != null) AudioManager.Instance.PlaySFX(openSound);
-                    else AudioManager.Instance.PlayButtonClickSound();
+                    else AudioManager.Instance.PlayGateUnlockSound();
                 }
 
                 ShowHUDMessage(openedMessage, 3.5f);
@@ -187,7 +187,7 @@ namespace Level2
             if (AudioManager.Instance != null)
             {
                 if (lockedSound != null) AudioManager.Instance.PlaySFX(lockedSound);
-                else AudioManager.Instance.PlayButtonClickSound();
+                else AudioManager.Instance.PlayLockedSound();
             }
         }
 

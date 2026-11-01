@@ -415,6 +415,11 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
             noticeIconRenderer.enabled = true;
         }
 
+        if (Application.isPlaying && AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayVillagerNoticeSound();
+        }
+
         float elapsed = 0f;
         while (elapsed < noticeDuration)
         {
@@ -437,9 +442,10 @@ public class VillagerAI : MonoBehaviour, ISpellTarget
     {
         currentState = VillagerState.Scream;
 
-        if (AudioManager.Instance != null && screamSound != null)
+        if (AudioManager.Instance != null)
         {
-            AudioManager.Instance.PlaySFX(screamSound);
+            if (screamSound != null) AudioManager.Instance.PlaySFX(screamSound);
+            else if (Application.isPlaying) AudioManager.Instance.PlayVillagerScreamSound();
         }
 
         float elapsed = 0f;

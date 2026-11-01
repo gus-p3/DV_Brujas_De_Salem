@@ -32,10 +32,8 @@ namespace Level2
     /// - En forma de gato muestra "Necesitas forma humana para abrir esto" con enfriamiento anti-spam y no se abre.
     /// - Contiene ingredientes (IngredientInventory), frascos de poción (GameManager.AddSpellCharges con tope 3),
     ///   corazones (GameManager.GainHeart si la vida no está llena) y llaves de exploración (KeyInventory).
-    /// - Si un frasco de poción ya está al tope (3/3) o la salud al máximo, conserva ese objeto pendiente dentro
-    ///   del cofre ("abierto con contenido pendiente") para que el jugador pueda volver por él sin perderlo.
-    /// - Persiste su estado con claves "L2_Chest_<ID>" sobreviviendo a checkpoints y reiniciándose junto con
-    ///   IngredientInventory al reiniciar el nivel.
+    /// - Al abrirse, reproduce sonido de cofre y muestra la animación emergente de cada objeto obtenido
+    ///   (LootPopupVisualizer: icono real en el mundo + tarjeta ilustrada en el HUD).
     /// </summary>
     [RequireComponent(typeof(BoxCollider2D), typeof(SpriteRenderer))]
     public class Level2Chest : MonoBehaviour, IInteractable
@@ -224,6 +222,7 @@ namespace Level2
                 if (Time.unscaledTime - lastCatWarningTime >= catWarningCooldown)
                 {
                     lastCatWarningTime = Time.unscaledTime;
+                    if (AudioManager.Instance != null) AudioManager.Instance.PlayErrorSound();
                     ShowBanner(Level2Controls.CatChestBlockedMessage);
                 }
                 return;
@@ -234,6 +233,7 @@ namespace Level2
                 bool hasKey = KeyInventory.Instance != null && KeyInventory.Instance.HasKey(requiredKeyId);
                 if (!hasKey)
                 {
+                    if (AudioManager.Instance != null) AudioManager.Instance.PlayLockedSound();
                     ShowBanner($"Cofre cerrado con llave. Necesitas: {requiredKeyName}");
                     return;
                 }
@@ -249,6 +249,7 @@ namespace Level2
 
             List<string> obtainedLabels = new List<string>();
             List<string> pendingReasons = new List<string>();
+            int popupOrder = 0;
 
             if (contents != null)
             {
@@ -260,19 +261,19 @@ namespace Level2
                     switch (entry.itemKind)
                     {
                         case ChestItemKind.Ingredient:
-                            DeliverIngredientEntry(entry, i, obtainedLabels);
+                            DeliverIngredientEntry(entry, i, obtainedLabels, ref popupOrder);
                             break;
 
                         case ChestItemKind.Potion:
-                            DeliverPotionEntry(entry, obtainedLabels, pendingReasons);
+                            DeliverPotionEntry(entry, obtainedLabels, pendingReasons, ref popupOrder);
                             break;
 
                         case ChestItemKind.Heart:
-                            DeliverHeartEntry(entry, obtainedLabels, pendingReasons);
+                            DeliverHeartEntry(entry, obtainedLabels, pendingReasons, ref popupOrder);
                             break;
 
                         case ChestItemKind.Key:
-                            DeliverKeyEntry(entry, obtainedLabels);
+                            DeliverKeyEntry(entry, obtainedLabels, ref popupOrder);
                             break;
                     }
                 }
@@ -291,6 +292,10 @@ namespace Level2
                 if (GameManager.Instance != null && scoreReward > 0)
                 {
                     GameManager.Instance.AddScore(scoreReward);
+                }
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.PlayChestOpenSound();
                 }
                 PlayLidPopAnimation();
                 OnOpened?.Invoke(this);
@@ -322,7 +327,14 @@ namespace Level2
             ShowBanner(finalMessage);
         }
 
-        private void DeliverIngredientEntry(ChestContentEntry entry, int index, List<string> obtainedLabels)
+        private Vector3 GetPopupPosition(int popupOrder)
+        {
+            float xOffset = popupOrder == 0 ? 0f : ((popupOrder % 2 == 1 ? 1f : -1f) * 0.48f * ((popupOrder + 1) / 2));
+            float yOffset = 0.25f + popupOrder * 0.36f;
+            return transform.position + new Vector3(xOffset, yOffset, 0f);
+        }
+
+        private void DeliverIngredientEntry(ChestContentEntry entry, int index, List<string> obtainedLabels, ref int popupOrder)
         {
             int count = Mathf.Max(1, entry.amount);
             if (IngredientInventory.Instance != null)
@@ -343,15 +355,28 @@ namespace Level2
             }
 
             entry.claimed = true;
-            obtainedLabels.Add($"{GetIngredientSpanishName(entry.ingredientType)} x{count}");
+            string ingName = GetIngredientSpanishName(entry.ingredientType);
+            obtainedLabels.Add($"{ingName} x{count}");
+
+            if (Application.isPlaying)
+            {
+                LootPopupVisualizer.ShowIngredientReward(GetPopupPosition(popupOrder), entry.ingredientType, count);
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayIngredientPickupSound();
+            }
+            popupOrder++;
         }
 
-        private void DeliverPotionEntry(ChestContentEntry entry, List<string> obtainedLabels, List<string> pendingReasons)
+        private void DeliverPotionEntry(ChestContentEntry entry, List<string> obtainedLabels, List<string> pendingReasons, ref int popupOrder)
         {
             if (GameManager.Instance == null)
             {
                 entry.claimed = true;
                 obtainedLabels.Add($"{GetPotionSpanishName(entry.potionType)} x{entry.amount}");
+                if (Application.isPlaying)
+                {
+                    LootPopupVisualizer.ShowPotionReward(GetPopupPosition(popupOrder), entry.potionType, entry.amount);
+                }
+                popupOrder++;
                 return;
             }
 
@@ -375,6 +400,13 @@ namespace Level2
 
             obtainedLabels.Add($"{GetPotionSpanishName(entry.potionType)} x{toGrant}");
 
+            if (Application.isPlaying)
+            {
+                LootPopupVisualizer.ShowPotionReward(GetPopupPosition(popupOrder), entry.potionType, toGrant);
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayPotionPickupSound();
+            }
+            popupOrder++;
+
             if (toGrant >= entry.amount)
             {
                 entry.claimed = true;
@@ -389,12 +421,17 @@ namespace Level2
             }
         }
 
-        private void DeliverHeartEntry(ChestContentEntry entry, List<string> obtainedLabels, List<string> pendingReasons)
+        private void DeliverHeartEntry(ChestContentEntry entry, List<string> obtainedLabels, List<string> pendingReasons, ref int popupOrder)
         {
-            if (GameManager.Instance == null)
+            if (GameManager.Instance == null || !Application.isPlaying)
             {
                 entry.claimed = true;
                 obtainedLabels.Add($"Corazón x{entry.amount}");
+                if (Application.isPlaying)
+                {
+                    LootPopupVisualizer.ShowHeartReward(GetPopupPosition(popupOrder), entry.amount);
+                }
+                popupOrder++;
                 return;
             }
 
@@ -423,6 +460,11 @@ namespace Level2
             if (granted > 0)
             {
                 obtainedLabels.Add($"Corazón x{granted}");
+                if (Application.isPlaying)
+                {
+                    LootPopupVisualizer.ShowHeartReward(GetPopupPosition(popupOrder), granted);
+                }
+                popupOrder++;
             }
 
             if (granted >= entry.amount)
@@ -439,7 +481,7 @@ namespace Level2
             }
         }
 
-        private void DeliverKeyEntry(ChestContentEntry entry, List<string> obtainedLabels)
+        private void DeliverKeyEntry(ChestContentEntry entry, List<string> obtainedLabels, ref int popupOrder)
         {
             string display = string.IsNullOrEmpty(entry.keyDisplayName) ? "Llave Antigua" : entry.keyDisplayName;
             if (KeyInventory.Instance != null && !string.IsNullOrEmpty(entry.keyId))
@@ -448,6 +490,13 @@ namespace Level2
             }
             entry.claimed = true;
             obtainedLabels.Add($"{display} x1");
+
+            if (Application.isPlaying)
+            {
+                LootPopupVisualizer.ShowKeyReward(GetPopupPosition(popupOrder), display);
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayKeyPickupSound();
+            }
+            popupOrder++;
         }
 
         private static int GetCurrentCharges(PotionType type)
@@ -571,7 +620,6 @@ namespace Level2
 
         private IEnumerator LidPopRoutine()
         {
-            // Tiempo sin escala: el banner del HUD o una pausa no congelan la tapa a medio abrir
             if (openFrames != null && openFrames.Length > 0 && spriteRenderer != null)
             {
                 foreach (Sprite frame in openFrames)
@@ -582,9 +630,9 @@ namespace Level2
                 UpdateVisual();
             }
 
-            float duration = 0.22f;
+            float duration = 0.24f;
             float elapsed = 0f;
-            Vector3 peakScale = new Vector3(baseLocalScale.x * 1.15f, baseLocalScale.y * 1.18f, baseLocalScale.z);
+            Vector3 peakScale = new Vector3(baseLocalScale.x * 1.18f, baseLocalScale.y * 1.22f, baseLocalScale.z);
 
             while (elapsed < duration)
             {

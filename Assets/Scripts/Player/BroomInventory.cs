@@ -50,6 +50,25 @@ public class BroomInventory : MonoBehaviour
         ResetInventory();
     }
 
+    private void Start()
+    {
+        // Si en la escena actual (p. ej. Nivel 2) la bruja ya inicia con canFly activo,
+        // registrar las 3 partes de la escoba como completadas y mostrar la barra de energía de vuelo.
+        PlayerController pc = GetComponent<PlayerController>();
+        if (pc != null && pc.CanFly && !IsComplete)
+        {
+            foreach (BroomPart part in Enum.GetValues(typeof(BroomPart)))
+            {
+                collectedParts.Add(part);
+            }
+            HUDController hud = UnityEngine.Object.FindFirstObjectByType<HUDController>();
+            if (hud != null)
+            {
+                hud.SetFlightSliderVisible(true);
+            }
+        }
+    }
+
     private void OnDestroy()
     {
         if (Instance == this)

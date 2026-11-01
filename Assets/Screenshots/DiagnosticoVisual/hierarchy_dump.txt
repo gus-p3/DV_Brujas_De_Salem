@@ -1,0 +1,300 @@
+=== Interior_House4_Manor ===
+  - Wall_0_0 pos=(140.00, 26.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_0_1 pos=(144.00, 26.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_0_2 pos=(148.00, 26.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_0_3 pos=(152.00, 26.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_0_4 pos=(156.00, 26.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_1_0 pos=(140.00, 30.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_1_1 pos=(144.00, 30.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_1_2 pos=(148.00, 30.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_1_3 pos=(152.00, 30.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_1_4 pos=(156.00, 30.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_2_0 pos=(140.00, 34.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_2_1 pos=(144.00, 34.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_2_2 pos=(148.00, 34.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_2_3 pos=(152.00, 34.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_2_4 pos=(156.00, 34.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_3_0 pos=(140.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_3_1 pos=(144.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_3_2 pos=(148.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_3_3 pos=(152.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_3_4 pos=(156.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Bottom_Floor_Solid pos=(148.00, 24.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Gameplay:2 draw=Tiled size=(4.00, 0.50) Col=True trigger=False bounds=(137.40, 24.25, 0.00)..(158.60, 24.75, 0.00)
+  - Ceiling_Solid pos=(148.00, 37.20, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Gameplay:2 draw=Tiled size=(4.00, 0.50) Col=True trigger=False bounds=(137.40, 36.95, 0.00)..(158.60, 37.45, 0.00)
+  - LeftWall_Solid pos=(137.60, 30.85, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=True trigger=False bounds=(137.20, 24.00, 0.00)..(138.00, 37.70, 0.00)
+  - RightWall_Solid pos=(158.40, 30.85, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=True trigger=False bounds=(158.00, 24.00, 0.00)..(158.80, 37.70, 0.00)
+  - Floor1_LeftLanding pos=(139.50, 28.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interior_Floor_Planks sort=Gameplay:1 draw=Tiled size=(4.00, 1.00) Col=True trigger=False bounds=(138.30, 28.25, 0.00)..(140.70, 28.75, 0.00)
+  - Floor1_Slab pos=(150.20, 28.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interior_Floor_Planks sort=Gameplay:1 draw=Tiled size=(4.00, 1.00) Col=True trigger=False bounds=(142.70, 28.25, 0.00)..(157.70, 28.75, 0.00)
+  - Floor2_Slab pos=(145.80, 32.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interior_Floor_Planks sort=Gameplay:1 draw=Tiled size=(4.00, 1.00) Col=True trigger=False bounds=(138.55, 32.25, 0.00)..(153.05, 32.75, 0.00)
+  - Floor2_RightLanding pos=(156.40, 32.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interior_Floor_Planks sort=Gameplay:1 draw=Tiled size=(4.00, 1.00) Col=True trigger=False bounds=(155.20, 32.25, 0.00)..(157.60, 32.75, 0.00)
+  - Library_Mezzanine pos=(142.50, 34.30, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interior_Floor_Planks sort=Gameplay:1 draw=Tiled size=(4.00, 1.00) Col=True trigger=False bounds=(140.00, 34.05, 0.00)..(145.00, 34.55, 0.00)
+  - Ladder_Int_House4_CellarToF1 pos=(141.60, 26.75, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Cainos_Ladder sort=Gameplay:1 draw=Tiled size=(0.85, 4.00) Col=True trigger=True bounds=(140.93, 24.45, 0.00)..(142.28, 29.05, 0.00)
+  - Ladder_Int_House4_F1ToF2 pos=(154.00, 30.75, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Cainos_Ladder sort=Gameplay:1 draw=Tiled size=(0.85, 4.00) Col=True trigger=True bounds=(153.33, 28.45, 0.00)..(154.68, 33.05, 0.00)
+  - Door_Int_House4_Ground pos=(144.20, 29.74, 0.00) scale=(0.90, 0.90, 1.00) SR=True sprite=Village_Door_Open sort=Gameplay:1 draw=Simple size=(1.50, 2.25) Col=True trigger=True bounds=(143.55, 28.74, 0.00)..(144.85, 30.73, 0.00)
+  - Door_Int_House4_Balcony pos=(151.00, 33.74, 0.00) scale=(0.90, 0.90, 1.00) SR=True sprite=Village_Door_Open sort=Gameplay:1 draw=Simple size=(1.50, 2.25) Col=True trigger=True bounds=(150.35, 32.74, 0.00)..(151.65, 34.73, 0.00)
+  - Manor_Cellar_Crate1 pos=(146.00, 26.85, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=TX Village Props - Crate Large sort=Gameplay:1 draw=Simple size=(1.41, 1.41) Col=True trigger=False bounds=(145.31, 26.16, 0.00)..(146.72, 27.57, 0.00)
+  - Manor_Cellar_Crate2 pos=(150.00, 26.85, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=TX Village Props - Crate Large sort=Gameplay:1 draw=Simple size=(1.41, 1.41) Col=True trigger=False bounds=(149.31, 26.16, 0.00)..(150.72, 27.57, 0.00)
+  - Manor_Cellar_Shelf pos=(153.00, 26.00, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(1.94, 2.50) Col=none
+  - Light_Manor_Cellar pos=(148.00, 26.70, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+  - Key_Manor_Master pos=(155.50, 24.79, 0.00) scale=(0.92, 0.92, 1.08) SR=True sprite=Interactive_Key sort=Foreground:18 draw=Simple size=(0.75, 0.75) Col=True trigger=True bounds=(154.91, 24.19, 0.00)..(156.09, 25.38, 0.00)
+      * KeyGoldenHalo pos=(155.50, 24.79, 0.00) SR=True sprite= sort=Foreground:17 Col=none
+      * Glow pos=(155.50, 24.79, 0.00) SR=True sprite= sort=Foreground:17 Col=none
+      * Sparkle pos=(155.35, 24.88, 0.00) SR=False sprite= sort=Foreground:19 Col=none
+  - Lore_House4_Records pos=(148.00, 25.40, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interactive_LoreBook_0 sort=Gameplay:2 draw=Simple size=(0.91, 1.20) Col=True trigger=True bounds=(147.40, 24.75, 0.00)..(148.60, 26.05, 0.00)
+  - Manor_Fireplace pos=(148.00, 30.20, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(2.50, 3.00) Col=none
+  - Manor_Table pos=(151.20, 29.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(2.31, 1.39) Col=none
+  - Manor_Shelf_F1 pos=(139.80, 30.00, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(1.94, 2.50) Col=none
+  - Manor_Chandelier_F1 pos=(148.00, 31.90, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:1 draw=Simple size=(1.06, 0.66) Col=none
+  - Light_Manor_F1 pos=(148.00, 31.00, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+  - Manor_Shelf_F2_A pos=(141.50, 34.00, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(1.94, 2.50) Col=none
+  - Manor_Shelf_F2_B pos=(144.00, 34.00, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(1.94, 2.50) Col=none
+  - Manor_Bed_F2 pos=(147.50, 33.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(2.38, 1.38) Col=none
+  - Manor_Window_F2 pos=(153.00, 34.70, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:-1 draw=Simple size=(1.50, 1.31) Col=none
+  - Light_Manor_F2 pos=(148.00, 35.10, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+  - LadderTopBridge_Ladder_Int_House4_CellarToF1 pos=(141.60, 28.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Gameplay:-1 draw=Tiled size=(4.00, 0.50) Col=True trigger=False bounds=(140.30, 28.25, 0.00)..(142.90, 28.75, 0.00)
+  - LadderTopBridge_Ladder_Int_House4_F1ToF2 pos=(154.00, 32.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Gameplay:-1 draw=Tiled size=(4.00, 0.50) Col=True trigger=False bounds=(152.70, 32.25, 0.00)..(155.30, 32.75, 0.00)
+  - Cellar_WalkableSteps pos=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+      * CellarStep_1 pos=(143.53, 25.13, 0.00) SR=True sprite=TX Village Props - Obstacle Platform X32 sort=Gameplay:0 Col=True bounds=(142.80, 25.01, 0.00)..(144.25, 25.25, 0.00)
+      * CellarStep_2 pos=(144.25, 25.63, 0.00) SR=True sprite=TX Village Props - Obstacle Platform X32 sort=Gameplay:0 Col=True bounds=(143.53, 25.51, 0.00)..(144.98, 25.75, 0.00)
+      * CellarStep_3 pos=(144.98, 26.13, 0.00) SR=True sprite=TX Village Props - Obstacle Platform X32 sort=Gameplay:0 Col=True bounds=(144.25, 26.01, 0.00)..(145.70, 26.25, 0.00)
+      * CellarStep_4 pos=(145.70, 26.63, 0.00) SR=True sprite=TX Village Props - Obstacle Platform X32 sort=Gameplay:0 Col=True bounds=(144.98, 26.51, 0.00)..(146.43, 26.75, 0.00)
+      * CellarStep_5 pos=(146.43, 27.13, 0.00) SR=True sprite=TX Village Props - Obstacle Platform X32 sort=Gameplay:0 Col=True bounds=(145.70, 27.01, 0.00)..(147.15, 27.25, 0.00)
+      * CellarStep_6 pos=(147.15, 27.63, 0.00) SR=True sprite=TX Village Props - Obstacle Platform X32 sort=Gameplay:0 Col=True bounds=(146.43, 27.51, 0.00)..(147.88, 27.75, 0.00)
+      * CellarStep_7 pos=(147.88, 28.13, 0.00) SR=True sprite=TX Village Props - Obstacle Platform X32 sort=Gameplay:0 Col=True bounds=(147.15, 28.01, 0.00)..(148.60, 28.25, 0.00)
+      * CellarStep_8 pos=(148.60, 28.63, 0.00) SR=True sprite=TX Village Props - Obstacle Platform X32 sort=Gameplay:0 Col=True bounds=(147.88, 28.51, 0.00)..(149.33, 28.75, 0.00)
+  - CellarExitBackupTrigger pos=(141.60, 25.45, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=True trigger=True bounds=(140.70, 24.75, 0.00)..(142.50, 26.15, 0.00)
+  - Chest_Int_House4_Royal pos=(142.50, 34.55, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=TX Chest Animation Golden 0 sort=Gameplay:2 draw=Simple size=(1.25, 1.00) Col=True trigger=True bounds=(141.78, 34.33, 0.00)..(143.23, 35.68, 0.00)
+  - Chest_Int_House4_CellarAlch pos=(144.80, 25.75, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=TX Chest Animation Silver 0 sort=Gameplay:2 draw=Simple size=(1.00, 1.00) Col=True trigger=True bounds=(144.08, 25.53, 0.00)..(145.53, 26.88, 0.00)
+  - Challenge_PotionSentinel_ManorCrypt pos=(152.80, 24.75, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:4 draw=Simple size=(1.00, 1.00) Col=True trigger=False bounds=(152.23, 24.78, 0.00)..(153.38, 28.43, 0.00)
+      * ArcaneWardVisual pos=(152.45, 25.60, 0.00) SR=False sprite=null sort=Gameplay:5 Col=none
+      * SentinelAura pos=(152.80, 25.60, 0.00) SR=True sprite= sort=Default:4 Col=none
+  - RoomCutaway_Backdrop pos=(148.00, 30.85, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=RoomCutaway_House4_Manor sort=Midground:10 draw=Simple size=(21.19, 13.19) Col=none
+  - Cainos_Slab_Brackets pos=(148.00, 24.50, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+      * Floor1_Slab_BracketL pos=(143.15, 28.07, 0.00) SR=True sprite=TX Village Props - Platform L 01 sort=Gameplay:0 Col=none
+      * Floor1_Slab_BracketR pos=(157.25, 28.07, 0.00) SR=True sprite=TX Village Props - Platform R 01 sort=Gameplay:0 Col=none
+      * Floor2_Slab_BracketL pos=(139.00, 32.07, 0.00) SR=True sprite=TX Village Props - Platform L 01 sort=Gameplay:0 Col=none
+      * Floor2_Slab_BracketR pos=(152.60, 32.07, 0.00) SR=True sprite=TX Village Props - Platform R 01 sort=Gameplay:0 Col=none
+      * Library_Mezzanine_BracketL pos=(140.45, 33.87, 0.00) SR=True sprite=TX Village Props - Platform L 01 sort=Gameplay:0 Col=none
+      * Library_Mezzanine_BracketR pos=(144.55, 33.87, 0.00) SR=True sprite=TX Village Props - Platform R 01 sort=Gameplay:0 Col=none
+  - Cainos_Interior_Decor pos=(148.00, 24.50, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+      * Cainos_Manor_Crypt_WeaponRack pos=(139.60, 24.75, 0.00) SR=True sprite=TX Village Props - Weapon Rack sort=Gameplay:0 Col=none
+      * Cainos_Manor_Crypt_Barrel pos=(156.80, 24.75, 0.00) SR=True sprite=TX Village Props - Barrel sort=Gameplay:0 Col=none
+      * Torch_Manor_CryptWest pos=(144.80, 26.80, 0.00) SR=True sprite=TX Village Props - Torch sort=Gameplay:0 Col=none
+      * Torch_Manor_CryptEast pos=(154.80, 26.80, 0.00) SR=True sprite=TX Village Props - Torch sort=Gameplay:0 Col=none
+      * Cainos_Manor_F1_GrandShelf pos=(142.20, 30.00, 0.00) SR=True sprite=Interior_Bookshelf sort=Gameplay:0 Col=none
+      * Cainos_Manor_F1_AlchRack pos=(156.20, 29.46, 0.00) SR=True sprite=Interior_Cauldron_Rack sort=Gameplay:0 Col=none
+      * Cainos_Manor_F1_BannerLeft pos=(145.00, 31.00, 0.00) SR=True sprite=TX Village Props - Banner sort=Gameplay:-1 Col=none
+      * Cainos_Manor_F1_BannerRight pos=(151.00, 31.00, 0.00) SR=True sprite=TX Village Props - Banner sort=Gameplay:-1 Col=none
+      * Cainos_Manor_F2_StudyTable pos=(150.50, 33.34, 0.00) SR=True sprite=Interior_Table_Chairs sort=Gameplay:0 Col=none
+      * Cainos_Manor_F2_WeaponRack pos=(156.40, 32.75, 0.00) SR=True sprite=TX Village Props - Weapon Rack sort=Gameplay:0 Col=none
+=== Interior_House1_Apothecary ===
+  - Wall_0_0 pos=(12.00, 30.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_0_1 pos=(16.00, 30.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_0_2 pos=(20.00, 30.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_0_3 pos=(24.00, 30.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_1_0 pos=(12.00, 34.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_1_1 pos=(16.00, 34.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_1_2 pos=(20.00, 34.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_1_3 pos=(24.00, 34.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_2_0 pos=(12.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_2_1 pos=(16.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_2_2 pos=(20.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_2_3 pos=(24.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Bottom_Floor_Solid pos=(18.00, 28.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Gameplay:2 draw=Tiled size=(4.00, 0.50) Col=True trigger=False bounds=(9.40, 28.25, 0.00)..(26.60, 28.75, 0.00)
+  - Ceiling_Solid pos=(18.00, 39.60, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Gameplay:2 draw=Tiled size=(4.00, 0.50) Col=True trigger=False bounds=(9.40, 39.35, 0.00)..(26.60, 39.85, 0.00)
+  - LeftWall_Solid pos=(9.60, 34.05, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=True trigger=False bounds=(9.20, 28.10, 0.00)..(10.00, 40.00, 0.00)
+  - RightWall_Solid pos=(26.40, 34.05, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=True trigger=False bounds=(26.00, 28.10, 0.00)..(26.80, 40.00, 0.00)
+  - Floor2_Slab pos=(16.80, 32.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interior_Floor_Planks sort=Gameplay:1 draw=Tiled size=(4.00, 1.00) Col=True trigger=False bounds=(10.70, 32.25, 0.00)..(22.90, 32.75, 0.00)
+  - Floor2_RightLanding pos=(24.80, 32.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interior_Floor_Planks sort=Gameplay:1 draw=Tiled size=(4.00, 1.00) Col=True trigger=False bounds=(23.80, 32.25, 0.00)..(25.80, 32.75, 0.00)
+  - Ladder_Int_House1_F1ToF2 pos=(23.20, 30.75, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Cainos_Ladder sort=Gameplay:1 draw=Tiled size=(0.85, 4.00) Col=True trigger=True bounds=(22.53, 28.45, 0.00)..(23.88, 33.05, 0.00)
+  - Door_Int_House1_Ground pos=(12.20, 29.74, 0.00) scale=(0.90, 0.90, 1.00) SR=True sprite=Village_Door_Open sort=Gameplay:1 draw=Simple size=(1.50, 2.25) Col=True trigger=True bounds=(11.55, 28.74, 0.00)..(12.85, 30.73, 0.00)
+  - Door_Int_House1_Balcony pos=(12.20, 33.74, 0.00) scale=(0.90, 0.90, 1.00) SR=True sprite=Village_Door_Open sort=Gameplay:1 draw=Simple size=(1.50, 2.25) Col=True trigger=True bounds=(11.55, 32.74, 0.00)..(12.85, 34.73, 0.00)
+  - Cauldron_Alch pos=(15.50, 29.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(1.16, 1.09) Col=none
+  - Table_Alch pos=(18.50, 29.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(2.31, 1.39) Col=none
+  - Shelf_Alch_1 pos=(21.00, 30.00, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(1.94, 2.50) Col=none
+  - Window_F1 pos=(17.00, 30.70, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:-1 draw=Simple size=(1.50, 1.31) Col=none
+  - Chandelier_F1 pos=(18.00, 31.90, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:1 draw=Simple size=(1.06, 0.66) Col=none
+  - Light_F1 pos=(18.00, 31.00, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+  - Lore_House1_Recipe pos=(18.50, 29.40, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interactive_LoreBook_0 sort=Gameplay:2 draw=Simple size=(0.91, 1.20) Col=True trigger=True bounds=(17.90, 28.75, 0.00)..(19.10, 30.05, 0.00)
+  - Bed_F2 pos=(15.50, 33.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(2.38, 1.38) Col=none
+  - Wardrobe_F2 pos=(18.20, 34.00, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(1.38, 2.47) Col=none
+  - Window_F2 pos=(20.50, 34.70, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:-1 draw=Simple size=(1.50, 1.31) Col=none
+  - Chandelier_F2 pos=(18.00, 39.00, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:1 draw=Simple size=(1.06, 0.66) Col=none
+  - Light_F2 pos=(18.00, 35.00, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+  - LadderTopBridge_Ladder_Int_House1_F1ToF2 pos=(23.20, 32.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Gameplay:-1 draw=Tiled size=(4.00, 0.50) Col=True trigger=False bounds=(21.90, 32.25, 0.00)..(24.50, 32.75, 0.00)
+  - Chest_Int_House1_Upper pos=(19.80, 35.85, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=TX Chest Animation Silver 0 sort=Gameplay:2 draw=Simple size=(1.25, 1.00) Col=True trigger=True bounds=(19.08, 35.63, 0.00)..(20.53, 36.98, 0.00)
+  - Challenge_FlightLoft_H1 pos=(19.80, 35.65, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interior_Rafter_Loft sort=Gameplay:1 draw=Simple size=(3.81, 0.88) Col=True trigger=False bounds=(17.90, 35.45, 0.00)..(21.70, 35.85, 0.00)
+      * LoftChain_L_0 pos=(18.45, 36.20, 0.00) SR=True sprite=TX Village Props - Chain 01 sort=Gameplay:0 Col=none
+      * LoftChain_L_1 pos=(18.45, 37.15, 0.00) SR=True sprite=TX Village Props - Chain 01 sort=Gameplay:0 Col=none
+      * LoftChain_L_2 pos=(18.45, 38.10, 0.00) SR=True sprite=TX Village Props - Chain 01 sort=Gameplay:0 Col=none
+      * LoftPulley_L pos=(18.45, 38.90, 0.00) SR=True sprite=TX Village Props - Elevator  Pully sort=Gameplay:1 Col=none
+      * LoftChain_R_0 pos=(21.15, 36.20, 0.00) SR=True sprite=TX Village Props - Chain 01 sort=Gameplay:0 Col=none
+      * LoftChain_R_1 pos=(21.15, 37.15, 0.00) SR=True sprite=TX Village Props - Chain 01 sort=Gameplay:0 Col=none
+      * LoftChain_R_2 pos=(21.15, 38.10, 0.00) SR=True sprite=TX Village Props - Chain 01 sort=Gameplay:0 Col=none
+      * LoftPulley_R pos=(21.15, 38.90, 0.00) SR=True sprite=TX Village Props - Elevator  Pully sort=Gameplay:1 Col=none
+      * FlightHint_Loft_H1 pos=(18.25, 35.10, 0.00) SR=True sprite=null sort=Default:0 Col=True bounds=(16.50, 33.35, 0.00)..(20.00, 36.85, 0.00)
+  - RoomCutaway_Backdrop pos=(18.00, 34.05, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=RoomCutaway_House1_Apothecary sort=Midground:10 draw=Simple size=(17.19, 11.63) Col=none
+  - Cainos_Slab_Brackets pos=(18.00, 28.50, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+      * Floor2_Slab_BracketL pos=(11.15, 32.07, 0.00) SR=True sprite=TX Village Props - Platform L 01 sort=Gameplay:0 Col=none
+      * Floor2_Slab_BracketR pos=(22.45, 32.07, 0.00) SR=True sprite=TX Village Props - Platform R 01 sort=Gameplay:0 Col=none
+  - Cainos_Interior_Decor pos=(18.00, 28.50, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+      * Cainos_Apothecary_BarrelHerbs pos=(13.80, 28.75, 0.00) SR=True sprite=TX Village Props - Barrel sort=Gameplay:0 Col=none
+      * Cainos_Apothecary_GrainBox pos=(14.70, 28.75, 0.00) SR=True sprite=TX Village Props - Grain Box sort=Gameplay:0 Col=none
+      * Cainos_Apothecary_CauldronBig pos=(16.60, 28.75, 0.00) SR=True sprite=TX Village Props - Cauldron sort=Gameplay:1 Col=none
+      * Cainos_Apothecary_Pot1 pos=(19.90, 29.19, 0.00) SR=True sprite=TX Village Props - Pot 01 sort=Gameplay:1 Col=none
+      * Cainos_Apothecary_CrateLarge pos=(22.10, 29.37, 0.00) SR=True sprite=TX Village Props - Crate Large sort=Gameplay:0 Col=none
+      * Cainos_Apothecary_BagHerbs pos=(24.60, 28.75, 0.00) SR=True sprite=TX Village Props - Gunny Bag 01 sort=Gameplay:0 Col=none
+      * Cainos_Apothecary_BannerLeft pos=(14.00, 31.00, 0.00) SR=True sprite=TX Village Props - Banner sort=Gameplay:-1 Col=none
+      * Cainos_Apothecary_WindowRight pos=(20.80, 30.90, 0.00) SR=True sprite=Interior_Window_Shutters sort=Gameplay:-1 Col=none
+      * Cainos_Apothecary_F2_Shelf pos=(13.90, 33.90, 0.00) SR=True sprite=Interior_Bookshelf sort=Gameplay:0 Col=none
+      * Cainos_Apothecary_F2_Basket pos=(16.90, 32.75, 0.00) SR=True sprite=TX Village Props - Basket sort=Gameplay:1 Col=none
+      * Cainos_Apothecary_F2_Pot3 pos=(21.40, 33.19, 0.00) SR=True sprite=TX Village Props - Pot 03 sort=Gameplay:1 Col=none
+      * Torch_Apothecary_F1 pos=(13.20, 30.80, 0.00) SR=True sprite=TX Village Props - Torch sort=Gameplay:0 Col=none
+      * Torch_Apothecary_Loft pos=(17.50, 36.80, 0.00) SR=True sprite=TX Village Props - Torch sort=Gameplay:0 Col=none
+=== Interior_House2_Tavern ===
+  - Wall_0_0 pos=(41.00, 26.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_0_1 pos=(45.00, 26.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_0_2 pos=(49.00, 26.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_0_3 pos=(53.00, 26.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_0_4 pos=(57.00, 26.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_1_0 pos=(41.00, 30.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_1_1 pos=(45.00, 30.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_1_2 pos=(49.00, 30.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_1_3 pos=(53.00, 30.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_1_4 pos=(57.00, 30.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_2_0 pos=(41.00, 34.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_2_1 pos=(45.00, 34.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_2_2 pos=(49.00, 34.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_2_3 pos=(53.00, 34.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_2_4 pos=(57.00, 34.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_3_0 pos=(41.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_3_1 pos=(45.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_3_2 pos=(49.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_3_3 pos=(53.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_3_4 pos=(57.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Bottom_Floor_Solid pos=(48.00, 24.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Gameplay:2 draw=Tiled size=(4.00, 0.50) Col=True trigger=False bounds=(38.40, 24.25, 0.00)..(57.60, 24.75, 0.00)
+  - Ceiling_Solid pos=(48.00, 36.80, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Gameplay:2 draw=Tiled size=(4.00, 0.50) Col=True trigger=False bounds=(38.40, 36.55, 0.00)..(57.60, 37.05, 0.00)
+  - LeftWall_Solid pos=(38.60, 30.65, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=True trigger=False bounds=(38.20, 24.00, 0.00)..(39.00, 37.30, 0.00)
+  - RightWall_Solid pos=(57.40, 30.65, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=True trigger=False bounds=(57.00, 24.00, 0.00)..(57.80, 37.30, 0.00)
+  - Floor1_Slab pos=(46.20, 28.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interior_Floor_Planks sort=Gameplay:1 draw=Tiled size=(4.00, 1.00) Col=True trigger=False bounds=(39.45, 28.25, 0.00)..(52.95, 28.75, 0.00)
+  - Floor1_RightLanding pos=(55.80, 28.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interior_Floor_Planks sort=Gameplay:1 draw=Tiled size=(4.00, 1.00) Col=True trigger=False bounds=(54.90, 28.25, 0.00)..(56.70, 28.75, 0.00)
+  - Floor2_LeftLanding pos=(41.20, 32.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interior_Floor_Planks sort=Gameplay:1 draw=Tiled size=(4.00, 1.00) Col=True trigger=False bounds=(39.40, 32.25, 0.00)..(43.00, 32.75, 0.00)
+  - Floor2_Slab pos=(51.20, 32.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interior_Floor_Planks sort=Gameplay:1 draw=Tiled size=(4.00, 1.00) Col=True trigger=False bounds=(45.60, 32.25, 0.00)..(56.80, 32.75, 0.00)
+  - Ladder_Int_House2_CellarToF1 pos=(54.00, 26.75, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Cainos_Ladder sort=Gameplay:1 draw=Tiled size=(0.85, 4.00) Col=True trigger=True bounds=(53.33, 24.45, 0.00)..(54.68, 29.05, 0.00)
+  - Ladder_Int_House2_F1ToF2 pos=(44.20, 30.75, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Cainos_Ladder sort=Gameplay:1 draw=Tiled size=(0.85, 4.00) Col=True trigger=True bounds=(43.53, 28.45, 0.00)..(44.88, 33.05, 0.00)
+  - Door_Int_House2_Ground pos=(41.20, 29.74, 0.00) scale=(0.90, 0.90, 1.00) SR=True sprite=Village_Door_Open sort=Gameplay:1 draw=Simple size=(1.50, 2.25) Col=True trigger=True bounds=(40.55, 28.74, 0.00)..(41.85, 30.73, 0.00)
+  - Door_Int_House2_Balcony pos=(54.80, 33.74, 0.00) scale=(0.90, 0.90, 1.00) SR=True sprite=Village_Door_Open sort=Gameplay:1 draw=Simple size=(1.50, 2.25) Col=True trigger=True bounds=(54.15, 32.74, 0.00)..(55.45, 34.73, 0.00)
+  - Cellar_Barrel_1 pos=(44.20, 24.75, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=TX Village Props - Barrel sort=Gameplay:0 draw=Simple size=(0.84, 1.09) Col=none
+  - Cellar_Barrel_2 pos=(49.80, 25.55, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=TX Village Props - Barrel sort=Gameplay:0 draw=Simple size=(0.84, 1.09) Col=none
+  - Cellar_Crate_Step pos=(49.00, 26.85, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=TX Village Props - Crate Large sort=Gameplay:1 draw=Simple size=(1.41, 1.41) Col=True trigger=False bounds=(48.31, 26.16, 0.00)..(49.72, 27.57, 0.00)
+  - Light_Cellar pos=(48.00, 26.70, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+  - Key_Tavern_Chest pos=(42.00, 24.79, 0.00) scale=(0.92, 0.92, 1.08) SR=True sprite=Interactive_Key sort=Foreground:18 draw=Simple size=(0.75, 0.75) Col=True trigger=True bounds=(41.41, 24.19, 0.00)..(42.59, 25.38, 0.00)
+      * KeyGoldenHalo pos=(42.00, 24.79, 0.00) SR=True sprite= sort=Foreground:17 Col=none
+      * Glow pos=(42.00, 24.79, 0.00) SR=True sprite= sort=Foreground:17 Col=none
+      * Sparkle pos=(42.22, 24.74, 0.00) SR=False sprite= sort=Foreground:19 Col=none
+  - Tavern_Fireplace pos=(48.20, 30.20, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(2.50, 3.00) Col=none
+  - Tavern_Table pos=(51.20, 29.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(2.31, 1.39) Col=none
+  - Tavern_Window pos=(45.80, 30.70, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:-1 draw=Simple size=(1.50, 1.31) Col=none
+  - Tavern_Chandelier pos=(48.50, 31.90, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:1 draw=Simple size=(1.06, 0.66) Col=none
+  - Light_Tavern_F1 pos=(48.20, 30.90, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+  - Lore_House2_Diary pos=(51.20, 29.40, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interactive_LoreBook_0 sort=Gameplay:2 draw=Simple size=(0.91, 1.20) Col=True trigger=True bounds=(50.60, 28.75, 0.00)..(51.80, 30.05, 0.00)
+  - Tavern_Bed_1 pos=(47.50, 33.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(2.38, 1.38) Col=none
+  - Tavern_Shelf pos=(50.50, 34.00, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(1.94, 2.50) Col=none
+  - Tavern_Wardrobe pos=(41.50, 34.00, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(1.38, 2.47) Col=none
+  - Light_Tavern_F2 pos=(48.50, 34.90, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+  - LadderTopBridge_Ladder_Int_House2_CellarToF1 pos=(54.00, 28.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Gameplay:-1 draw=Tiled size=(4.00, 0.50) Col=True trigger=False bounds=(52.70, 28.25, 0.00)..(55.30, 28.75, 0.00)
+  - LadderTopBridge_Ladder_Int_House2_F1ToF2 pos=(44.20, 32.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Gameplay:-1 draw=Tiled size=(4.00, 0.50) Col=True trigger=False bounds=(42.90, 32.25, 0.00)..(45.50, 32.75, 0.00)
+  - Cellar_WalkableSteps pos=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+      * CellarStep_1 pos=(49.18, 25.13, 0.00) SR=True sprite=TX Village Props - Obstacle Platform X32 sort=Gameplay:0 Col=True bounds=(48.45, 25.01, 0.00)..(49.90, 25.25, 0.00)
+      * CellarStep_2 pos=(49.75, 25.63, 0.00) SR=True sprite=TX Village Props - Obstacle Platform X32 sort=Gameplay:0 Col=True bounds=(49.03, 25.51, 0.00)..(50.48, 25.75, 0.00)
+      * CellarStep_3 pos=(50.33, 26.13, 0.00) SR=True sprite=TX Village Props - Obstacle Platform X32 sort=Gameplay:0 Col=True bounds=(49.60, 26.01, 0.00)..(51.05, 26.25, 0.00)
+      * CellarStep_4 pos=(50.90, 26.63, 0.00) SR=True sprite=TX Village Props - Obstacle Platform X32 sort=Gameplay:0 Col=True bounds=(50.18, 26.51, 0.00)..(51.63, 26.75, 0.00)
+      * CellarStep_5 pos=(51.48, 27.13, 0.00) SR=True sprite=TX Village Props - Obstacle Platform X32 sort=Gameplay:0 Col=True bounds=(50.75, 27.01, 0.00)..(52.20, 27.25, 0.00)
+      * CellarStep_6 pos=(52.05, 27.63, 0.00) SR=True sprite=TX Village Props - Obstacle Platform X32 sort=Gameplay:0 Col=True bounds=(51.33, 27.51, 0.00)..(52.78, 27.75, 0.00)
+      * CellarStep_7 pos=(52.63, 28.13, 0.00) SR=True sprite=TX Village Props - Obstacle Platform X32 sort=Gameplay:0 Col=True bounds=(51.90, 28.01, 0.00)..(53.35, 28.25, 0.00)
+      * CellarStep_8 pos=(53.20, 28.63, 0.00) SR=True sprite=TX Village Props - Obstacle Platform X32 sort=Gameplay:0 Col=True bounds=(52.48, 28.51, 0.00)..(53.93, 28.75, 0.00)
+  - CellarExitBackupTrigger pos=(54.00, 25.45, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=True trigger=True bounds=(53.10, 24.75, 0.00)..(54.90, 26.15, 0.00)
+  - Chest_Int_House2_Locked pos=(52.40, 32.75, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=TX Chest Animation Iron 0 sort=Gameplay:2 draw=Simple size=(1.25, 1.00) Col=True trigger=True bounds=(51.68, 32.53, 0.00)..(53.13, 33.88, 0.00)
+  - Challenge_CatTunnel_TavernCellar pos=(46.60, 27.10, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interior_Cellar_CatArch sort=Gameplay:1 draw=Simple size=(2.13, 2.91) Col=True trigger=False bounds=(45.55, 25.65, 0.00)..(47.65, 28.55, 0.00)
+      * CatPassageHint_TavernCellar pos=(46.60, 25.23, 0.00) SR=none Col=True bounds=(45.30, 24.78, 0.00)..(47.90, 25.68, 0.00)
+  - RoomCutaway_Backdrop pos=(48.00, 30.65, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=RoomCutaway_House2_Tavern sort=Midground:10 draw=Simple size=(19.19, 12.81) Col=none
+  - Cainos_Slab_Brackets pos=(48.00, 24.50, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+      * Floor1_Slab_BracketL pos=(39.90, 28.07, 0.00) SR=True sprite=TX Village Props - Platform L 01 sort=Gameplay:0 Col=none
+      * Floor1_Slab_BracketR pos=(52.50, 28.07, 0.00) SR=True sprite=TX Village Props - Platform R 01 sort=Gameplay:0 Col=none
+      * Floor2_Slab_BracketL pos=(46.05, 32.07, 0.00) SR=True sprite=TX Village Props - Platform L 01 sort=Gameplay:0 Col=none
+      * Floor2_Slab_BracketR pos=(56.35, 32.07, 0.00) SR=True sprite=TX Village Props - Platform R 01 sort=Gameplay:0 Col=none
+  - Cainos_Interior_Decor pos=(48.00, 24.50, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+      * Cainos_Tavern_Cellar_Bag1 pos=(40.60, 24.75, 0.00) SR=True sprite=TX Village Props - Gunny Bag 01 sort=Gameplay:0 Col=none
+      * Cainos_Tavern_Cellar_CrateS pos=(43.30, 25.44, 0.00) SR=True sprite=TX Village Props - Crate Large sort=Gameplay:0 Col=none
+      * Cainos_Tavern_Cellar_Logs pos=(55.40, 24.75, 0.00) SR=True sprite=TX Village Props - Wood Logs sort=Gameplay:0 Col=none
+      * Torch_Tavern_CellarWest pos=(42.00, 26.80, 0.00) SR=True sprite=TX Village Props - Torch sort=Gameplay:0 Col=none
+      * Torch_Tavern_CellarEast pos=(52.50, 26.80, 0.00) SR=True sprite=TX Village Props - Torch sort=Gameplay:0 Col=none
+      * Cainos_Tavern_F1_Barrels pos=(42.80, 28.75, 0.00) SR=True sprite=TX Village Props - Barrel sort=Gameplay:0 Col=none
+      * Cainos_Tavern_F1_Bench pos=(45.80, 28.75, 0.00) SR=True sprite=TX Village Props - Log Bench sort=Gameplay:0 Col=none
+      * Cainos_Tavern_F1_ShelfMugs pos=(53.20, 29.88, 0.00) SR=True sprite=Interior_Bookshelf sort=Gameplay:0 Col=none
+      * Cainos_Tavern_F1_PotWine pos=(55.50, 29.19, 0.00) SR=True sprite=TX Village Props - Pot 01 sort=Gameplay:1 Col=none
+      * Cainos_Tavern_F1_WindowRight pos=(51.80, 30.80, 0.00) SR=True sprite=Interior_Window_Shutters sort=Gameplay:-1 Col=none
+      * Cainos_Tavern_F1_Banner pos=(43.20, 31.00, 0.00) SR=True sprite=TX Village Props - Banner sort=Gameplay:-1 Col=none
+      * Cainos_Tavern_F2_Crate pos=(45.50, 33.25, 0.00) SR=True sprite=TX Village Props - Crate Small sort=Gameplay:0 Col=none
+      * Cainos_Tavern_F2_Basket pos=(49.20, 32.75, 0.00) SR=True sprite=TX Village Props - Basket sort=Gameplay:0 Col=none
+=== Interior_House3_Abandoned ===
+  - Wall_0_0 pos=(100.00, 30.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_0_1 pos=(104.00, 30.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_0_2 pos=(108.00, 30.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_0_3 pos=(112.00, 30.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_0_4 pos=(116.00, 30.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_1_0 pos=(100.00, 34.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_1_1 pos=(104.00, 34.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_1_2 pos=(108.00, 34.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_1_3 pos=(112.00, 34.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_1_4 pos=(116.00, 34.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_2_0 pos=(100.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_2_1 pos=(104.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_2_2 pos=(108.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_2_3 pos=(112.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_2_4 pos=(116.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_3_0 pos=(100.00, 42.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_3_1 pos=(104.00, 42.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_3_2 pos=(108.00, 42.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_3_3 pos=(112.00, 42.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Wall_3_4 pos=(116.00, 42.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Midground:10 draw=Simple size=(4.00, 4.00) Col=none
+  - Bottom_Floor_Solid pos=(107.00, 28.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Gameplay:2 draw=Tiled size=(4.00, 0.50) Col=True trigger=False bounds=(97.40, 28.25, 0.00)..(116.60, 28.75, 0.00)
+  - Ceiling_Solid pos=(107.00, 40.80, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Gameplay:2 draw=Tiled size=(4.00, 0.50) Col=True trigger=False bounds=(97.40, 40.55, 0.00)..(116.60, 41.05, 0.00)
+  - LeftWall_Solid pos=(97.60, 34.65, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=True trigger=False bounds=(97.20, 28.00, 0.00)..(98.00, 41.30, 0.00)
+  - RightWall_Solid pos=(116.40, 34.65, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=True trigger=False bounds=(116.00, 28.00, 0.00)..(116.80, 41.30, 0.00)
+  - Floor2_Slab pos=(105.00, 32.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interior_Floor_Planks sort=Gameplay:1 draw=Tiled size=(4.00, 1.00) Col=True trigger=False bounds=(98.50, 32.25, 0.00)..(111.50, 32.75, 0.00)
+  - Floor2_RightLanding pos=(114.60, 32.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interior_Floor_Planks sort=Gameplay:1 draw=Tiled size=(4.00, 1.00) Col=True trigger=False bounds=(113.50, 32.25, 0.00)..(115.70, 32.75, 0.00)
+  - Attic_LeftLanding pos=(100.00, 36.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interior_Floor_Planks sort=Gameplay:1 draw=Tiled size=(4.00, 1.00) Col=True trigger=False bounds=(98.60, 36.25, 0.00)..(101.40, 36.75, 0.00)
+  - Attic_Slab pos=(109.50, 36.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interior_Floor_Planks sort=Gameplay:1 draw=Tiled size=(4.00, 1.00) Col=True trigger=False bounds=(103.50, 36.25, 0.00)..(115.50, 36.75, 0.00)
+  - Ladder_Int_House3_F1ToF2 pos=(112.50, 30.75, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Cainos_Ladder sort=Gameplay:1 draw=Tiled size=(0.85, 4.00) Col=True trigger=True bounds=(111.83, 28.45, 0.00)..(113.18, 33.05, 0.00)
+  - Ladder_Int_House3_F2ToAttic pos=(102.50, 34.75, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Cainos_Ladder sort=Gameplay:1 draw=Tiled size=(0.85, 4.00) Col=True trigger=True bounds=(101.83, 32.45, 0.00)..(103.18, 37.05, 0.00)
+  - Door_Int_House3_Ground pos=(100.20, 29.74, 0.00) scale=(0.90, 0.90, 1.00) SR=True sprite=Village_Door_Open sort=Gameplay:1 draw=Simple size=(1.50, 2.25) Col=True trigger=True bounds=(99.55, 28.74, 0.00)..(100.85, 30.73, 0.00)
+  - Door_Int_House3_Roof pos=(114.40, 33.74, 0.00) scale=(0.90, 0.90, 1.00) SR=True sprite=Village_Door_Open sort=Gameplay:1 draw=Simple size=(1.50, 2.25) Col=True trigger=True bounds=(113.75, 32.74, 0.00)..(115.05, 34.73, 0.00)
+  - Abandoned_Wardrobe pos=(104.50, 30.00, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(1.38, 2.47) Col=none
+  - Abandoned_Crate_1 pos=(108.00, 30.85, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=TX Village Props - Crate Large sort=Gameplay:1 draw=Simple size=(1.41, 1.41) Col=True trigger=False bounds=(107.31, 30.16, 0.00)..(108.72, 31.57, 0.00)
+  - Abandoned_Table_F2 pos=(106.50, 33.50, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(2.31, 1.39) Col=none
+  - Abandoned_Window_F2 pos=(109.50, 34.70, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:-1 draw=Simple size=(1.50, 1.31) Col=none
+  - Attic_Shelf pos=(106.50, 38.00, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=null sort=Gameplay:0 draw=Simple size=(1.94, 2.50) Col=none
+  - Light_Abandoned_F1 pos=(107.00, 30.80, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+  - Light_Abandoned_F2 pos=(107.00, 34.80, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+  - Light_Abandoned_Attic pos=(108.00, 38.50, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+  - Lore_House3_Grimoire pos=(108.80, 37.40, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=Interactive_LoreBook_0 sort=Gameplay:2 draw=Simple size=(0.91, 1.20) Col=True trigger=True bounds=(108.20, 36.75, 0.00)..(109.40, 38.05, 0.00)
+  - LadderTopBridge_Ladder_Int_House3_F1ToF2 pos=(112.50, 32.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Gameplay:-1 draw=Tiled size=(4.00, 0.50) Col=True trigger=False bounds=(111.20, 32.25, 0.00)..(113.80, 32.75, 0.00)
+  - LadderTopBridge_Ladder_Int_House3_F2ToAttic pos=(102.50, 36.50, 0.00) scale=(1.00, 1.00, 1.00) SR=False sprite=null sort=Gameplay:-1 draw=Tiled size=(4.00, 0.50) Col=True trigger=False bounds=(101.20, 36.25, 0.00)..(103.80, 36.75, 0.00)
+  - Chest_Int_House3_Attic pos=(112.20, 36.75, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=TX Chest Animation Wooden 0 sort=Gameplay:2 draw=Simple size=(1.25, 1.00) Col=True trigger=True bounds=(111.48, 36.53, 0.00)..(112.93, 37.88, 0.00)
+  - RoomCutaway_Backdrop pos=(107.00, 34.65, 0.00) scale=(1.00, 1.00, 1.00) SR=True sprite=RoomCutaway_House3_Abandoned sort=Midground:10 draw=Simple size=(19.19, 12.81) Col=none
+  - Cainos_Slab_Brackets pos=(107.00, 28.50, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+      * Floor2_Slab_BracketL pos=(98.95, 32.07, 0.00) SR=True sprite=TX Village Props - Platform L 01 sort=Gameplay:0 Col=none
+      * Floor2_Slab_BracketR pos=(111.05, 32.07, 0.00) SR=True sprite=TX Village Props - Platform R 01 sort=Gameplay:0 Col=none
+      * Attic_Slab_BracketL pos=(103.95, 36.07, 0.00) SR=True sprite=TX Village Props - Platform L 01 sort=Gameplay:0 Col=none
+      * Attic_Slab_BracketR pos=(115.05, 36.07, 0.00) SR=True sprite=TX Village Props - Platform R 01 sort=Gameplay:0 Col=none
+  - Cainos_Interior_Decor pos=(107.00, 28.50, 0.00) scale=(1.00, 1.00, 1.00) SR=none Col=none
+      * Cainos_Abandoned_F1_Table pos=(102.30, 29.34, 0.00) SR=True sprite=Interior_Table_Chairs sort=Gameplay:0 Col=none
+      * Cainos_Abandoned_F1_Bookshelf pos=(110.20, 29.94, 0.00) SR=True sprite=Interior_Bookshelf sort=Gameplay:0 Col=none
+      * Cainos_Abandoned_F1_Bag pos=(114.20, 28.75, 0.00) SR=True sprite=TX Village Props - Gunny Bag 02 sort=Gameplay:0 Col=none
+      * Cainos_Abandoned_F1_Window pos=(106.50, 30.80, 0.00) SR=True sprite=Interior_Window_Shutters sort=Gameplay:-1 Col=none
+      * Cainos_Abandoned_F2_Cauldron pos=(104.20, 33.46, 0.00) SR=True sprite=Interior_Cauldron_Rack sort=Gameplay:0 Col=none
+      * Cainos_Abandoned_F2_Barrel pos=(111.00, 32.75, 0.00) SR=True sprite=TX Village Props - Barrel sort=Gameplay:0 Col=none
+      * Cainos_Abandoned_Attic_Logs pos=(104.50, 36.75, 0.00) SR=True sprite=TX Village Props - Wood Logs sort=Gameplay:0 Col=none
+      * Cainos_Abandoned_Attic_Chandelier pos=(108.50, 40.00, 0.00) SR=True sprite=Interior_Chandelier sort=Gameplay:1 Col=none
+      * Torch_Abandoned_Attic pos=(110.80, 38.60, 0.00) SR=True sprite=TX Village Props - Torch sort=Gameplay:0 Col=none

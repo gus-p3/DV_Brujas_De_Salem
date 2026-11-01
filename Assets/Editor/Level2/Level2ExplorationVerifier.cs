@@ -467,6 +467,9 @@ namespace Level2.Editor
         {
             if (witch == null || pc == null) return false;
             GameManager gm = GameManager.Instance;
+            int oldLives = gm != null ? gm.Lives : 3;
+            int oldScore = gm != null ? gm.Score : 0;
+            float oldTime = gm != null ? gm.TimeElapsed : 0f;
             if (gm != null)
             {
                 gm.Lives = 2;
@@ -481,7 +484,11 @@ namespace Level2.Editor
             InteriorTransitionManager.Instance.TransitionThroughDoor(extDoor.TargetDoor, witch, immediate: true);
 
             if (gm == null) return true;
-            return gm.Lives == 2 && gm.Score == 350 && Mathf.Abs(gm.TimeElapsed - 42.5f) < 0.1f;
+            bool ok = gm.Lives == 2 && gm.Score == 350 && Mathf.Abs(gm.TimeElapsed - 42.5f) < 0.1f;
+            gm.Lives = oldLives;
+            gm.Score = oldScore;
+            gm.TimeElapsed = oldTime;
+            return ok;
         }
 
         private static bool VerifyCameraBoundsAdaptation(GameObject witch)
@@ -578,17 +585,30 @@ namespace Level2.Editor
 
             // 2) Otorgar llave y abrir -> debe abrirse y entregar recompensa
             inv.AddKey("key_tavern_chest", "Llave de Hierro de la Posada");
-            int scoreBefore = GameManager.Instance != null ? GameManager.Instance.Score : 0;
+            GameManager gm = GameManager.Instance;
+            int scoreBefore = gm != null ? gm.Score : 0;
+            int blindBefore = gm != null ? gm.BlindCharges : 0;
+            int hypnoBefore = gm != null ? gm.HypnotizeCharges : 0;
+            int sleepBefore = gm != null ? gm.SleepCharges : 0;
+            if (gm != null) gm.SleepCharges = 0;
+
             lockedChest.Interact(witch);
             bool openedWithKey = lockedChest.HasBeenOpened;
-            int scoreAfterFirst = GameManager.Instance != null ? GameManager.Instance.Score : scoreBefore + 250;
+            int scoreAfterFirst = gm != null ? gm.Score : scoreBefore + 250;
 
             // 3) Intentar interactuar de nuevo -> no debe duplicar recompensa
             lockedChest.Interact(witch);
-            int scoreAfterSecond = GameManager.Instance != null ? GameManager.Instance.Score : scoreAfterFirst;
+            int scoreAfterSecond = gm != null ? gm.Score : scoreAfterFirst;
             bool noDuplicateReward = scoreAfterSecond == scoreAfterFirst;
 
-            // Resetear estado del cofre para dejar la escena limpia
+            // Resetear estado del cofre y del GameManager para dejar la escena limpia
+            if (gm != null)
+            {
+                gm.Score = scoreBefore;
+                gm.BlindCharges = blindBefore;
+                gm.HypnotizeCharges = hypnoBefore;
+                gm.SleepCharges = sleepBefore;
+            }
             lockedChest.ResetChestState();
             inv.ResetExplorationProgress();
 
@@ -791,6 +811,12 @@ namespace Level2.Editor
             if (InteriorTransitionManager.Instance != null)
             {
                 InteriorTransitionManager.Instance.ApplyCameraBounds(null);
+            }
+            GameObject envRoot = GameObject.Find("Environment");
+            if (envRoot != null)
+            {
+                Transform parallax = envRoot.transform.Find("Parallax");
+                if (parallax != null) parallax.gameObject.SetActive(true);
             }
             if (KeyInventory.Instance != null)
             {

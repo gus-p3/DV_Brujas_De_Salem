@@ -123,6 +123,11 @@ public class PotionProjectile : MonoBehaviour
         CameraFollow.Shake(0.08f, 0.15f);
         hasImpacted = true;
 
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayPotionShatterSound();
+        }
+
         SpawnSplashEffect(impactPoint);
         ApplySplashDamage(impactPoint);
 

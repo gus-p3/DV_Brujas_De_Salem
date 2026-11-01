@@ -77,6 +77,7 @@ public class PotionPickup : MonoBehaviour
             {
                 hud.ShowMessage($"¡Llevas el máximo de pociones de {GetPotionName(potionType)}! ({maxCharges})", 2f);
             }
+            if (AudioManager.Instance != null) AudioManager.Instance.PlayErrorSound();
             return;
         }
 
@@ -94,9 +95,13 @@ public class PotionPickup : MonoBehaviour
                 break;
         }
 
-        if (AudioManager.Instance != null && collectSound != null)
+        SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
+        LootPopupVisualizer.ShowPotionReward(transform.position, potionType, amount, sr != null ? sr.sprite : null);
+
+        if (AudioManager.Instance != null)
         {
-            AudioManager.Instance.PlaySFX(collectSound);
+            if (collectSound != null) AudioManager.Instance.PlaySFX(collectSound);
+            else AudioManager.Instance.PlayPotionPickupSound();
         }
 
         OnCollected?.Invoke(potionType);

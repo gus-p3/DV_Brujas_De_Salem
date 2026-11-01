@@ -191,9 +191,10 @@ public class FrenzyController : MonoBehaviour
             isFrenzyActive = true;
             OnFrenzyStarted?.Invoke();
 
-            if (AudioManager.Instance != null && mobSound != null)
+            if (AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlaySFX(mobSound);
+                if (mobSound != null) AudioManager.Instance.PlaySFX(mobSound);
+                else if (Application.isPlaying) AudioManager.Instance.PlayFrenzyAlarmSound();
             }
 
             HUDController hud = UnityEngine.Object.FindFirstObjectByType<HUDController>();

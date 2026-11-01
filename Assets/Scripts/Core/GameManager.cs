@@ -12,7 +12,19 @@ public enum GameState
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance { get; private set; }
+    private static GameManager _instance;
+    public static GameManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = UnityEngine.Object.FindFirstObjectByType<GameManager>();
+            }
+            return _instance;
+        }
+        private set => _instance = value;
+    }
 
     public GameState CurrentState { get; private set; }
     public event Action<GameState> OnStateChanged;
@@ -45,15 +57,23 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
+        if (_instance == null || _instance == this)
         {
-            Instance = this;
+            _instance = this;
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this)
+        {
+            _instance = null;
         }
     }
 
@@ -219,6 +239,12 @@ public class GameManager : MonoBehaviour
                 else if (sleep > 0) inv.SelectPotion(PotionType.Sleep);
             }
         }
+
+        HUDController hud = UnityEngine.Object.FindFirstObjectByType<HUDController>();
+        if (hud != null)
+        {
+            hud.UpdateStatsUI();
+        }
     }
 
     public bool TryConsumeSpell(int spellType)
@@ -229,7 +255,15 @@ public class GameManager : MonoBehaviour
         else if (spellType == 1 && HypnotizeCharges > 0) { HypnotizeCharges--; success = true; }
         else if (spellType == 2 && SleepCharges > 0) { SleepCharges--; success = true; }
 
-        if (success) OnStatsUpdated?.Invoke();
+        if (success)
+        {
+            OnStatsUpdated?.Invoke();
+            HUDController hud = UnityEngine.Object.FindFirstObjectByType<HUDController>();
+            if (hud != null)
+            {
+                hud.UpdateStatsUI();
+            }
+        }
         return success;
     }
 

@@ -248,8 +248,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30f17dd0b66a9d541bd144369b6d1c9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VillagerSpriteAnimator
-  animations: {fileID: 11400000, guid: 8c342aa5edf4aef4a9a7b35d13fa01e9, type: 2}
-  tempoJitter: 0.08
-  actionInterval: {x: 5, y: 11}
-  breathAmount: 0.012
-  breathPeriod: 2.8
+  animationSet: {fileID: 11400000, guid: 8c342aa5edf4aef4a9a7b35d13fa01e9, type: 2}
+  idleFps: 6.5
+  walkFps: 14.5
+  runFps: 20
+  statusFps: 8.5
+  enableProceduralFluidity: 1
+  walkBounceHeight: 0.042
+  runBounceHeight: 0.082
+  walkLeanDegrees: 3.5
+  runLeanDegrees: 8

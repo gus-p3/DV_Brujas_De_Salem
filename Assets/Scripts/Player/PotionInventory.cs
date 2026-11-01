@@ -108,8 +108,14 @@ public class PotionInventory : MonoBehaviour
 
     public void SelectPotion(PotionType type)
     {
+        bool changed = selectedPotion != type;
         selectedPotion = type;
         OnPotionSelected?.Invoke(selectedPotion);
+
+        if (changed && Application.isPlaying && AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayPotionSelectSound();
+        }
 
         HUDController hud = UnityEngine.Object.FindFirstObjectByType<HUDController>();
         if (hud != null)
@@ -197,9 +203,10 @@ public class PotionInventory : MonoBehaviour
             else if (GameManager.Instance.SleepCharges > 0) SelectPotion(PotionType.Sleep);
         }
 
-        if (AudioManager.Instance != null && throwSound != null)
+        if (AudioManager.Instance != null)
         {
-            AudioManager.Instance.PlaySFX(throwSound);
+            if (throwSound != null) AudioManager.Instance.PlaySFX(throwSound);
+            else AudioManager.Instance.PlayPotionThrowSound();
         }
     }
 
@@ -274,9 +281,10 @@ public class PotionInventory : MonoBehaviour
 
     private void PlayErrorSound()
     {
-        if (AudioManager.Instance != null && emptyChargesSound != null)
+        if (AudioManager.Instance != null)
         {
-            AudioManager.Instance.PlaySFX(emptyChargesSound);
+            if (emptyChargesSound != null) AudioManager.Instance.PlaySFX(emptyChargesSound);
+            else AudioManager.Instance.PlayErrorSound();
         }
     }
 }

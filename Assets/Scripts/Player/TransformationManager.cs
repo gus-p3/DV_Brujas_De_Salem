@@ -173,7 +173,7 @@ public class TransformationManager : MonoBehaviour
         if (cooldownTimer > 0f) cooldownTimer -= Time.deltaTime;
         UpdateCatEnergy(Time.deltaTime);
 
-        if (Input.GetKeyDown(KeyCode.T) && cooldownTimer <= 0f)
+        if ((Input.GetKeyDown(KeyCode.T) || Input.GetKeyDown(KeyCode.C)) && cooldownTimer <= 0f)
         {
             if (IsCatForm) TryTransformToHuman();
             else TransformToCat();

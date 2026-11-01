@@ -1,57 +1,69 @@
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 namespace Level2
 {
+    public enum ChestRewardType
+    {
+        Ingredient = 0,
+        PotionBlind = 1,
+        PotionHypnotize = 2,
+        PotionSleep = 3,
+        Heart = 4,
+        Key = 5,
+        ScoreBonus = 6
+    }
+
     /// <summary>
-    /// Cofre interactivo del siglo XVII para interiores, balcones, sótanos y áticos del Nivel 2.
-    /// - Puede abrirse directamente o requerir una llave específica (KeyInventory).
-    /// - Entrega recompensas reales integradas con GameManager (pociones, corazones, puntos)
-    ///   e IngredientInventory.
-    /// - Registra su apertura en KeyInventory para impedir recompensas duplicadas o infinitas.
+    /// Cofre interactivo situado en el interior de las casas coloniales del Nivel 2.
+    /// Soporta cofres abiertos directamente con E/Q y cofres cerrados que exigen una llave específica
+    /// de KeyInventory. Otorga recompensas (ingredientes, pociones, corazones, llaves o puntos)
+    /// y dispara la animación de recompensa visual (LootPopupVisualizer).
     /// </summary>
     [RequireComponent(typeof(BoxCollider2D))]
     public class TreasureChest : MonoBehaviour, IInteractable
     {
         [Header("Identificación y Bloqueo")]
         [SerializeField] private string chestId = "chest_default";
-        [SerializeField] private string chestTitle = "Cofre de Roble";
+        [SerializeField] private string chestDisplayName = "Cofre Colonial";
         [SerializeField] private bool requiresKey = false;
         [SerializeField] private string requiredKeyId = "";
-        [SerializeField] private string requiredKeyName = "Llave Antigua";
+        [SerializeField] private string requiredKeyDisplayName = "Llave del Cofre";
 
-        [Header("Recompensas Reales")]
-        [SerializeField] private int scoreReward = 250;
-        [SerializeField] private bool grantPotion = true;
-        [SerializeField] private PotionType potionRewardType = PotionType.Blind;
-        [SerializeField] private int potionRewardCount = 1;
-        [SerializeField] private bool grantHeart = false;
-        [SerializeField] private string grantKeyId = "";
-        [SerializeField] private string grantKeyDisplayName = "";
+        [Header("Recompensa Principal")]
+        [SerializeField] private ChestRewardType primaryReward = ChestRewardType.PotionSleep;
+        [SerializeField] private IngredientType ingredientReward = IngredientType.Mushroom;
+        [SerializeField] private string ingredientUniqueId = "ing_chest_bonus";
+        [SerializeField] private string rewardKeyId = "";
+        [SerializeField] private string rewardKeyDisplayName = "";
+        [SerializeField] private int rewardAmount = 1;
+        [SerializeField] private int bonusScore = 200;
 
         [Header("Visuales")]
-        [SerializeField] private SpriteRenderer spriteRenderer;
+        [SerializeField] private SpriteRenderer chestRenderer;
         [SerializeField] private Sprite closedSprite;
         [SerializeField] private Sprite openSprite;
 
-        private bool isOpened;
+        private bool isOpened = false;
 
         public string InteractionId => chestId;
-        public int Priority => 18;
+        public int Priority => 25;
         public bool UsesInteractKey => true;
         public Transform Transform => transform;
-        public float PromptHeightOffset => 1.05f;
+        public float PromptHeightOffset => 1.15f;
 
         public string ChestId => chestId;
-        public bool IsOpened => isOpened || (KeyInventory.Instance != null && KeyInventory.Instance.IsChestOpened(chestId));
+        public bool IsOpened => isOpened;
         public bool RequiresKey => requiresKey;
         public string RequiredKeyId => requiredKeyId;
+
+        public event Action<TreasureChest> OnChestOpened;
 
         private void Awake()
         {
             BoxCollider2D col = GetComponent<BoxCollider2D>();
             if (col != null) col.isTrigger = true;
-            if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
+            if (chestRenderer == null) chestRenderer = GetComponent<SpriteRenderer>();
         }
 
         private void Start()
@@ -60,89 +72,132 @@ namespace Level2
             {
                 isOpened = true;
             }
-            UpdateVisual();
+            UpdateVisuals();
         }
 
         public void Configure(
             string id,
-            string title,
+            string displayName,
+            Sprite closed,
+            Sprite open,
+            bool locked = false,
+            string keyId = "",
+            string keyName = "")
+        {
+            chestId = id;
+            chestDisplayName = displayName;
+            closedSprite = closed;
+            openSprite = open;
+            requiresKey = locked;
+            requiredKeyId = keyId;
+            requiredKeyDisplayName = keyName;
+
+            if (chestRenderer == null) chestRenderer = GetComponent<SpriteRenderer>();
+            UpdateVisuals();
+        }
+
+        public void Configure(
+            string id,
+            string displayName,
             int score,
             bool givePotion,
             PotionType potionType,
             bool giveHeart,
             Sprite closed,
             Sprite open,
-            bool needsKey = false,
+            bool locked = false,
             string keyId = "",
             string keyName = "")
         {
-            chestId = id;
-            chestTitle = title;
-            scoreReward = score;
-            grantPotion = givePotion;
-            potionRewardType = potionType;
-            potionRewardCount = 1;
-            grantHeart = giveHeart;
-            closedSprite = closed;
-            openSprite = open;
-            requiresKey = needsKey;
-            requiredKeyId = keyId;
-            requiredKeyName = keyName;
+            Configure(id, displayName, closed, open, locked, keyId, keyName);
+            bonusScore = score;
+            if (givePotion)
+            {
+                primaryReward = potionType switch
+                {
+                    PotionType.Blind => ChestRewardType.PotionBlind,
+                    PotionType.Hypnotize => ChestRewardType.PotionHypnotize,
+                    _ => ChestRewardType.PotionSleep
+                };
+            }
+            else if (giveHeart)
+            {
+                primaryReward = ChestRewardType.Heart;
+            }
+            else
+            {
+                primaryReward = ChestRewardType.ScoreBonus;
+            }
+        }
 
-            if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
-            UpdateVisual();
+        public void ConfigureReward(
+            ChestRewardType type,
+            int amount = 1,
+            int score = 200,
+            IngredientType ingType = IngredientType.Mushroom,
+            string ingId = "ing_chest_01",
+            string grantedKeyId = "",
+            string grantedKeyName = "")
+        {
+            primaryReward = type;
+            rewardAmount = Mathf.Max(1, amount);
+            bonusScore = score;
+            ingredientReward = ingType;
+            ingredientUniqueId = ingId;
+            rewardKeyId = grantedKeyId;
+            rewardKeyDisplayName = grantedKeyName;
         }
 
         public bool CanInteract(GameObject interactor)
         {
-            if (interactor == null) return false;
-            return !IsOpened;
+            if (isOpened || interactor == null) return false;
+            return true;
         }
 
         public string GetPromptText(GameObject interactor)
         {
-            if (IsOpened) return string.Empty;
+            if (isOpened) return "";
 
             if (requiresKey)
             {
-                bool hasKey = KeyInventory.Instance != null && KeyInventory.Instance.HasKey(requiredKeyId);
-                if (hasKey)
+                if (!string.IsNullOrEmpty(requiredKeyId) && KeyInventory.Instance != null && KeyInventory.Instance.HasKey(requiredKeyId))
                 {
-                    return $"Q: Abrir {chestTitle} (Usar {requiredKeyName})";
+                    return $"Q: Abrir {chestDisplayName} ({requiredKeyDisplayName})";
                 }
-                return $"Q: {chestTitle} (Requiere {requiredKeyName})";
+                return $"Q: {chestDisplayName} cerrado (Requiere {requiredKeyDisplayName})";
             }
 
-            return $"Q: Abrir {chestTitle}";
+            return $"Q: Abrir {chestDisplayName}";
         }
 
         public void Interact(GameObject interactor)
         {
-            if (IsOpened) return;
+            if (isOpened || interactor == null) return;
 
-            TransformationManager tm = interactor != null ? interactor.GetComponent<TransformationManager>() : null;
+            TransformationManager tm = interactor.GetComponent<TransformationManager>();
             if (tm != null && tm.IsCatForm)
             {
-                ShowBanner("Necesitas forma humana para abrir cofres");
+                Level2CatPickupGuard.NotifyCatBlocked(forceShow: true);
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayErrorSound();
                 return;
             }
 
             if (requiresKey)
             {
-                bool hasKey = KeyInventory.Instance != null && KeyInventory.Instance.HasKey(requiredKeyId);
-                if (!hasKey)
+                if (string.IsNullOrEmpty(requiredKeyId) || KeyInventory.Instance == null || !KeyInventory.Instance.HasKey(requiredKeyId))
                 {
-                    ShowBanner($"Cofre cerrado con llave. Necesitas: {requiredKeyName}");
+                    ShowMessage($"Cerrado con llave. Necesitas: {requiredKeyDisplayName}");
+                    if (AudioManager.Instance != null) AudioManager.Instance.PlayLockedSound();
                     return;
                 }
             }
 
-            OpenAndGrantRewards();
+            OpenChest();
         }
 
-        private void OpenAndGrantRewards()
+        public void OpenChest()
         {
-            if (IsOpened) return;
+            if (isOpened) return;
             isOpened = true;
 
             if (KeyInventory.Instance != null)
@@ -150,71 +205,98 @@ namespace Level2
                 KeyInventory.Instance.MarkChestOpened(chestId);
             }
 
-            UpdateVisual();
+            UpdateVisuals();
+            string rewardDescription = GrantReward();
 
-            List<string> rewardDescriptions = new List<string>();
-
-            if (GameManager.Instance != null)
+            if (GameManager.Instance != null && bonusScore > 0)
             {
-                if (scoreReward > 0)
-                {
-                    GameManager.Instance.AddScore(scoreReward);
-                    rewardDescriptions.Add($"+{scoreReward} pts");
-                }
-
-                if (grantPotion && potionRewardCount > 0)
-                {
-                    int b = potionRewardType == PotionType.Blind ? potionRewardCount : 0;
-                    int h = potionRewardType == PotionType.Hypnotize ? potionRewardCount : 0;
-                    int s = potionRewardType == PotionType.Sleep ? potionRewardCount : 0;
-                    GameManager.Instance.AddSpellCharges(b, h, s);
-                    string pName = potionRewardType switch
-                    {
-                        PotionType.Blind => "Poción de Ceguera",
-                        PotionType.Hypnotize => "Poción de Hipnosis",
-                        PotionType.Sleep => "Poción de Sueño",
-                        _ => "Poción"
-                    };
-                    rewardDescriptions.Add($"+{potionRewardCount} {pName}");
-                }
-
-                if (grantHeart)
-                {
-                    GameManager.Instance.GainHeart(1);
-                    rewardDescriptions.Add("+1 Corazón");
-                }
+                GameManager.Instance.AddScore(bonusScore);
             }
 
-            if (!string.IsNullOrEmpty(grantKeyId) && KeyInventory.Instance != null)
+            if (AudioManager.Instance != null)
             {
-                KeyInventory.Instance.AddKey(grantKeyId, grantKeyDisplayName);
-                rewardDescriptions.Add(grantKeyDisplayName);
+                AudioManager.Instance.PlayChestOpenSound();
             }
 
-            string summary = rewardDescriptions.Count > 0
-                ? $"¡{chestTitle} abierto! ({string.Join(", ", rewardDescriptions)})"
-                : $"¡{chestTitle} abierto!";
-
-            ShowBanner(summary);
+            ShowMessage($"¡{chestDisplayName} abierto! Obtenido: {rewardDescription}");
+            OnChestOpened?.Invoke(this);
         }
 
-        private void UpdateVisual()
+        private string GrantReward()
         {
-            if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
-            if (spriteRenderer == null) return;
-            spriteRenderer.sprite = IsOpened && openSprite != null ? openSprite : closedSprite;
+            switch (primaryReward)
+            {
+                case ChestRewardType.Ingredient:
+                    if (IngredientInventory.Instance != null)
+                    {
+                        IngredientInventory.Instance.Collect(ingredientReward, ingredientUniqueId);
+                    }
+                    LootPopupVisualizer.ShowIngredientReward(transform.position, ingredientReward, 1);
+                    return $"Ingrediente ({GetIngredientName(ingredientReward)})";
+
+                case ChestRewardType.PotionBlind:
+                    if (GameManager.Instance != null) GameManager.Instance.AddSpellCharges(rewardAmount, 0, 0);
+                    LootPopupVisualizer.ShowPotionReward(transform.position, PotionType.Blind, rewardAmount);
+                    return $"+{rewardAmount} Poción de Ceguera";
+
+                case ChestRewardType.PotionHypnotize:
+                    if (GameManager.Instance != null) GameManager.Instance.AddSpellCharges(0, rewardAmount, 0);
+                    LootPopupVisualizer.ShowPotionReward(transform.position, PotionType.Hypnotize, rewardAmount);
+                    return $"+{rewardAmount} Poción de Hipnosis";
+
+                case ChestRewardType.PotionSleep:
+                    if (GameManager.Instance != null) GameManager.Instance.AddSpellCharges(0, 0, rewardAmount);
+                    LootPopupVisualizer.ShowPotionReward(transform.position, PotionType.Sleep, rewardAmount);
+                    return $"+{rewardAmount} Poción de Sueño";
+
+                case ChestRewardType.Heart:
+                    if (GameManager.Instance != null) GameManager.Instance.GainHeart(rewardAmount);
+                    LootPopupVisualizer.ShowHeartReward(transform.position, rewardAmount);
+                    return $"+{rewardAmount} Corazón de Vida";
+
+                case ChestRewardType.Key:
+                    if (!string.IsNullOrEmpty(rewardKeyId) && KeyInventory.Instance != null)
+                    {
+                        KeyInventory.Instance.AddKey(rewardKeyId, rewardKeyDisplayName);
+                    }
+                    LootPopupVisualizer.ShowKeyReward(transform.position, rewardKeyDisplayName);
+                    return rewardKeyDisplayName;
+
+                default:
+                    return $"+{bonusScore} Puntos de Tesoro";
+            }
         }
 
-        private static void ShowBanner(string msg)
+        private string GetIngredientName(IngredientType type) => type switch
+        {
+            IngredientType.Mushroom => "Hongo Místico",
+            IngredientType.Spider => "Araña de Cripta",
+            IngredientType.WitheredFlower => "Flor Marchita",
+            IngredientType.Root => "Raíz Antigua",
+            _ => "Ingrediente"
+        };
+
+        private void UpdateVisuals()
+        {
+            if (chestRenderer == null) chestRenderer = GetComponent<SpriteRenderer>();
+            if (chestRenderer == null) return;
+
+            if (isOpened && openSprite != null)
+            {
+                chestRenderer.sprite = openSprite;
+            }
+            else if (!isOpened && closedSprite != null)
+            {
+                chestRenderer.sprite = closedSprite;
+            }
+        }
+
+        private void ShowMessage(string message)
         {
             HUDController hud = UnityEngine.Object.FindFirstObjectByType<HUDController>();
             if (hud != null)
             {
-                hud.ShowMessage(msg, 2.2f);
-            }
-            if (AudioManager.Instance != null)
-            {
-                AudioManager.Instance.PlayButtonClickSound();
+                hud.ShowMessage(message, 2.8f);
             }
         }
     }

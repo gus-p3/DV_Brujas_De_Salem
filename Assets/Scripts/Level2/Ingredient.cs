@@ -155,7 +155,7 @@ namespace Level2
             // Audio sutil de rechazo / aviso
             if (AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlayButtonClickSound();
+                AudioManager.Instance.PlayErrorSound();
             }
         }
 
@@ -175,6 +175,10 @@ namespace Level2
                 GameManager.Instance.AddScore(scoreValue);
             }
 
+            // Animación visual emergente de recompensa (icono real + etiqueta + tarjeta HUD)
+            SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
+            LootPopupVisualizer.ShowIngredientReward(transform.position, ingredientType, 1, sr != null ? sr.sprite : null);
+
             // Efecto de sonido
             if (AudioManager.Instance != null)
             {
@@ -184,7 +188,7 @@ namespace Level2
                 }
                 else
                 {
-                    AudioManager.Instance.PlayButtonClickSound();
+                    AudioManager.Instance.PlayIngredientPickupSound();
                 }
             }
 

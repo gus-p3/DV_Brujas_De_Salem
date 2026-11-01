@@ -126,7 +126,7 @@ namespace Level2
 
             if (catOnly && owningInterior == null)
             {
-                return "Q: Entrar por la gatera (forma de gato)";
+                return $"Q: {actionLabel}";
             }
 
             if (requiresAllIngredients && (IngredientInventory.Instance == null || !IngredientInventory.Instance.AreAllRequiredCollected))
@@ -161,18 +161,14 @@ namespace Level2
             if (tm != null && tm.IsCatForm && owningInterior == null && (isLocked || permanentlyBarred || requiresAllIngredients))
             {
                 ShowFeedback("Necesitas forma humana para abrir esta puerta");
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayErrorSound();
                 return;
             }
 
             if (permanentlyBarred)
             {
                 ShowFeedback(barredMessage);
-                return;
-            }
-
-            if (catOnly && owningInterior == null && (tm == null || !tm.IsCatForm))
-            {
-                ShowFeedback(CatFlapMessage);
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayLockedSound();
                 return;
             }
 
@@ -181,6 +177,7 @@ namespace Level2
                 int current = IngredientInventory.Instance != null ? IngredientInventory.Instance.TotalCollected : 0;
                 int req = IngredientInventory.Instance != null ? IngredientInventory.Instance.TotalRequired : 8;
                 ShowFeedback($"Sello arcano activo ({current}/{req}). Revisa los cofres de las casas y de la calle.");
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayLockedSound();
                 return;
             }
 
@@ -194,6 +191,7 @@ namespace Level2
                 else
                 {
                     ShowFeedback($"Cerrada con llave. Necesitas: {requiredKeyDisplayName}");
+                    if (AudioManager.Instance != null) AudioManager.Instance.PlayLockedSound();
                     return;
                 }
             }
@@ -201,10 +199,16 @@ namespace Level2
             if (targetDoor == null)
             {
                 ShowFeedback("La puerta no conduce a ningún sitio accesible.");
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayLockedSound();
                 return;
             }
 
             lastGlobalDoorUseTime = Time.unscaledTime;
+
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayDoorOpenSound();
+            }
 
             // Abrir visualmente ambas puertas conectadas
             SetOpenVisual(true);

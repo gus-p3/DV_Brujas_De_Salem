@@ -220,7 +220,7 @@ public class HUDController : MonoBehaviour
         }
     }
 
-    private void UpdateStatsUI()
+    public void UpdateStatsUI()
     {
         if (GameManager.Instance == null) return;
         if (scoreText != null) scoreText.text = GameManager.Instance.Score.ToString("D4");

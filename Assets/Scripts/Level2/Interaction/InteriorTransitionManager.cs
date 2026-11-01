@@ -186,6 +186,17 @@ namespace Level2
                 climber.StopClimbing(restoreVelocityZero: true);
             }
 
+            // Si entra a un interior en forma de gato (ej. por la gatera de la Casa 3),
+            // devolver automáticamente a forma humana para que pueda subir escaleras y abrir cofres.
+            if (destination != null && destination.OwningInterior != null)
+            {
+                TransformationManager tm = player.GetComponent<TransformationManager>();
+                if (tm != null && tm.IsCatForm)
+                {
+                    tm.ResetToHumanForm();
+                }
+            }
+
             PlayerController pc = player.GetComponent<PlayerController>();
             if (pc != null)
             {

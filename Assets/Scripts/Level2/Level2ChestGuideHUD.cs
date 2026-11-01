@@ -6,11 +6,11 @@ using UnityEngine.UI;
 namespace Level2
 {
     /// <summary>
-    /// Guía discreta del HUD propio del Nivel 2 que recuerda que los objetos están dentro de los cofres.
-    /// - Bajo la guía de controles muestra "Ingredientes: búscalos en los cofres (Q para abrir)" y "Cofres abiertos: X/Y".
-    /// - Tras abrir el primer cofre la guía se atenúa para no estorbar (el contador sigue legible).
-    /// - Si la bruja pulsa Q junto a un cofre ya vaciado, avisa "Este cofre ya está vacío" (el cofre deja de ser
-    ///   interactuable al vaciarse, así que el aviso vive aquí y no cambia Level2Chest).
+    /// Guía del HUD propio del Nivel 2 que recuerda que los objetos están dentro de los cofres
+    /// y muestra en tiempo real tanto los cofres abiertos como el estado de las llaves recolectadas.
+    /// - Bajo la guía de controles muestra "Ingredientes: búscalos en los cofres (Q para abrir)",
+    ///   "Cofres abiertos: X/Y" y "Llaves: Posada [✓/✗] | Mansión [✓/✗]".
+    /// - Si la bruja pulsa Q junto a un cofre ya vaciado, avisa "Este cofre ya está vacío".
     /// Vive en IngredientHUD_Canvas; no toca HUDController ni el HUD principal.
     /// </summary>
     public class Level2ChestGuideHUD : MonoBehaviour
@@ -18,13 +18,14 @@ namespace Level2
         public const string GuideText = "Ingredientes: búscalos en los cofres (Q para abrir)";
         public const string EmptyChestMessage = "Este cofre ya está vacío";
 
-        [SerializeField] private float dimmedAlpha = 0.55f;
+        [SerializeField] private float dimmedAlpha = 0.72f;
         [SerializeField] private float emptyChestRadius = 1.3f;
         [SerializeField] private float emptyChestCooldown = 1.5f;
 
         private Level2Chest[] chests = new Level2Chest[0];
         private CanvasGroup panelGroup;
         private TextMeshProUGUI counterText;
+        private TextMeshProUGUI keysText;
         private Transform player;
         private PlayerInteractor interactor;
         private float lastEmptyNotice = -10f;
@@ -39,6 +40,7 @@ namespace Level2
             chests = Object.FindObjectsByType<Level2Chest>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             foreach (Level2Chest chest in chests) chest.OnOpened += HandleChestOpened;
             if (IngredientInventory.Instance != null) IngredientInventory.Instance.OnInventoryReset += Refresh;
+            if (KeyInventory.Instance != null) KeyInventory.Instance.OnKeyCollected += HandleKeyCollected;
             // Los cofres recuperan su estado persistido en su propio Start: se cuenta un frame después
             StartCoroutine(RefreshNextFrame());
         }
@@ -50,6 +52,7 @@ namespace Level2
                 if (chest != null) chest.OnOpened -= HandleChestOpened;
             }
             if (IngredientInventory.Instance != null) IngredientInventory.Instance.OnInventoryReset -= Refresh;
+            if (KeyInventory.Instance != null) KeyInventory.Instance.OnKeyCollected -= HandleKeyCollected;
         }
 
         private IEnumerator RefreshNextFrame()
@@ -59,6 +62,7 @@ namespace Level2
         }
 
         private void HandleChestOpened(Level2Chest chest) => Refresh();
+        private void HandleKeyCollected(string keyId) => Refresh();
 
         public void Refresh()
         {
@@ -69,6 +73,18 @@ namespace Level2
             }
             OpenedCount = opened;
             if (counterText != null) counterText.text = $"Cofres abiertos: {opened}/{chests.Length}";
+
+            if (keysText != null)
+            {
+                bool hasTavern = KeyInventory.Instance != null && KeyInventory.Instance.HasKey("key_tavern_chest");
+                bool hasManor = KeyInventory.Instance != null && KeyInventory.Instance.HasKey("key_manor_master");
+                string tColor = hasTavern ? "#FFD94A" : "#8E8578";
+                string mColor = hasManor ? "#FFD94A" : "#8E8578";
+                string tMark = hasTavern ? "OBTENIDA" : "Sótano Posada";
+                string mMark = hasManor ? "OBTENIDA" : "Cripta Mansión";
+                keysText.text = $"Llaves de cofre: <color={tColor}>Posada [{tMark}]</color>  |  <color={mColor}>Mansión [{mMark}]</color>";
+            }
+
             if (panelGroup != null) panelGroup.alpha = opened > 0 ? dimmedAlpha : 1f;
         }
 
@@ -97,6 +113,7 @@ namespace Level2
                 if (Vector2.Distance(chest.transform.position, player.position) > emptyChestRadius) continue;
                 lastEmptyNotice = Time.unscaledTime;
                 ShowMessage(EmptyChestMessage);
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayErrorSound();
                 return true;
             }
             return false;
@@ -118,11 +135,11 @@ namespace Level2
             RectTransform rt = (RectTransform)panel.transform;
             rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(1f, 1f);
             rt.anchoredPosition = new Vector2(-25f, -106f);
-            rt.sizeDelta = new Vector2(420f, 48f);
+            rt.sizeDelta = new Vector2(436f, 68f);
 
             Image bg = panel.GetComponent<Image>();
             if (bg == null) bg = panel.AddComponent<Image>();
-            bg.color = new Color(0.10f, 0.07f, 0.05f, 0.82f);
+            bg.color = new Color(0.10f, 0.07f, 0.05f, 0.86f);
             bg.raycastTarget = false;
 
             panelGroup = panel.GetComponent<CanvasGroup>();
@@ -130,11 +147,12 @@ namespace Level2
             panelGroup.interactable = false;
             panelGroup.blocksRaycasts = false;
 
-            MakeLine(panel.transform, "GuideText", GuideText, 0.5f, 1f);
-            counterText = MakeLine(panel.transform, "CounterText", "Cofres abiertos: 0/0", 0f, 0.5f);
+            MakeLine(panel.transform, "GuideText", GuideText, 0.66f, 1f, 13.5f);
+            counterText = MakeLine(panel.transform, "CounterText", "Cofres abiertos: 0/0", 0.33f, 0.66f, 14f);
+            keysText = MakeLine(panel.transform, "KeysText", "Llaves: Posada [Pendiente]  |  Mansión [Pendiente]", 0f, 0.33f, 13f);
         }
 
-        private static TextMeshProUGUI MakeLine(Transform parent, string name, string text, float yMin, float yMax)
+        private static TextMeshProUGUI MakeLine(Transform parent, string name, string text, float yMin, float yMax, float fontSize)
         {
             Transform tr = parent.Find(name);
             GameObject go = tr != null ? tr.gameObject : new GameObject(name, typeof(RectTransform));
@@ -148,7 +166,7 @@ namespace Level2
             TextMeshProUGUI tmp = go.GetComponent<TextMeshProUGUI>();
             if (tmp == null) tmp = go.AddComponent<TextMeshProUGUI>();
             tmp.text = text;
-            tmp.fontSize = 14f;
+            tmp.fontSize = fontSize;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.color = new Color(0.98f, 0.90f, 0.68f, 0.95f);
             tmp.raycastTarget = false;

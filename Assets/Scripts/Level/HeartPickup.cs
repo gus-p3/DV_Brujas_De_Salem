@@ -74,6 +74,9 @@ public class HeartPickup : MonoBehaviour
         // Suma 0 puntos como especifica la regla A8
         GameManager.Instance.AddScore(0);
 
+        SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
+        LootPopupVisualizer.ShowHeartReward(transform.position, 1, sr != null ? sr.sprite : null);
+
         // Disparar tip de tutorial la primera vez (Requisito C8)
         if (TutorialManager.Instance != null && !TutorialManager.Instance.HasSeen("tip_corazon_recogido"))
         {

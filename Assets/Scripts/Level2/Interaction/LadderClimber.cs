@@ -209,6 +209,10 @@ namespace Level2
             }
 
             rb.linearVelocity = new Vector2(targetVx, targetVy);
+            if (Mathf.Abs(targetVy) > 0.5f && Application.isPlaying && AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayLadderStepSound();
+            }
         }
 
         private void ReadClimbInputs(out float horiz, out float vert, out bool jumpPressed)

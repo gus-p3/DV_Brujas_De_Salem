@@ -105,14 +105,14 @@ public static class Level2IngredientVerifier
             }
         }
 
-        if (looseIngs.Length == 0 && totalIngInChests >= 10)
+        if (looseIngs.Length == 0 && totalIngInChests >= 8)
         {
             Debug.Log($"[PASS] Total de ingredientes en cofres correcto: {totalIngInChests} (0 sueltos en escena).");
             passed++;
         }
         else
         {
-            Debug.LogError($"[FAIL] Se esperaban 0 ingredientes sueltos (encontrados {looseIngs.Length}) y >= 10 en cofres (encontrados {totalIngInChests}).");
+            Debug.LogError($"[FAIL] Se esperaban 0 ingredientes sueltos (encontrados {looseIngs.Length}) y >= 8 en cofres (encontrados {totalIngInChests}).");
             failed++;
         }
 

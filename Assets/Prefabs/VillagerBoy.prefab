@@ -56,6 +56,10 @@ PrefabInstance:
       propertyPath: animations
       value: 
       objectReference: {fileID: 11400000, guid: 1f36f8e9de81577499da511b80e45835, type: 2}
+    - target: {fileID: 3995122170193234864, guid: c5aef00c90c0bee45823058cc4bd1751, type: 3}
+      propertyPath: animationSet
+      value: 
+      objectReference: {fileID: 11400000, guid: 1f36f8e9de81577499da511b80e45835, type: 2}
     - target: {fileID: 4739339873456388969, guid: c5aef00c90c0bee45823058cc4bd1751, type: 3}
       propertyPath: m_Sprite
       value: 

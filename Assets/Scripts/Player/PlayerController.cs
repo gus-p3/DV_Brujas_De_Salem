@@ -122,6 +122,7 @@ public class PlayerController : MonoBehaviour, IDetectable
 
     private bool isFlying;
     private float flightEnergy = 1f;
+    private float flightStartTime = -10f;
 
     // Entrada programática
     private bool scriptedJumpHeld;
@@ -138,21 +139,25 @@ public class PlayerController : MonoBehaviour, IDetectable
     /// <summary>Dirección horizontal unitaria hacia donde mira la bruja (+1 o -1).</summary>
     public int FacingDirection => facingRight ? 1 : -1;
 
-    /// <summary>Permite volar. Se habilita al reunir las 3 partes de la escoba.</summary>
+    /// <summary>Permite volar. Se habilita si canFly está activo en la escena (Nivel 2) o al reunir las 3 partes de la escoba (Nivel 1).</summary>
     public bool CanFly
     {
         get
         {
+            if (canFly)
+            {
+                return true;
+            }
             if (BroomInventory.Instance != null)
             {
                 return BroomInventory.Instance.IsComplete;
             }
-            return canFly;
+            return false;
         }
         set
         {
             canFly = value;
-            if (!canFly && isFlying)
+            if (!CanFly && isFlying)
             {
                 StopFlight();
             }
@@ -238,7 +243,7 @@ public class PlayerController : MonoBehaviour, IDetectable
         ReadInput();
 
         // Si se revoca CanFly desde el Inspector mientras vuela, se cancela el vuelo
-        if (!canFly && isFlying)
+        if (!CanFly && isFlying)
         {
             StopFlight();
         }
@@ -334,7 +339,7 @@ public class PlayerController : MonoBehaviour, IDetectable
         }
         else
         {
-            bool hasBroomMaterials = BroomInventory.Instance != null ? BroomInventory.Instance.IsComplete : canFly;
+            bool hasBroomMaterials = CanFly;
             if (!hasBroomMaterials)
             {
                 HUDController hud = UnityEngine.Object.FindFirstObjectByType<HUDController>();
@@ -343,6 +348,17 @@ public class PlayerController : MonoBehaviour, IDetectable
                     hud.ShowMessage("Aún te falta material para la escoba", 2.0f);
                 }
                 return;
+            }
+
+            // Si está en forma de gato al pulsar F, intentar volver a forma humana automáticamente
+            TransformationManager tm = GetComponent<TransformationManager>();
+            if (tm != null && tm.IsCatForm)
+            {
+                tm.TryTransformToHuman();
+                if (tm.IsCatForm)
+                {
+                    return;
+                }
             }
 
             if (flightEnergy >= minEnergyToStartFlight)
@@ -356,11 +372,20 @@ public class PlayerController : MonoBehaviour, IDetectable
 
     private void CheckGround()
     {
+        bool wasGrounded = isGrounded;
         GetGroundCheckBox(out Vector2 center, out Vector2 size);
         bool overlapping = Physics2D.OverlapBox(center, size, 0f, groundMask) != null;
 
         // Si va subiendo rápido no cuenta como suelo: evita volver a saltar en pleno impulso
         isGrounded = overlapping && rb.linearVelocity.y <= groundedMaxUpwardSpeed;
+
+        if (!wasGrounded && isGrounded && rb.linearVelocity.y <= -2.0f && Application.isPlaying)
+        {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayLandSound();
+            }
+        }
     }
 
     private void GetGroundCheckBox(out Vector2 center, out Vector2 size)
@@ -392,6 +417,13 @@ public class PlayerController : MonoBehaviour, IDetectable
         Vector2 velocity = rb.linearVelocity;
         velocity.x = Mathf.MoveTowards(velocity.x, targetSpeed, rate * Time.fixedDeltaTime);
         rb.linearVelocity = velocity;
+
+        if (isGrounded && Mathf.Abs(velocity.x) > 1.2f && Application.isPlaying && AudioManager.Instance != null)
+        {
+            TransformationManager tm = GetComponent<TransformationManager>();
+            bool isCat = tm != null && tm.IsCatForm;
+            AudioManager.Instance.PlayFootstepSound(isCat);
+        }
     }
 
     private void HandleJump()
@@ -449,10 +481,16 @@ public class PlayerController : MonoBehaviour, IDetectable
     {
         isFlying = true;
         isJumping = false;
+        flightStartTime = Time.time;
         rb.gravityScale = 0f;
         Vector2 velocity = rb.linearVelocity;
-        velocity.y = 0f;
+        // Impulso inicial suave hacia arriba si despega desde el suelo para despegar de inmediato
+        velocity.y = isGrounded ? Mathf.Max(velocity.y, 2.2f) : 0f;
         rb.linearVelocity = velocity;
+        if (Application.isPlaying && AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayBroomFlySound();
+        }
         OnFlightChanged?.Invoke(true);
     }
 
@@ -509,15 +547,24 @@ public class PlayerController : MonoBehaviour, IDetectable
 
     private void HandleFlight()
     {
-        // Aterrizaje voluntario: tocando suelo y pulsando hacia abajo
-        if (isGrounded && verticalInput < landingInputThreshold)
+        // Aterrizaje voluntario: tocando suelo y pulsando hacia abajo (tras breve margen desde el despegue)
+        if (isGrounded && verticalInput < landingInputThreshold && (Time.time - flightStartTime) > 0.25f)
         {
             StopFlight();
             return;
         }
 
-        // Consumo de energía
-        flightEnergy = Mathf.Max(0f, flightEnergy - Time.fixedDeltaTime / maxFlightDuration);
+        // Permitir ascender tanto con W / Flecha Arriba como manteniendo Espacio (Salto)
+        float effectiveVertical = verticalInput;
+        if (!useScriptedInput && Input.GetButton(JumpButton) && effectiveVertical < 0.5f)
+        {
+            effectiveVertical = 1f;
+        }
+
+        // Consumo de energía (más lento si está flotando quieta en el aire)
+        bool activelyMoving = Mathf.Abs(moveInput) > 0.05f || Mathf.Abs(effectiveVertical) > 0.05f;
+        float drainFactor = activelyMoving ? 1.0f : 0.45f;
+        flightEnergy = Mathf.Max(0f, flightEnergy - (Time.fixedDeltaTime * drainFactor) / Mathf.Max(1f, maxFlightDuration));
         OnFlightEnergyChanged?.Invoke(flightEnergy);
 
         if (flightEnergy <= 0f)
@@ -526,7 +573,7 @@ public class PlayerController : MonoBehaviour, IDetectable
             return;
         }
 
-        Vector2 target = new Vector2(moveInput * flyHorizontalSpeed, verticalInput * flySpeed);
+        Vector2 target = new Vector2(moveInput * flyHorizontalSpeed, effectiveVertical * flySpeed);
         rb.linearVelocity = Vector2.MoveTowards(rb.linearVelocity, target, flyAcceleration * Time.fixedDeltaTime);
     }
 

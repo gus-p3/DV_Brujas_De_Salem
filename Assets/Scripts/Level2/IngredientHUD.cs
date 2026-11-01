@@ -27,6 +27,12 @@ namespace Level2
         [SerializeField] private RectTransform flowerIconTransform;
         [SerializeField] private RectTransform rootIconTransform;
 
+        [Header("Sprites de Ingredientes")]
+        [SerializeField] private Sprite mushroomSprite;
+        [SerializeField] private Sprite spiderSprite;
+        [SerializeField] private Sprite flowerSprite;
+        [SerializeField] private Sprite rootSprite;
+
         [Header("Colores")]
         [SerializeField] private Color normalColor = new Color(0.9f, 0.9f, 0.9f, 1f);
         [SerializeField] private Color completeColor = new Color(1f, 0.85f, 0.25f, 1f);
@@ -57,10 +63,14 @@ namespace Level2
             {
                 bannerPanel.SetActive(false);
             }
+
+            EnsureIconSpritesAssigned();
         }
 
         private void Start()
         {
+            EnsureIconSpritesAssigned();
+
             if (IngredientInventory.Instance != null)
             {
                 IngredientInventory.Instance.OnIngredientCollected += HandleIngredientCollected;
@@ -249,8 +259,78 @@ namespace Level2
             flowerIconTransform = flowerIcon;
             rootIconTransform = rootIcon;
 
+            if (mushroomIcon != null && mushroomIcon.GetComponent<Image>() != null && mushroomIcon.GetComponent<Image>().sprite != null)
+                mushroomSprite = mushroomIcon.GetComponent<Image>().sprite;
+            if (spiderIcon != null && spiderIcon.GetComponent<Image>() != null && spiderIcon.GetComponent<Image>().sprite != null)
+                spiderSprite = spiderIcon.GetComponent<Image>().sprite;
+            if (flowerIcon != null && flowerIcon.GetComponent<Image>() != null && flowerIcon.GetComponent<Image>().sprite != null)
+                flowerSprite = flowerIcon.GetComponent<Image>().sprite;
+            if (rootIcon != null && rootIcon.GetComponent<Image>() != null && rootIcon.GetComponent<Image>().sprite != null)
+                rootSprite = rootIcon.GetComponent<Image>().sprite;
+
             bannerText = banner;
             bannerPanel = bannerObj;
+            EnsureIconSpritesAssigned();
+        }
+
+        public Sprite GetIngredientSprite(IngredientType type)
+        {
+            return type switch
+            {
+                IngredientType.Mushroom => mushroomSprite != null ? mushroomSprite : GetIconImageSprite(mushroomIconTransform),
+                IngredientType.Spider => spiderSprite != null ? spiderSprite : GetIconImageSprite(spiderIconTransform),
+                IngredientType.WitheredFlower => flowerSprite != null ? flowerSprite : GetIconImageSprite(flowerIconTransform),
+                IngredientType.Root => rootSprite != null ? rootSprite : GetIconImageSprite(rootIconTransform),
+                _ => mushroomSprite
+            };
+        }
+
+        private void OnValidate()
+        {
+            EnsureIconSpritesAssigned();
+        }
+
+        public void EnsureIconSpritesAssigned()
+        {
+#if UNITY_EDITOR
+            if (mushroomSprite == null)
+                mushroomSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Environment/Level2/Placeholder_Ingredient_Mushroom.png");
+            if (spiderSprite == null)
+                spiderSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Environment/Level2/Placeholder_Ingredient_Spider.png");
+            if (flowerSprite == null)
+                flowerSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Environment/Level2/Placeholder_Ingredient_WitheredFlower.png");
+            if (rootSprite == null)
+                rootSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Environment/Level2/Placeholder_Ingredient_Root.png");
+#endif
+            BindOrRestoreIcon(mushroomIconTransform, ref mushroomSprite);
+            BindOrRestoreIcon(spiderIconTransform, ref spiderSprite);
+            BindOrRestoreIcon(flowerIconTransform, ref flowerSprite);
+            BindOrRestoreIcon(rootIconTransform, ref rootSprite);
+        }
+
+        private static Sprite GetIconImageSprite(RectTransform rt)
+        {
+            if (rt == null) return null;
+            Image img = rt.GetComponent<Image>();
+            return img != null ? img.sprite : null;
+        }
+
+        private static void BindOrRestoreIcon(RectTransform rt, ref Sprite storedSprite)
+        {
+            if (rt == null) return;
+            Image img = rt.GetComponent<Image>();
+            if (img == null) return;
+
+            if (img.sprite != null && storedSprite == null)
+            {
+                storedSprite = img.sprite;
+            }
+            else if (img.sprite == null && storedSprite != null)
+            {
+                img.sprite = storedSprite;
+            }
+            img.preserveAspect = true;
+            img.color = Color.white;
         }
     }
 }

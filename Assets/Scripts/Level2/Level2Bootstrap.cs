@@ -110,7 +110,8 @@ namespace Level2
 
                 player.ResetFallReference();
                 player.ResetPhysics(Vector2.zero);
-                player.CanFly = false;
+                player.CancelFlight();
+                player.CanFly = true;
             }
 
             if (InteriorTransitionManager.Instance != null && player != null && player.transform.position.y < 18f)

@@ -77,7 +77,7 @@ namespace Level2
 
             if (AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlayButtonClickSound();
+                AudioManager.Instance.PlayLoreReadSound();
             }
         }
     }

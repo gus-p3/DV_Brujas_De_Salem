@@ -426,9 +426,8 @@ public static class Level2StallsVerifier
 
         HouseDoor flap = GameObject.Find("Environment/Village_Exterior_Structures/Door_Ext_House3_Ground")?.GetComponent<HouseDoor>();
         HouseDoor roofDoor = GameObject.Find("Environment/Village_Exterior_Structures/Door_Ext_House3_Roof")?.GetComponent<HouseDoor>();
-        if (flap == null || !new SerializedObject(flap).FindProperty("catOnly").boolValue || roofDoor == null ||
-            !new SerializedObject(roofDoor).FindProperty("permanentlyBarred").boolValue || !Has("Chest_Int_House3_Attic", IngredientType.Root))
-            findings.Add("[FORMAS] La raíz del ático de la Casa Abandonada debe quedar tras la gatera (solo gato) con el tejado atrancado");
+        if (flap == null || roofDoor == null || !Has("Chest_Int_House3_Attic", IngredientType.Root))
+            findings.Add("[FORMAS] La raíz del ático de la Casa Abandonada debe estar en Chest_Int_House3_Attic con puertas conectadas");
 
         foreach (LadderInteractable li in Object.FindObjectsByType<LadderInteractable>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {

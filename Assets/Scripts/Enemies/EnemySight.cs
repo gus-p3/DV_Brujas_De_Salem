@@ -445,6 +445,17 @@ public class EnemySight : MonoBehaviour
         }
 
         state = newState;
+        if (Application.isPlaying && AudioManager.Instance != null)
+        {
+            if (state == AlertState.Suspicion)
+            {
+                AudioManager.Instance.PlayVillagerNoticeSound();
+            }
+            else if (state == AlertState.Alert)
+            {
+                AudioManager.Instance.PlayGuardAlertSound();
+            }
+        }
         OnAlertStateChanged?.Invoke(state);
     }
 
