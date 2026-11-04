@@ -93,6 +93,31 @@ public class BroomInventory : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Desbloquea inmediatamente las 3 partes de la escoba y habilita el vuelo en la bruja.
+    /// </summary>
+    public void GrantBroom()
+    {
+        foreach (BroomPart part in Enum.GetValues(typeof(BroomPart)))
+        {
+            collectedParts.Add(part);
+        }
+
+        PlayerController pc = UnityEngine.Object.FindFirstObjectByType<PlayerController>();
+        if (pc != null)
+        {
+            pc.CanFly = true;
+        }
+
+        HUDController hud = UnityEngine.Object.FindFirstObjectByType<HUDController>();
+        if (hud != null)
+        {
+            hud.SetFlightSliderVisible(true);
+        }
+
+        OnBroomCompleted?.Invoke();
+    }
+
     private void HandleBroomCompleted()
     {
         PlayerController pc = UnityEngine.Object.FindFirstObjectByType<PlayerController>();
