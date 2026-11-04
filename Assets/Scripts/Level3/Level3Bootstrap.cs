@@ -12,6 +12,7 @@ namespace Level3
     ///   BroomInventory con escoba desbloqueada (GrantBroom()) y PotionInventory inicializado con al menos
     ///   3 pociones de dormir (Sleep) al empezar el nivel para que nunca quede bloqueado.
     /// </summary>
+    [DefaultExecutionOrder(-600)]
     public class Level3Bootstrap : MonoBehaviour
     {
         public static Level3Bootstrap Instance { get; private set; }
@@ -23,6 +24,11 @@ namespace Level3
         [SerializeField] private int minimumStartingSleepPotions = 3;
         [SerializeField] private int minimumStartingBlindPotions = 1;
         [SerializeField] private int minimumStartingHypnotizePotions = 1;
+
+        private PlayerInteractor cachedInteractor;
+        private PotionInventory cachedPotionInventory;
+        private bool suppressedPotionThisFrame;
+        private float lastBridgeInteractTime = -10f;
 
         private void Awake()
         {
@@ -42,6 +48,66 @@ namespace Level3
         private void Start()
         {
             InitializeLevel3State();
+        }
+
+        private void Update()
+        {
+            if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameState.Playing)
+            {
+                return;
+            }
+
+            if (cachedInteractor == null)
+            {
+                cachedInteractor = Object.FindFirstObjectByType<PlayerInteractor>();
+            }
+            if (cachedPotionInventory == null)
+            {
+                cachedPotionInventory = Object.FindFirstObjectByType<PotionInventory>();
+            }
+
+            if (cachedInteractor == null) return;
+
+            IInteractable focus = cachedInteractor.RefreshFocus();
+            bool hasActiveInteractable = focus != null && focus.UsesInteractKey && focus.CanInteract(cachedInteractor.gameObject);
+
+            if (hasActiveInteractable)
+            {
+                // Frente a un objeto interactuable (Cofre, Pista, Caldero, Portón, Puerta de Iglesia):
+                // tanto E como Q ejecutan la interacción y suprimen el disparo de pociones en este frame.
+                if ((Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.Q)) &&
+                    Time.unscaledTime >= lastBridgeInteractTime + 0.32f)
+                {
+                    lastBridgeInteractTime = Time.unscaledTime;
+                    if (cachedPotionInventory != null && cachedPotionInventory.enabled)
+                    {
+                        cachedPotionInventory.enabled = false;
+                        suppressedPotionThisFrame = true;
+                    }
+                    Level2Controls.ConsumeInteractNow();
+                    cachedInteractor.TriggerCurrentInteraction();
+                }
+            }
+            else
+            {
+                // Lejos de objetos interactuables: permitir que Q o E disparen la poción seleccionada en PotionInventory
+                if (Level2Controls.Instance != null && Level2Controls.Instance.enabled)
+                {
+                    Level2Controls.Instance.enabled = false;
+                }
+            }
+        }
+
+        private void LateUpdate()
+        {
+            if (suppressedPotionThisFrame)
+            {
+                suppressedPotionThisFrame = false;
+                if (cachedPotionInventory != null)
+                {
+                    cachedPotionInventory.enabled = true;
+                }
+            }
         }
 
         private void OnDestroy()

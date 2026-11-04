@@ -39,6 +39,8 @@ namespace Level3.Editor
         private const string EnvPath = "Assets/Art/Environment/";
         private const string GroundSpritePath = EnvPath + "Env_Ground_Tile.png";
         private const string CainosAtlasPath = "Assets/Cainos/Pixel Art Platformer - Village Props/Texture/TX Village Props.png";
+        private const string CainosChestAtlasPath = "Assets/Cainos/Pixel Art Platformer - Village Props/Texture/TX Chest Animation.png";
+        private const string VillagerPreacherPrefabPath = "Assets/Prefabs/VillagerPreacher.prefab";
 
         [MenuItem("Tools/Level 3/Build Complete Level 3 Scene")]
         public static void BuildCompleteLevel3Scene()
@@ -176,7 +178,12 @@ namespace Level3.Editor
             BuildAct2WitchCabinAndClearing(roots["Environment"], roots["Gameplay"], log);
 
             // ------------------------------------------------------------------
-            // 7. Conectar CaptureListener a todos los guardias creados
+            // 7. Construcción del Acto 3: El Regreso a la Aldea y la Iglesia de Salem (X: 150 a X: 265)
+            // ------------------------------------------------------------------
+            BuildAct3ChurchDistrict(roots["Environment"], roots["Gameplay"], roots["NPCs"], log);
+
+            // ------------------------------------------------------------------
+            // 8. Conectar CaptureListener a todos los guardias creados
             // ------------------------------------------------------------------
             CaptureListener captureListener = Object.FindFirstObjectByType<CaptureListener>();
             if (captureListener != null)
@@ -297,7 +304,7 @@ namespace Level3.Editor
                     var useLimitsProp = so.FindProperty("useLimits");
                     if (useLimitsProp != null) useLimitsProp.boolValue = true;
                     if (minProp != null) minProp.vector2Value = new Vector2(-2f, -1f);
-                    if (maxProp != null) maxProp.vector2Value = new Vector2(240f, 18f);
+                    if (maxProp != null) maxProp.vector2Value = new Vector2(268f, 18f);
                     so.ApplyModifiedPropertiesWithoutUndo();
                 }
             }
@@ -371,13 +378,13 @@ namespace Level3.Editor
             act1Npcs.SetParent(npcsRoot, false);
 
             // ------------------------------------------------------------------
-            // SUELO PRINCIPAL DEL ACTO 1 Y ACTO 2:
+            // SUELO PRINCIPAL DEL ACTO 1, ACTO 2 Y ACTO 3:
             // - Tramo A: X: -6 a X: 52 (58u de largo, superficie en Y: 0.17)
             // - Hueco del Barranco del Río Oscuro: X: 52 a X: 68 (16u de ancho)
-            // - Tramo B: X: 68 a X: 168 (100u de largo, superficie en Y: 0.17, cubre Bastión + Claro + Cabaña)
+            // - Tramo B: X: 68 a X: 270 (202u de largo, superficie en Y: 0.17, cubre Bastión + Cabaña + Distrito Iglesia)
             // ------------------------------------------------------------------
             CreateGroundSegment(act1Env, "Ground_Forest_West", -6f, 58f, groundLayer, groundSprite);
-            CreateGroundSegment(act1Env, "Ground_Forest_East", 68f, 100f, groundLayer, groundSprite);
+            CreateGroundSegment(act1Env, "Ground_Forest_East", 68f, 202f, groundLayer, groundSprite);
 
             // Muro límite izquierdo en X: -4 para impedir caer fuera del mapa
             CreateSolidWall(act1Env, "Boundary_WestWall", new Vector2(-4.5f, 6f), new Vector2(1.5f, 14f), groundLayer, null);
@@ -715,6 +722,507 @@ namespace Level3.Editor
                 "refill_return_trail_1", "Alijo del Sendero de Regreso", PotionType.Sleep, 2, sleepFlaskSprite);
 
             log.AppendLine("  - Acto 2 (X: 112..150): Claro seguro con Checkpoint (X:116), Faroles con LanternFlicker, Casa de la Bruja (X:124..136), WitchCauldronInteractable (X:130), PotionRefillStations y Portón de Regreso a la Aldea (X:146).");
+        }
+
+        // =========================================================================
+        // CONSTRUCCIÓN DEL ACTO 3: DISTRITO DE LA IGLESIA DE SALEM (X: 150 a X: 265)
+        // =========================================================================
+        private static void BuildAct3ChurchDistrict(Transform envRoot, Transform gameplayRoot, Transform npcsRoot, StringBuilder log)
+        {
+            int groundLayer = LayerMask.NameToLayer("Ground");
+            LayerMask groundMask = 1 << groundLayer;
+
+            Sprite logASprite = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Platform_Log_A.png");
+            Sprite logBSprite = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Platform_Log_B.png");
+            Sprite logCSprite = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Platform_Log_C.png");
+            Sprite gateSprite = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Goal_Gate.png");
+
+            Sprite cornCluster = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Corn_Cluster.png");
+            Sprite stalkA = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Corn_Stalk_A.png");
+            Sprite stalkB = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Corn_Stalk_B.png");
+            Sprite stalkC = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Corn_Stalk_C.png");
+
+            GameObject guardPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(GuardPrefabPath);
+            GameObject villagerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(VillagerPrefabPath);
+            GameObject villagerPreacherPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(VillagerPreacherPrefabPath);
+            GameObject checkpointPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(CheckpointPrefabPath);
+
+            GameObject potSleepPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PotionSleepPath);
+            GameObject potBlindPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PotionBlindPath);
+            GameObject potHypnoPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PotionHypnotizePath);
+            GameObject heartPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(HeartPickupPath);
+
+            Sprite[] cainosSprites = AssetDatabase.LoadAllAssetsAtPath(CainosAtlasPath).OfType<Sprite>().ToArray();
+            Sprite[] chestSprites = AssetDatabase.LoadAllAssetsAtPath(CainosChestAtlasPath).OfType<Sprite>().ToArray();
+
+            Sprite sleepFlaskSprite = null;
+            if (potSleepPrefab != null)
+            {
+                SpriteRenderer pfSr = potSleepPrefab.GetComponentInChildren<SpriteRenderer>();
+                if (pfSr != null) sleepFlaskSprite = pfSr.sprite;
+            }
+
+            Transform act3Env = new GameObject("Act3_ChurchDistrict_Env").transform;
+            act3Env.SetParent(envRoot, false);
+
+            Transform act3Gameplay = new GameObject("Act3_ChurchDistrict_Gameplay").transform;
+            act3Gameplay.SetParent(gameplayRoot, false);
+
+            Transform act3Pickups = new GameObject("Act3_Pickups").transform;
+            act3Pickups.SetParent(act3Gameplay, false);
+
+            Transform act3Npcs = new GameObject("Act3_NPCs").transform;
+            act3Npcs.SetParent(npcsRoot, false);
+
+            // Muro límite derecho tras la Iglesia en X: 266
+            CreateSolidWall(act3Env, "Boundary_EastChurchWall", new Vector2(266f, 6f), new Vector2(1.5f, 14f), groundLayer, null);
+
+            // ------------------------------------------------------------------
+            // TRAMO 3.1: LA ENTRADA TRASERA DE LA ALDEA Y PISTA #1 (X: 150 a 180)
+            // ------------------------------------------------------------------
+            CreateCheckpoint(act3Gameplay, checkpointPrefab, "Checkpoint_Act3_VillageRear", new Vector3(152f, 0.17f, 0f));
+
+            // Patrulla doble: 1 Aldeano y 1 Guardia custodiando la entrada trasera
+            CreateVillager(act3Npcs, villagerPrefab, "Villager_Act3_RearEntry", new Vector3(156.5f, 0.17f, 0f), WanderPattern.WalkAndReturn, 3.2f);
+            Transform[] wpRearGuard = CreateWaypoints(act3Npcs, "Waypoints_Guard_RearEntry", new Vector2(154.5f, 0.17f), new Vector2(165.0f, 0.17f));
+            CreateGuard(act3Npcs, guardPrefab, "Guard_Act3_RearEntry", new Vector3(159.5f, 0.17f, 0f), wpRearGuard, PatrolMode.PingPong, groundMask);
+
+            // Pociones y estación de recarga en el Tramo 3.1
+            InstantiatePickup(act3Pickups, potSleepPrefab, "PotionPickup_Act3_Rear_Sleep", new Vector3(153.8f, 0.65f, 0f));
+            InstantiatePickup(act3Pickups, potHypnoPrefab, "PotionPickup_Act3_Rear_Hypno", new Vector3(158.8f, 0.65f, 0f));
+            CreatePotionRefillStation(act3Gameplay, "PotionRefillStation_Act3_Rear", new Vector3(165.2f, 0.72f, 0f),
+                "refill_act3_rear", "Alijo de los Linderos", PotionType.Sleep, 2, sleepFlaskSprite);
+
+            // Pista #1 (LoreObject en X: 162)
+            CreateIlluminatedLoreStand(
+                act3Gameplay,
+                cainosSprites,
+                "Lore_Clue_1_Sacristan",
+                new Vector3(162f, 0.85f, 0f),
+                "clue_sacristan_1",
+                "Nota del Sacristán I",
+                "Por orden del Juez, escondí la Llave de la Cripta dentro del Cofre de Madera al final del conducto bajo el muro de piedra. Solo una criatura pequeña como un gato podría colarse ahí...");
+
+            // Conducto bajo el muro de piedra (CatOnlyPassage de X: 168 a 174) custodiado por un guardia
+            GameObject stoneWallTunnel = new GameObject("StoneWall_CatConduct");
+            stoneWallTunnel.transform.SetParent(act3Env, false);
+            stoneWallTunnel.layer = groundLayer;
+            stoneWallTunnel.transform.position = new Vector3(171f, 1.82f, 0f);
+            BoxCollider2D swCol = stoneWallTunnel.AddComponent<BoxCollider2D>();
+            swCol.size = new Vector2(6.0f, 1.40f);
+
+            for (int i = 0; i < 2; i++)
+            {
+                GameObject seg = new GameObject($"StoneWall_Visual_{i}");
+                seg.transform.SetParent(stoneWallTunnel.transform, false);
+                seg.transform.localPosition = new Vector3(-1.5f + i * 3.0f, 0.1f, 0f);
+                seg.transform.localScale = new Vector3(1.1f, 2.1f, 1f);
+                SpriteRenderer sr = seg.AddComponent<SpriteRenderer>();
+                sr.sprite = logBSprite;
+                sr.color = new Color(0.45f, 0.46f, 0.52f, 1f);
+                sr.sortingLayerName = "Gameplay";
+                sr.sortingOrder = 2;
+            }
+
+            CreateCatOnlyTrigger(act3Gameplay, "CatOnlyPassage_Act3_ConductEntry", new Vector3(167.8f, 1.0f, 0f),
+                "Conducto bajo el muro de piedra: Usa forma de Gato [F] para llegar al Cofre de Madera.");
+            CreateCatOnlyTrigger(act3Gameplay, "CatOnlyPassage_Act3_ConductExit", new Vector3(174.2f, 1.0f, 0f),
+                "Conducto bajo el muro de piedra: Usa forma de Gato [F] para cruzar.");
+
+            Transform[] wpWallGuard = CreateWaypoints(act3Npcs, "Waypoints_Guard_StoneWall", new Vector2(168.5f, 2.55f), new Vector2(173.5f, 2.55f));
+            CreateGuard(act3Npcs, guardPrefab, "Guard_Act3_StoneWall", new Vector3(171f, 2.55f, 0f), wpWallGuard, PatrolMode.PingPong, groundMask);
+
+            // Cofre #1 (TreasureChest en X: 176): no requiere llave, otorga "crypt_chest_key"
+            CreateLevel3TreasureChest(
+                act3Gameplay,
+                chestSprites,
+                "Chest_Act3_1_Wooden",
+                new Vector3(176f, 0.65f, 0f),
+                "chest_act3_crypt_wooden",
+                "Cofre de Madera del Conducto",
+                "Wooden",
+                requiresKey: false,
+                requiredKeyId: string.Empty,
+                requiredKeyName: string.Empty,
+                rewardKeyId: "crypt_chest_key",
+                rewardKeyName: "Llave del Cofre del Campanario");
+
+            // 2 PotionPickup (Sleep) junto al Cofre #1
+            InstantiatePickup(act3Pickups, potSleepPrefab, "PotionPickup_Chest1_Sleep_1", new Vector3(177.3f, 0.65f, 0f));
+            InstantiatePickup(act3Pickups, potSleepPrefab, "PotionPickup_Chest1_Sleep_2", new Vector3(178.5f, 0.65f, 0f));
+
+            // ------------------------------------------------------------------
+            // TRAMO 3.2: EL PATIO DE LAS CRIPTAS, GUARDIAS Y PISTA #2 (X: 180 a 215)
+            // ------------------------------------------------------------------
+            CreateCheckpoint(act3Gameplay, checkpointPrefab, "Checkpoint_Act3_CryptYard", new Vector3(182f, 0.17f, 0f));
+
+            // Escondites entre tumbas y faroles
+            CreateForestHideout(act3Env, "Hideout_CryptYard_1", 186f, 0f, 3.8f, 3.5f, cornCluster, stalkA, stalkB, stalkC);
+            CreateForestHideout(act3Env, "Hideout_CryptYard_2", 200f, 0f, 3.8f, 3.5f, cornCluster, stalkA, stalkB, stalkC);
+            PlaceCainosSprite(act3Env, cainosSprites, "Crypt_Gravestone_1", "TX Village Props - Gravestone 01", new Vector3(184.5f, 0.65f, 0f), 1.0f);
+            PlaceCainosSprite(act3Env, cainosSprites, "Crypt_Gravestone_2", "TX Village Props - Gravestone 03", new Vector3(198.2f, 0.65f, 0f), 1.0f);
+
+            // Pista #2 (LoreObject en X: 190)
+            CreateIlluminatedLoreStand(
+                act3Gameplay,
+                cainosSprites,
+                "Lore_Clue_2_CaptainDiary",
+                new Vector3(190f, 0.85f, 0f),
+                "clue_captain_diary_2",
+                "Diario del Capitán de la Guardia",
+                "Cerramos la Reja del Atrio; el guardia de la linterna dorada en el balcón tiene esa llave. Detrás de la reja, en el Cofre de Hierro del Campanario Alto, guardamos el Sello del Inquisidor.");
+
+            // Balcón medio (X: 191 a 201, Y: 3.5) + Escalera (LadderInteractable en X: 191.8)
+            GameObject midBalcony = CreateOneWayPlatform(act3Env, "CryptYard_MidBalcony", logCSprite, new Vector2(196f, 3.5f), 2.8f, groundLayer);
+            Collider2D midBalconyCol = midBalcony.GetComponent<Collider2D>();
+            CreateClimbableLadder(act3Gameplay, cainosSprites, "Ladder_CryptBalcony", 191.8f, 0.17f, 3.5f, midBalconyCol);
+
+            // Dos guardias patrullando abajo
+            Transform[] wpCryptLow1 = CreateWaypoints(act3Npcs, "Waypoints_Guard_CryptLow1", new Vector2(183.5f, 0.17f), new Vector2(193.0f, 0.17f));
+            CreateGuard(act3Npcs, guardPrefab, "Guard_CryptYard_Low1", new Vector3(188f, 0.17f, 0f), wpCryptLow1, PatrolMode.PingPong, groundMask);
+
+            Transform[] wpCryptLow2 = CreateWaypoints(act3Npcs, "Waypoints_Guard_CryptLow2", new Vector2(197.0f, 0.17f), new Vector2(208.5f, 0.17f));
+            CreateGuard(act3Npcs, guardPrefab, "Guard_CryptYard_Low2", new Vector3(203f, 0.17f, 0f), wpCryptLow2, PatrolMode.PingPong, groundMask);
+
+            // Guardia Portador con Brillo (KeyCarrierGuard) en el balcón medio (X: 196, Y: 3.5) -> "sanctuary_gate_key"
+            Transform[] wpBalconyCarrier = CreateWaypoints(act3Npcs, "Waypoints_KeyCarrier_3_Balcony", new Vector2(192.8f, 3.78f), new Vector2(199.2f, 3.78f));
+            GameObject guardCarrier3 = CreateGuard(act3Npcs, guardPrefab, "Guard_KeyCarrier_3_Balcony", new Vector3(196f, 3.78f, 0f), wpBalconyCarrier, PatrolMode.PingPong, groundMask);
+            if (guardCarrier3 != null)
+            {
+                KeyCarrierGuard kc3 = guardCarrier3.AddComponent<KeyCarrierGuard>();
+                kc3.Configure(
+                    "sanctuary_gate_key",
+                    "Llave de la Reja del Atrio",
+                    new Color(1f, 0.86f, 0.18f, 0.95f),
+                    autoCollect: false);
+                EditorUtility.SetDirty(kc3);
+            }
+
+            // Plataforma alta del Campanario (X: 204, Y: 5.5) accesible volando en escoba + Cofre #2 (TreasureChest)
+            CreateOneWayPlatform(act3Env, "Platform_HighBelfry_Chest2", logASprite, new Vector2(204f, 5.5f), 1.6f, groundLayer);
+            CreateLevel3TreasureChest(
+                act3Gameplay,
+                chestSprites,
+                "Chest_Act3_2_Iron",
+                new Vector3(204f, 5.95f, 0f),
+                "chest_act3_belfry_iron",
+                "Cofre de Hierro del Campanario Alto",
+                "Iron",
+                requiresKey: true,
+                requiredKeyId: "crypt_chest_key",
+                requiredKeyName: "Llave del Cofre del Campanario",
+                rewardKeyId: "inquisitor_chest_key",
+                rewardKeyName: "Llave del Cofre del Inquisidor");
+
+            // En X: 212: Reja del Atrio (LockedGateInteractable) que se abre con "sanctuary_gate_key"
+            CreateLockedGateWithCanopyBlocker(
+                act3Gameplay,
+                "Gate_Act3_Sanctuary",
+                new Vector3(212f, 0.17f, 0f),
+                "sanctuary_atrium_gate",
+                "Reja del Atrio de la Iglesia",
+                "sanctuary_gate_key",
+                "Llave de la Reja del Atrio",
+                requireMasterPotion: false,
+                advanceCabinPhase: false,
+                gateSprite,
+                groundLayer);
+
+            // ------------------------------------------------------------------
+            // TRAMO 3.3: EL ATRIO DE LA IGLESIA, PISTA #3, COFRE MAESTRO Y LA GRAN IGLESIA (X: 215 a 265)
+            // ------------------------------------------------------------------
+            CreateCheckpoint(act3Gameplay, checkpointPrefab, "Checkpoint_Act3_ChurchAtrium", new Vector3(216f, 0.17f, 0f));
+
+            // Pista #3 (LoreObject en X: 220)
+            CreateIlluminatedLoreStand(
+                act3Gameplay,
+                cainosSprites,
+                "Lore_Clue_3_PriestConfession",
+                new Vector3(220f, 0.85f, 0f),
+                "clue_priest_confession_3",
+                "Confesión del Párroco",
+                "La verdadera Llave de la Iglesia de Salem descansa en el Cofre Dorado sobre el tejado del santuario. Usa la Llave del Inquisidor para abrirlo, duerme a los centinelas y entra a la Iglesia.");
+
+            CreatePotionRefillStation(act3Gameplay, "PotionRefillStation_Act3_Atrium", new Vector3(222.5f, 0.72f, 0f),
+                "refill_act3_atrium", "Alijo del Atrio", PotionType.Sleep, 2, sleepFlaskSprite);
+
+            // Reto final frente a la Iglesia (X: 224 a 248):
+            // Abajo: 2 guardias + 1 aldeano predicador, escondites y pociones
+            CreateForestHideout(act3Env, "Hideout_Atrium_West", 227.5f, 0f, 4.0f, 3.6f, cornCluster, stalkA, stalkB, stalkC);
+            CreateForestHideout(act3Env, "Hideout_Atrium_East", 242.5f, 0f, 4.0f, 3.6f, cornCluster, stalkA, stalkB, stalkC);
+
+            Transform[] wpAtrium1 = CreateWaypoints(act3Npcs, "Waypoints_Guard_Atrium1", new Vector2(224.5f, 0.17f), new Vector2(235.0f, 0.17f));
+            CreateGuard(act3Npcs, guardPrefab, "Guard_Atrium_1", new Vector3(229f, 0.17f, 0f), wpAtrium1, PatrolMode.PingPong, groundMask);
+
+            Transform[] wpAtrium2 = CreateWaypoints(act3Npcs, "Waypoints_Guard_Atrium2", new Vector2(237.0f, 0.17f), new Vector2(248.0f, 0.17f));
+            CreateGuard(act3Npcs, guardPrefab, "Guard_Atrium_2", new Vector3(243f, 0.17f, 0f), wpAtrium2, PatrolMode.PingPong, groundMask);
+
+            CreateVillager(act3Npcs, villagerPreacherPrefab != null ? villagerPreacherPrefab : villagerPrefab,
+                "Villager_Atrium_Preacher", new Vector3(233.5f, 0.17f, 0f), WanderPattern.LookAround, 3.8f);
+
+            InstantiatePickup(act3Pickups, potSleepPrefab, "PotionPickup_Atrium_Sleep", new Vector3(229.5f, 0.65f, 0f));
+            InstantiatePickup(act3Pickups, potBlindPrefab, "PotionPickup_Atrium_Blind", new Vector3(236.0f, 0.65f, 0f));
+            InstantiatePickup(act3Pickups, potHypnoPrefab, "PotionPickup_Atrium_Hypno", new Vector3(244.0f, 0.65f, 0f));
+            InstantiatePickup(act3Pickups, heartPrefab, "HeartPickup_Atrium", new Vector3(247.5f, 0.65f, 0f));
+
+            // Arriba (X: 236, Y: 6.2): Tejado del Santuario accesible volando en escoba + Cofre #3 (Cofre Dorado)
+            CreateOneWayPlatform(act3Env, "Platform_Atrium_StepWest", logASprite, new Vector2(228.5f, 3.4f), 1.3f, groundLayer);
+            CreateOneWayPlatform(act3Env, "Platform_SanctuaryRoof_GoldChest", logCSprite, new Vector2(236f, 6.2f), 2.1f, groundLayer);
+
+            CreateLevel3TreasureChest(
+                act3Gameplay,
+                chestSprites,
+                "Chest_Act3_3_Golden",
+                new Vector3(236f, 6.65f, 0f),
+                "chest_act3_sanctuary_golden",
+                "Cofre Dorado del Santuario",
+                "Golden",
+                requiresKey: true,
+                requiredKeyId: "inquisitor_chest_key",
+                requiredKeyName: "Llave del Cofre del Inquisidor",
+                rewardKeyId: Level3StateController.ChurchMasterKeyId,
+                rewardKeyName: "Llave Maestra de la Iglesia");
+
+            // La Iglesia de Salem (X: 252 a 262) y ChurchDoorGoal en X: 255
+            BuildSalemChurchMonumentAndGoal(act3Env, act3Gameplay, cainosSprites, logBSprite, logCSprite, gateSprite);
+
+            log.AppendLine("  - Acto 3 (X: 150..265): 3 Pistas (LoreObject en X:162, X:190, X:220), 3 Cofres Encadenados (X:176, X:204 Y:5.5, X:236 Y:6.2), Guardia Portador #3 en balcón (X:196 Y:3.5), Reja del Atrio (X:212) y Gran Iglesia de Salem con ChurchDoorGoal (X:255).");
+        }
+
+        private static void BuildSalemChurchMonumentAndGoal(
+            Transform envParent,
+            Transform gameplayParent,
+            Sprite[] cainosSprites,
+            Sprite wallSprite,
+            Sprite roofSprite,
+            Sprite doorSprite)
+        {
+            GameObject churchRoot = new GameObject("Salem_Church_Monument");
+            churchRoot.transform.SetParent(envParent, false);
+            churchRoot.transform.position = new Vector3(255f, 0.17f, 0f);
+
+            // Nave principal de piedra oscura y torre del campanario (X: 252 a 262)
+            for (int i = 0; i < 3; i++)
+            {
+                GameObject wallSeg = new GameObject($"Church_StoneFacade_{i}");
+                wallSeg.transform.SetParent(churchRoot.transform, false);
+                wallSeg.transform.localPosition = new Vector3(-3.2f + i * 3.2f, 3.2f, 0f);
+                wallSeg.transform.localScale = new Vector3(1.25f, 9.5f, 1f);
+                SpriteRenderer sr = wallSeg.AddComponent<SpriteRenderer>();
+                sr.sprite = wallSprite;
+                sr.color = new Color(0.28f, 0.27f, 0.34f, 1f);
+                sr.sortingLayerName = "Midground";
+                sr.sortingOrder = 2;
+            }
+
+            // Torre central elevada de la Iglesia
+            GameObject steeple = new GameObject("Church_BellTower");
+            steeple.transform.SetParent(churchRoot.transform, false);
+            steeple.transform.localPosition = new Vector3(0f, 7.6f, 0f);
+            steeple.transform.localScale = new Vector3(1.1f, 6.2f, 1f);
+            SpriteRenderer stSr = steeple.AddComponent<SpriteRenderer>();
+            stSr.sprite = roofSprite;
+            stSr.color = new Color(0.22f, 0.20f, 0.28f, 1f);
+            stSr.sortingLayerName = "Midground";
+            stSr.sortingOrder = 3;
+
+            // Columnas y decoración eclesiástica de Cainos
+            PlaceCainosSprite(churchRoot.transform, cainosSprites, "Church_Pillar_L", "TX Village Props - Stall Tent Pillar", new Vector3(252.6f, 1.85f, 0f), 1.55f);
+            PlaceCainosSprite(churchRoot.transform, cainosSprites, "Church_Pillar_R", "TX Village Props - Stall Tent Pillar", new Vector3(257.4f, 1.85f, 0f), 1.55f);
+            PlaceCainosSprite(churchRoot.transform, cainosSprites, "Church_Cross_Top", "TX Village Props - Gravestone 02", new Vector3(255.0f, 9.5f, 0f), 1.25f);
+
+            // Faroles consagrados a ambos lados del pórtico
+            CreateMysticLantern(churchRoot.transform, cainosSprites, "Church_Lantern_Left", new Vector3(251.5f, 1.35f, 0f), new Color(1f, 0.85f, 0.35f, 1f));
+            CreateMysticLantern(churchRoot.transform, cainosSprites, "Church_Lantern_Right", new Vector3(258.5f, 1.35f, 0f), new Color(1f, 0.85f, 0.35f, 1f));
+
+            // Gran Puerta de la Iglesia (ChurchDoorGoal) en X: 255, Y: 0.17
+            GameObject doorGo = new GameObject("Church_MainDoor_Goal");
+            doorGo.transform.SetParent(gameplayParent, false);
+            doorGo.transform.position = new Vector3(255f, 0.17f, 0f);
+
+            GameObject leftWing = new GameObject("LeftDoorWing");
+            leftWing.transform.SetParent(doorGo.transform, false);
+            leftWing.transform.localPosition = new Vector3(-0.55f, 2.1f, 0f);
+            leftWing.transform.localScale = new Vector3(0.65f, 1.25f, 1f);
+            SpriteRenderer lwSr = leftWing.AddComponent<SpriteRenderer>();
+            lwSr.sprite = doorSprite;
+            lwSr.color = new Color(0.55f, 0.38f, 0.22f, 1f);
+            lwSr.sortingLayerName = "Gameplay";
+            lwSr.sortingOrder = 3;
+
+            GameObject rightWing = new GameObject("RightDoorWing");
+            rightWing.transform.SetParent(doorGo.transform, false);
+            rightWing.transform.localPosition = new Vector3(0.55f, 2.1f, 0f);
+            rightWing.transform.localScale = new Vector3(0.65f, 1.25f, 1f);
+            SpriteRenderer rwSr = rightWing.AddComponent<SpriteRenderer>();
+            rwSr.sprite = doorSprite;
+            rwSr.color = new Color(0.55f, 0.38f, 0.22f, 1f);
+            rwSr.sortingLayerName = "Gameplay";
+            rwSr.sortingOrder = 3;
+
+            GameObject lightGo = new GameObject("SanctuaryPortal_Light2D");
+            lightGo.transform.SetParent(doorGo.transform, false);
+            lightGo.transform.localPosition = new Vector3(0f, 2.4f, 0f);
+            Light2D portalLight = lightGo.AddComponent<Light2D>();
+            portalLight.lightType = Light2D.LightType.Point;
+            portalLight.color = new Color(1f, 0.90f, 0.45f, 1f);
+            portalLight.intensity = 1.65f;
+            portalLight.pointLightOuterRadius = 5.0f;
+
+            BoxCollider2D goalTrigger = doorGo.AddComponent<BoxCollider2D>();
+            goalTrigger.isTrigger = true;
+            goalTrigger.size = new Vector2(3.6f, 4.4f);
+            goalTrigger.offset = new Vector2(0f, 2.2f);
+
+            ChurchDoorGoal goal = doorGo.AddComponent<ChurchDoorGoal>();
+            var soGoal = new SerializedObject(goal);
+            soGoal.FindProperty("doorRenderer").objectReferenceValue = lwSr;
+            soGoal.FindProperty("leftDoorWing").objectReferenceValue = leftWing.transform;
+            soGoal.FindProperty("rightDoorWing").objectReferenceValue = rightWing.transform;
+            soGoal.FindProperty("sanctuaryPortalLight").objectReferenceValue = portalLight;
+            soGoal.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        public static LoreObject CreateIlluminatedLoreStand(
+            Transform parent,
+            Sprite[] cainosAtlas,
+            string objectName,
+            Vector3 pos,
+            string loreId,
+            string title,
+            string message)
+        {
+            GameObject loreGo = new GameObject(objectName);
+            loreGo.transform.SetParent(parent, false);
+            loreGo.transform.position = pos;
+
+            Sprite standSp = cainosAtlas.FirstOrDefault(s => s != null && s.name == "TX Village Props - Billboard");
+            Sprite scrollSp = cainosAtlas.FirstOrDefault(s => s != null && s.name == "TX Village Props - Billboard Noti 01");
+
+            SpriteRenderer sr = loreGo.AddComponent<SpriteRenderer>();
+            sr.sprite = standSp != null ? standSp : LootPopupVisualizer.GetStarSprite();
+            sr.sortingLayerName = "Gameplay";
+            sr.sortingOrder = 3;
+
+            if (scrollSp != null)
+            {
+                GameObject pageGo = new GameObject("LoreScroll_Visual");
+                pageGo.transform.SetParent(loreGo.transform, false);
+                pageGo.transform.localPosition = new Vector3(0f, 0.35f, 0f);
+                pageGo.transform.localScale = Vector3.one * 1.15f;
+                SpriteRenderer pSr = pageGo.AddComponent<SpriteRenderer>();
+                pSr.sprite = scrollSp;
+                pSr.color = new Color(1f, 0.95f, 0.75f, 1f);
+                pSr.sortingLayerName = "Gameplay";
+                pSr.sortingOrder = 4;
+            }
+
+            GameObject lightGo = new GameObject("Lore_Light2D");
+            lightGo.transform.SetParent(loreGo.transform, false);
+            lightGo.transform.localPosition = new Vector3(0f, 0.5f, 0f);
+            Light2D l2d = lightGo.AddComponent<Light2D>();
+            l2d.lightType = Light2D.LightType.Point;
+            l2d.color = new Color(0.55f, 0.88f, 1f, 1f);
+            l2d.intensity = 1.25f;
+            l2d.pointLightOuterRadius = 2.8f;
+
+            PickupGlint glint = loreGo.AddComponent<PickupGlint>();
+            glint.SetColor(new Color(0.55f, 0.88f, 1f, 1f));
+
+            BoxCollider2D col = loreGo.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(2.0f, 2.2f);
+
+            LoreObject lore = loreGo.AddComponent<LoreObject>();
+            lore.Configure(loreId, title, message, 125);
+            return lore;
+        }
+
+        public static TreasureChest CreateLevel3TreasureChest(
+            Transform parent,
+            Sprite[] chestAtlas,
+            string objectName,
+            Vector3 pos,
+            string chestId,
+            string displayName,
+            string chestKind,
+            bool requiresKey,
+            string requiredKeyId,
+            string requiredKeyName,
+            string rewardKeyId,
+            string rewardKeyName)
+        {
+            GameObject chestGo = new GameObject(objectName);
+            chestGo.transform.SetParent(parent, false);
+            chestGo.transform.position = pos;
+
+            Sprite closedSp = chestAtlas.FirstOrDefault(s => s != null && s.name == $"TX Chest Animation {chestKind} 0");
+            Sprite openSp = chestAtlas.FirstOrDefault(s => s != null && s.name == $"TX Chest Animation {chestKind} 6");
+
+            SpriteRenderer sr = chestGo.AddComponent<SpriteRenderer>();
+            sr.sprite = closedSp;
+            sr.sortingLayerName = "Gameplay";
+            sr.sortingOrder = 4;
+
+            BoxCollider2D col = chestGo.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(2.1f, 1.8f);
+
+            PickupGlint glint = chestGo.AddComponent<PickupGlint>();
+            glint.SetColor(new Color(1f, 0.88f, 0.30f, 1f));
+
+            GameObject lightGo = new GameObject("Chest_Light2D");
+            lightGo.transform.SetParent(chestGo.transform, false);
+            lightGo.transform.localPosition = new Vector3(0f, 0.4f, 0f);
+            Light2D l2d = lightGo.AddComponent<Light2D>();
+            l2d.lightType = Light2D.LightType.Point;
+            l2d.color = new Color(1f, 0.85f, 0.32f, 1f);
+            l2d.intensity = 1.2f;
+            l2d.pointLightOuterRadius = 2.6f;
+
+            TreasureChest chest = chestGo.AddComponent<TreasureChest>();
+            chest.Configure(chestId, displayName, closedSp, openSp, requiresKey, requiredKeyId, requiredKeyName);
+            chest.ConfigureReward(
+                ChestRewardType.Key,
+                amount: 1,
+                score: 250,
+                grantedKeyId: rewardKeyId,
+                grantedKeyName: rewardKeyName);
+
+            return chest;
+        }
+
+        public static LadderInteractable CreateClimbableLadder(
+            Transform parent,
+            Sprite[] cainosAtlas,
+            string objectName,
+            float centerX,
+            float bottomY,
+            float topY,
+            Collider2D topPlatform)
+        {
+            GameObject ladderGo = new GameObject(objectName);
+            ladderGo.transform.SetParent(parent, false);
+            float height = Mathf.Max(1.5f, topY - bottomY);
+            ladderGo.transform.position = new Vector3(centerX, bottomY + height * 0.5f, 0f);
+
+            Sprite ladderSp = cainosAtlas.FirstOrDefault(s => s != null && s.name == "TX Village Props - Ladder 01");
+            if (ladderSp != null)
+            {
+                SpriteRenderer sr = ladderGo.AddComponent<SpriteRenderer>();
+                sr.sprite = ladderSp;
+                sr.sortingLayerName = "Gameplay";
+                sr.sortingOrder = 2;
+                float nativeH = Mathf.Max(0.5f, ladderSp.bounds.size.y);
+                ladderGo.transform.localScale = new Vector3(1f, height / nativeH, 1f);
+            }
+
+            BoxCollider2D col = ladderGo.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+
+            LadderInteractable ladder = ladderGo.AddComponent<LadderInteractable>();
+            ladder.Configure(objectName.ToLowerInvariant(), bottomY, topY, 1.1f, topPlatform);
+            return ladder;
         }
 
         public static void CreateMysticLantern(Transform parent, Sprite[] cainosAtlas, string name, Vector3 pos, Color lightColor)
