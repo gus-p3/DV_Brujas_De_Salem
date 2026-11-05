@@ -149,7 +149,7 @@ namespace Level2
 
             MakeLine(panel.transform, "GuideText", GuideText, 0.66f, 1f, 13.5f);
             counterText = MakeLine(panel.transform, "CounterText", "Cofres abiertos: 0/0", 0.33f, 0.66f, 14f);
-            keysText = MakeLine(panel.transform, "KeysText", "Llaves: Posada [Pendiente]  |  Mansión [Pendiente]", 0f, 0.33f, 13f);
+            keysText = MakeLine(panel.transform, "KeysText", "Llaves de cofre: Posada [Sótano]  |  Mansión [Cripta]", 0f, 0.33f, 13f);
         }
 
         private static TextMeshProUGUI MakeLine(Transform parent, string name, string text, float yMin, float yMax, float fontSize)

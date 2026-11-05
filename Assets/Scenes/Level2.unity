@@ -21968,13 +21968,21 @@ MonoBehaviour:
   contents:
   - itemKind: 0
     ingredientType: 0
-    ingredientUniqueId: L2_Ing_Mushroom_H1
+    ingredientUniqueId: ing_chest_int_house1_upper_m
     potionType: 0
     amount: 1
     keyId: 
     keyDisplayName: 
     claimed: 0
   - itemKind: 1
+    ingredientType: 0
+    ingredientUniqueId: 
+    potionType: 0
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
+  - itemKind: 2
     ingredientType: 0
     ingredientUniqueId: 
     potionType: 0
@@ -30538,6 +30546,22 @@ MonoBehaviour:
   requiredKeyId: key_tavern_chest
   requiredKeyName: Llave de Hierro de la Posada
   contents:
+  - itemKind: 0
+    ingredientType: 1
+    ingredientUniqueId: ing_chest_int_house2_locked_s
+    potionType: 0
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
+  - itemKind: 0
+    ingredientType: 2
+    ingredientUniqueId: ing_chest_int_house2_locked_f
+    potionType: 0
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
   - itemKind: 1
     ingredientType: 0
     ingredientUniqueId: 
@@ -33723,6 +33747,14 @@ MonoBehaviour:
   requiredKeyId: 
   requiredKeyName: 
   contents:
+  - itemKind: 0
+    ingredientType: 2
+    ingredientUniqueId: ing_chest_z4_alley_entry_f
+    potionType: 0
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
   - itemKind: 1
     ingredientType: 0
     ingredientUniqueId: 
@@ -34117,6 +34149,14 @@ MonoBehaviour:
   requiredKeyId: 
   requiredKeyName: 
   contents:
+  - itemKind: 0
+    ingredientType: 3
+    ingredientUniqueId: ing_chest_z5_high_tower_r
+    potionType: 0
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
   - itemKind: 1
     ingredientType: 0
     ingredientUniqueId: 
@@ -40509,6 +40549,14 @@ MonoBehaviour:
   requiredKeyId: 
   requiredKeyName: 
   contents:
+  - itemKind: 0
+    ingredientType: 3
+    ingredientUniqueId: ing_chest_z3_east_overlook_r
+    potionType: 0
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
   - itemKind: 1
     ingredientType: 0
     ingredientUniqueId: 
@@ -43548,7 +43596,7 @@ MonoBehaviour:
   contents:
   - itemKind: 0
     ingredientType: 3
-    ingredientUniqueId: L2_Ing_Root_H3
+    ingredientUniqueId: ing_chest_int_house3_attic_r
     potionType: 0
     amount: 1
     keyId: 
@@ -43558,6 +43606,14 @@ MonoBehaviour:
     ingredientType: 0
     ingredientUniqueId: 
     potionType: 1
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
+  - itemKind: 2
+    ingredientType: 0
+    ingredientUniqueId: 
+    potionType: 0
     amount: 1
     keyId: 
     keyDisplayName: 
@@ -45369,7 +45425,7 @@ MonoBehaviour:
   contents:
   - itemKind: 0
     ingredientType: 1
-    ingredientUniqueId: L2_Ing_Spider_Z2
+    ingredientUniqueId: ing_chest_z2_market_street_s
     potionType: 0
     amount: 1
     keyId: 
@@ -45379,6 +45435,14 @@ MonoBehaviour:
     ingredientType: 0
     ingredientUniqueId: 
     potionType: 2
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
+  - itemKind: 2
+    ingredientType: 0
+    ingredientUniqueId: 
+    potionType: 0
     amount: 1
     keyId: 
     keyDisplayName: 
@@ -46108,6 +46172,30 @@ MonoBehaviour:
   requiredKeyId: key_manor_master
   requiredKeyName: Llave Maestra del Magistrado
   contents:
+  - itemKind: 0
+    ingredientType: 0
+    ingredientUniqueId: ing_chest_int_house4_royal_m
+    potionType: 0
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
+  - itemKind: 0
+    ingredientType: 1
+    ingredientUniqueId: ing_chest_int_house4_royal_s
+    potionType: 0
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
+  - itemKind: 0
+    ingredientType: 3
+    ingredientUniqueId: ing_chest_int_house4_royal_r
+    potionType: 0
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
   - itemKind: 1
     ingredientType: 0
     ingredientUniqueId: 
@@ -50843,6 +50931,9 @@ MonoBehaviour:
   blindChargesText: {fileID: 468679001}
   hypnotizeChargesText: {fileID: 803468088}
   sleepChargesText: {fileID: 1996460544}
+  masterChargesText: {fileID: 0}
+  masterIconImage: {fileID: 0}
+  masterLockBadge: {fileID: 0}
   potionSelectionFrames:
   - {fileID: 723862856}
   - {fileID: 630847004}
@@ -69256,13 +69347,21 @@ MonoBehaviour:
   contents:
   - itemKind: 0
     ingredientType: 0
-    ingredientUniqueId: L2_Ing_Mushroom_Z1
+    ingredientUniqueId: ing_chest_z1_intro_m
     potionType: 0
     amount: 1
     keyId: 
     keyDisplayName: 
     claimed: 0
   - itemKind: 2
+    ingredientType: 0
+    ingredientUniqueId: 
+    potionType: 0
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
+  - itemKind: 1
     ingredientType: 0
     ingredientUniqueId: 
     potionType: 0
@@ -73310,6 +73409,14 @@ MonoBehaviour:
   requiredKeyId: 
   requiredKeyName: 
   contents:
+  - itemKind: 0
+    ingredientType: 1
+    ingredientUniqueId: ing_chest_ext_z2_balcony_s
+    potionType: 0
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
   - itemKind: 1
     ingredientType: 0
     ingredientUniqueId: 
@@ -76277,10 +76384,26 @@ MonoBehaviour:
   requiredKeyId: 
   requiredKeyName: 
   contents:
+  - itemKind: 0
+    ingredientType: 2
+    ingredientUniqueId: ing_chest_ext_z3_canal_overlook_f
+    potionType: 0
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
   - itemKind: 1
     ingredientType: 0
     ingredientUniqueId: 
     potionType: 2
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
+  - itemKind: 2
+    ingredientType: 0
+    ingredientUniqueId: 
+    potionType: 0
     amount: 1
     keyId: 
     keyDisplayName: 
@@ -87297,10 +87420,26 @@ MonoBehaviour:
   requiredKeyId: 
   requiredKeyName: 
   contents:
+  - itemKind: 0
+    ingredientType: 0
+    ingredientUniqueId: ing_chest_z1_stall_roof_m
+    potionType: 0
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
   - itemKind: 1
     ingredientType: 0
     ingredientUniqueId: 
     potionType: 2
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
+  - itemKind: 2
+    ingredientType: 0
+    ingredientUniqueId: 
+    potionType: 0
     amount: 1
     keyId: 
     keyDisplayName: 
@@ -94605,13 +94744,21 @@ MonoBehaviour:
   contents:
   - itemKind: 0
     ingredientType: 2
-    ingredientUniqueId: ing_flower_2
+    ingredientUniqueId: ing_chest_z5_market_plaza_f
     potionType: 0
     amount: 1
     keyId: 
     keyDisplayName: 
     claimed: 0
   - itemKind: 1
+    ingredientType: 0
+    ingredientUniqueId: 
+    potionType: 0
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
+  - itemKind: 2
     ingredientType: 0
     ingredientUniqueId: 
     potionType: 0
@@ -94908,7 +95055,23 @@ MonoBehaviour:
   contents:
   - itemKind: 0
     ingredientType: 3
-    ingredientUniqueId: L2_Ing_Root_Z4
+    ingredientUniqueId: ing_chest_z4_cat_tunnel_exit_r
+    potionType: 0
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
+  - itemKind: 1
+    ingredientType: 0
+    ingredientUniqueId: 
+    potionType: 0
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
+  - itemKind: 2
+    ingredientType: 0
+    ingredientUniqueId: 
     potionType: 0
     amount: 1
     keyId: 
@@ -97091,6 +97254,7 @@ MonoBehaviour:
   blindProjectilePrefab: {fileID: 2356667353680941898, guid: 7884d3adabaed71418549c5e2ca687ce, type: 3}
   hypnotizeProjectilePrefab: {fileID: 712480531911346899, guid: bee051e10130b8b4d96329b0133cba89, type: 3}
   sleepProjectilePrefab: {fileID: 380322473976602085, guid: 546291bd22d549045ba7fc67e6128b39, type: 3}
+  masterPotionPrefab: {fileID: 0}
   throwSound: {fileID: 0}
   emptyChargesSound: {fileID: 0}
 --- !u!114 &1986901632
@@ -99786,6 +99950,14 @@ MonoBehaviour:
   requiredKeyId: 
   requiredKeyName: 
   contents:
+  - itemKind: 0
+    ingredientType: 0
+    ingredientUniqueId: ing_chest_int_house4_cellar_alch_m
+    potionType: 0
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
   - itemKind: 1
     ingredientType: 0
     ingredientUniqueId: 
@@ -103146,7 +103318,15 @@ MonoBehaviour:
   contents:
   - itemKind: 0
     ingredientType: 2
-    ingredientUniqueId: L2_Ing_Flower_FlyPerch
+    ingredientUniqueId: ing_chest_fly_z3_canal_perch_f
+    potionType: 0
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
+  - itemKind: 1
+    ingredientType: 0
+    ingredientUniqueId: 
     potionType: 0
     amount: 1
     keyId: 
@@ -103547,13 +103727,21 @@ MonoBehaviour:
   contents:
   - itemKind: 0
     ingredientType: 1
-    ingredientUniqueId: L2_Ing_Spider_Z3
+    ingredientUniqueId: ing_chest_z3_plaza_street_s
     potionType: 0
     amount: 1
     keyId: 
     keyDisplayName: 
     claimed: 0
   - itemKind: 1
+    ingredientType: 0
+    ingredientUniqueId: 
+    potionType: 0
+    amount: 1
+    keyId: 
+    keyDisplayName: 
+    claimed: 0
+  - itemKind: 2
     ingredientType: 0
     ingredientUniqueId: 
     potionType: 0

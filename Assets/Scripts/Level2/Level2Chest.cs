@@ -198,9 +198,9 @@ namespace Level2
                 return $"Q: Cofre cerrado (Requiere {requiredKeyName})";
             }
 
-            if (hasBeenOpened && HasPendingItems)
+            if (hasBeenOpened)
             {
-                return "Q: Abrir cofre (Contenido pendiente)";
+                return string.Empty;
             }
 
             return "Q: Abrir cofre";
@@ -381,44 +381,43 @@ namespace Level2
             }
 
             int currentCharges = GetCurrentCharges(entry.potionType);
-            if (currentCharges >= MaxPotionChargesPerType)
-            {
-                if (!pendingReasons.Contains("Frasco al máximo"))
-                {
-                    pendingReasons.Add("Frasco al máximo");
-                }
-                return;
-            }
-
-            int room = MaxPotionChargesPerType - currentCharges;
+            int room = Mathf.Max(0, MaxPotionChargesPerType - currentCharges);
             int toGrant = Mathf.Min(entry.amount, room);
+            int overflow = entry.amount - toGrant;
 
-            int b = entry.potionType == PotionType.Blind ? toGrant : 0;
-            int h = entry.potionType == PotionType.Hypnotize ? toGrant : 0;
-            int s = entry.potionType == PotionType.Sleep ? toGrant : 0;
-            GameManager.Instance.AddSpellCharges(b, h, s);
-
-            obtainedLabels.Add($"{GetPotionSpanishName(entry.potionType)} x{toGrant}");
-
-            if (Application.isPlaying)
+            if (toGrant > 0)
             {
-                LootPopupVisualizer.ShowPotionReward(GetPopupPosition(popupOrder), entry.potionType, toGrant);
-                if (AudioManager.Instance != null) AudioManager.Instance.PlayPotionPickupSound();
+                int b = entry.potionType == PotionType.Blind ? toGrant : 0;
+                int h = entry.potionType == PotionType.Hypnotize ? toGrant : 0;
+                int s = entry.potionType == PotionType.Sleep ? toGrant : 0;
+                GameManager.Instance.AddSpellCharges(b, h, s);
             }
-            popupOrder++;
 
-            if (toGrant >= entry.amount)
+            if (overflow > 0)
             {
-                entry.claimed = true;
+                int bonus = 150 * overflow;
+                GameManager.Instance.AddScore(bonus);
+                if (toGrant > 0)
+                {
+                    obtainedLabels.Add($"{GetPotionSpanishName(entry.potionType)} x{toGrant} (+{bonus} pts)");
+                }
+                else
+                {
+                    obtainedLabels.Add($"{GetPotionSpanishName(entry.potionType)} (+{bonus} pts)");
+                }
             }
             else
             {
-                entry.amount -= toGrant;
-                if (!pendingReasons.Contains("Frasco al máximo"))
-                {
-                    pendingReasons.Add("Frasco al máximo");
-                }
+                obtainedLabels.Add($"{GetPotionSpanishName(entry.potionType)} x{toGrant}");
             }
+
+            if (Application.isPlaying)
+            {
+                LootPopupVisualizer.ShowPotionReward(GetPopupPosition(popupOrder), entry.potionType, entry.amount);
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayPotionPickupSound();
+            }
+            popupOrder++;
+            entry.claimed = true;
         }
 
         private void DeliverHeartEntry(ChestContentEntry entry, List<string> obtainedLabels, List<string> pendingReasons, ref int popupOrder)
@@ -435,50 +434,42 @@ namespace Level2
                 return;
             }
 
-            if (GameManager.Instance.CurrentHearts >= GameManager.Instance.MaxHearts)
+            int currentHearts = GameManager.Instance.CurrentHearts;
+            int maxHearts = GameManager.Instance.MaxHearts;
+            int missingHearts = Mathf.Max(0, maxHearts - currentHearts);
+            int toHeal = Mathf.Min(entry.amount, missingHearts);
+            int overflow = entry.amount - toHeal;
+
+            for (int h = 0; h < toHeal; h++)
             {
-                if (!pendingReasons.Contains("Corazones al máximo"))
-                {
-                    pendingReasons.Add("Corazones al máximo");
-                }
-                return;
+                GameManager.Instance.GainHeart(1);
             }
 
-            int granted = 0;
-            while (granted < entry.amount && GameManager.Instance.CurrentHearts < GameManager.Instance.MaxHearts)
+            if (overflow > 0)
             {
-                if (GameManager.Instance.GainHeart(1))
+                int bonus = 150 * overflow;
+                GameManager.Instance.AddScore(bonus);
+                if (toHeal > 0)
                 {
-                    granted++;
+                    obtainedLabels.Add($"Corazón x{toHeal} (+{bonus} pts)");
                 }
                 else
                 {
-                    break;
+                    obtainedLabels.Add($"Corazón (+{bonus} pts)");
                 }
-            }
-
-            if (granted > 0)
-            {
-                obtainedLabels.Add($"Corazón x{granted}");
-                if (Application.isPlaying)
-                {
-                    LootPopupVisualizer.ShowHeartReward(GetPopupPosition(popupOrder), granted);
-                }
-                popupOrder++;
-            }
-
-            if (granted >= entry.amount)
-            {
-                entry.claimed = true;
             }
             else
             {
-                entry.amount -= granted;
-                if (!pendingReasons.Contains("Corazones al máximo"))
-                {
-                    pendingReasons.Add("Corazones al máximo");
-                }
+                obtainedLabels.Add($"Corazón x{toHeal}");
             }
+
+            if (Application.isPlaying)
+            {
+                LootPopupVisualizer.ShowHeartReward(GetPopupPosition(popupOrder), entry.amount);
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayPotionPickupSound();
+            }
+            popupOrder++;
+            entry.claimed = true;
         }
 
         private void DeliverKeyEntry(ChestContentEntry entry, List<string> obtainedLabels, ref int popupOrder)
