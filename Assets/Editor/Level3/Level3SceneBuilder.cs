@@ -60,6 +60,7 @@ namespace Level3.Editor
         private const string VillagerPreacherPrefabPath = "Assets/Prefabs/VillagerPreacher.prefab";
         private const string GothicSignArtPath = "Assets/Screenshots/NIVEL2/Evidencias/Cartel gótico nocturno de iglesia (1).png";
         private const string CathedralArtPath = "Assets/Screenshots/NIVEL2/Evidencias/Catedral gótica bajo la luna(1).png";
+        private const string CathedralFeatheredArtPath = "Assets/Art/Environment/Level3/Catedral_Moonlit_Feathered.png";
 
         [MenuItem("Tools/Level 3/Build Complete Level 3 Scene")]
         public static void BuildCompleteLevel3Scene()
@@ -1670,7 +1671,7 @@ namespace Level3.Editor
 
             // TRAMO 3.8: LA GRAN VÍA SACRA Y FINAL DEL NIVEL 3 (X: 350 a 375)
             Sprite gothicSignSprite = LoadFirstSprite(GothicSignArtPath);
-            Sprite cathedralSprite = LoadFirstSprite(CathedralArtPath);
+            Sprite cathedralSprite = GetFeatheredCathedralSprite();
             BuildProcessionalViaSacraAndFinalGoal(
                 act3Env,
                 act3Gameplay,
@@ -2369,6 +2370,80 @@ namespace Level3.Editor
             InstantiatePickup(monPickups, heartPrefab, "HeartPickup_MonasteryAlley", new Vector3(349.5f, 0.65f, 0f));
         }
 
+        private static Sprite GetFeatheredCathedralSprite()
+        {
+            Sprite sp = LoadFirstSprite(CathedralFeatheredArtPath);
+            if (sp != null) return sp;
+
+            string srcPath = CathedralArtPath;
+            TextureImporter srcImp = AssetImporter.GetAtPath(srcPath) as TextureImporter;
+            bool wasReadable = srcImp != null && srcImp.isReadable;
+            if (srcImp != null && !wasReadable)
+            {
+                srcImp.isReadable = true;
+                srcImp.SaveAndReimport();
+            }
+
+            Texture2D srcTex = AssetDatabase.LoadAssetAtPath<Texture2D>(srcPath);
+            if (srcTex != null)
+            {
+                int w = srcTex.width;
+                int h = srcTex.height;
+                Color[] pixels = srcTex.GetPixels();
+                Color[] outPixels = new Color[pixels.Length];
+                float fadeX = 0.25f;
+                float fadeBottom = 0.28f;
+                float fadeTop = 0.20f;
+
+                for (int y = 0; y < h; y++)
+                {
+                    float v = (float)y / (h - 1);
+                    float aY = 1f;
+                    if (v < fadeBottom) aY = Mathf.SmoothStep(0f, 1f, v / fadeBottom);
+                    else if (v > 1f - fadeTop) aY = Mathf.SmoothStep(0f, 1f, (1f - v) / fadeTop);
+
+                    for (int x = 0; x < w; x++)
+                    {
+                        float u = (float)x / (w - 1);
+                        float aX = 1f;
+                        if (u < fadeX) aX = Mathf.SmoothStep(0f, 1f, u / fadeX);
+                        else if (u > 1f - fadeX) aX = Mathf.SmoothStep(0f, 1f, (1f - u) / fadeX);
+
+                        int idx = y * w + x;
+                        Color c = pixels[idx];
+                        outPixels[idx] = new Color(c.r, c.g, c.b, c.a * aX * aY);
+                    }
+                }
+
+                Texture2D dstTex = new Texture2D(w, h, TextureFormat.RGBA32, false);
+                dstTex.SetPixels(outPixels);
+                dstTex.Apply();
+
+                byte[] pngData = dstTex.EncodeToPNG();
+                File.WriteAllBytes(CathedralFeatheredArtPath, pngData);
+                AssetDatabase.ImportAsset(CathedralFeatheredArtPath, ImportAssetOptions.ForceUpdate);
+
+                TextureImporter dstImp = AssetImporter.GetAtPath(CathedralFeatheredArtPath) as TextureImporter;
+                if (dstImp != null)
+                {
+                    dstImp.textureType = TextureImporterType.Sprite;
+                    dstImp.spritePixelsPerUnit = 100;
+                    dstImp.alphaIsTransparency = true;
+                    dstImp.SaveAndReimport();
+                }
+
+                if (srcImp != null && !wasReadable)
+                {
+                    srcImp.isReadable = false;
+                    srcImp.SaveAndReimport();
+                }
+
+                sp = LoadFirstSprite(CathedralFeatheredArtPath);
+            }
+
+            return sp != null ? sp : LoadFirstSprite(CathedralArtPath);
+        }
+
         private static void BuildProcessionalViaSacraAndFinalGoal(
             Transform envParent,
             Transform gameplayParent,
@@ -2446,21 +2521,23 @@ namespace Level3.Editor
             Transform[] wpViaGuard = CreateWaypoints(viaNpcs, "Waypoints_Guard_ViaSacra", new Vector2(363.5f, 0.17f), new Vector2(367.0f, 0.17f));
             CreateGuard(viaNpcs, guardPrefab, "Guard_ViaSacra", new Vector3(365.5f, 0.17f, 0f), wpViaGuard, PatrolMode.PingPong, groundMask);
 
-            // 6. FONDO ESCÉNICO: CATEDRAL GÓTICA BAJO LA LUNA (Fondo del desenlace narrativo agregado al final del mundo)
+            // 6. FONDO ESCÉNICO DIFUMINADO: CATEDRAL GÓTICA BAJO LA LUNA
+            // Se difumina suavemente hacia el cielo nocturno y la silueta del bosque sin cortes rectangulares
             if (cathedralSprite != null)
             {
                 GameObject cathedralBg = new GameObject("Cathedral_Moonlit_Backdrop");
                 cathedralBg.transform.SetParent(viaEnv, false);
-                cathedralBg.transform.position = new Vector3(372.0f, 6.2f, 0f);
+                cathedralBg.transform.position = new Vector3(372.0f, 5.8f, 0f);
                 SpriteRenderer catSr = cathedralBg.AddComponent<SpriteRenderer>();
                 catSr.sprite = cathedralSprite;
                 catSr.sortingLayerName = "Background";
-                catSr.sortingOrder = 5;
-                catSr.color = new Color(0.85f, 0.85f, 0.95f, 1f);
-                cathedralBg.transform.localScale = new Vector3(1.15f, 1.15f, 1f);
+                catSr.sortingOrder = 4;
+                // Tinte nocturno armónico que lo integra de manera natural con el cielo y el fondo de la aldea
+                catSr.color = new Color(0.76f, 0.74f, 0.88f, 0.95f);
+                cathedralBg.transform.localScale = new Vector3(1.22f, 1.22f, 1f);
             }
 
-            // 7. BOSQUE MUY OSCURO: árboles retorcidos, niebla y transición nocturna (X: 366..378)
+            // 7. BOSQUE MUY OSCURO: árboles retorcidos, niebla difusora y transición nocturna (X: 366..378)
             string treesPath = DarkForestPath + "env_trees";
             Color deepNightTint = new Color(0.14f, 0.11f, 0.22f, 0.95f);
             Color frontTreeTint = new Color(0.18f, 0.15f, 0.26f, 1f);
@@ -2474,10 +2551,33 @@ namespace Level3.Editor
             PlaceForestDecor(viaEnv, "DarkForest_Tree_2", PackSprite(treesPath, "env_trees_1"), 371.0f, 2.1f, true, 2, frontTreeTint, 0.15f);
             PlaceForestDecor(viaEnv, "DarkForest_Tree_3", PackSprite(treesPath, "env_trees_5"), 375.2f, 2.3f, false, 2, frontTreeTint, 0.15f);
 
-            // Niebla suave oscura que se adentra en el bosque
+            // Bruma y niebla difusora que abraza e integra el fondo de la catedral con el horizonte
             Sprite fogSprite = LoadFirstSprite(FogSpritePath);
             if (fogSprite != null)
             {
+                // Capa difusora inferior sobre la base de la catedral
+                GameObject baseFog = new GameObject("Cathedral_Base_BlendFog");
+                baseFog.transform.SetParent(viaEnv, false);
+                baseFog.transform.position = new Vector3(372.0f, 2.5f, 0f);
+                SpriteRenderer bSr = baseFog.AddComponent<SpriteRenderer>();
+                bSr.sprite = fogSprite;
+                bSr.sortingLayerName = "Background";
+                bSr.sortingOrder = 6;
+                bSr.color = new Color(0.10f, 0.08f, 0.18f, 0.75f);
+                baseFog.transform.localScale = new Vector3(5.5f, 3.2f, 1f);
+
+                // Capa difusora lateral izquierda para transición suave con el cielo de la aldea
+                GameObject leftFog = new GameObject("Cathedral_Left_BlendFog");
+                leftFog.transform.SetParent(viaEnv, false);
+                leftFog.transform.position = new Vector3(365.0f, 5.5f, 0f);
+                SpriteRenderer lSr = leftFog.AddComponent<SpriteRenderer>();
+                lSr.sprite = fogSprite;
+                lSr.sortingLayerName = "Background";
+                lSr.sortingOrder = 6;
+                lSr.color = new Color(0.08f, 0.07f, 0.16f, 0.65f);
+                leftFog.transform.localScale = new Vector3(4.0f, 4.5f, 1f);
+
+                // Niebla en el suelo a lo largo del sendero oscuro
                 for (int f = 0; f < 3; f++)
                 {
                     float fx = 366f + f * 4.5f;
