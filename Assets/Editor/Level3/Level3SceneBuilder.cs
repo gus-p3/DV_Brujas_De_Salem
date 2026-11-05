@@ -29,8 +29,8 @@ namespace Level3.Editor
 
         // Límites de cada parte (X del mundo; la Parte 2 conserva las coordenadas originales del Acto 3)
         private const float Part1SpawnX = 2f;
-        private const float Part1EastWallX = 158f;
-        private const float Part1ExitX = 152.5f;
+        private const float Part1EastWallX = 226f;
+        private const float Part1ExitX = 218f;
         private const float Part2SpawnX = 145.6f;
         private const float Part2WestWallX = 142.5f;
         public const string Level1Path = "Assets/Scenes/Level1.unity";
@@ -225,9 +225,9 @@ namespace Level3.Editor
                 BuildAct1ForestTrail(roots["Environment"], roots["Gameplay"], roots["NPCs"], log);
 
                 // ------------------------------------------------------------------
-                // 6. Parte 1 — Acto 2: El Claro y la Casa de la Bruja (X: 112 a X: 158), descanso y salida
+                // 6. Parte 1 — Acto 2: El Claro, Cabaña (X: 112..146) y Desfiladero de las Sombras (X: 146..226)
                 // ------------------------------------------------------------------
-                BuildAct2WitchCabinAndClearing(roots["Environment"], roots["Gameplay"], log);
+                BuildAct2WitchCabinAndClearing(roots["Environment"], roots["Gameplay"], roots["NPCs"], log);
 
                 // Árboles retorcidos, rocas, ruinas, hierba y flores distintos en cada bioma
                 DecorateForestBiomes(roots["Environment"]);
@@ -456,8 +456,8 @@ namespace Level3.Editor
                 {
                     name = "Aldea de Salem (silueta)",
                     renderers = village.ToArray(),
-                    fadeInStartX = 146f,
-                    fadeInEndX = 158f,
+                    fadeInStartX = 175f,
+                    fadeInEndX = 226f,
                     fadeOut = false
                 });
                 Level3BiomeBackdrop backdrop = bgRoot.gameObject.AddComponent<Level3BiomeBackdrop>();
@@ -754,10 +754,13 @@ namespace Level3.Editor
             // SUELO PRINCIPAL DEL ACTO 1, ACTO 2 Y ACTO 3:
             // - Tramo A: X: -6 a X: 52 (58u de largo, superficie en Y: 0.17)
             // - Hueco del Barranco del Río Oscuro: X: 52 a X: 68 (16u de ancho)
-            // - Tramo B: X: 68 a X: 160 (92u de largo, superficie en Y: 0.17, cubre Bastión + Cabaña + Sendero de Regreso)
+            // - Tramo B: X: 68 a X: 170 (102u de largo, superficie en Y: 0.17, cubre Bastión + Cabaña)
+            // - Foso de Ciénaga Oscura del Desfiladero: X: 170 a X: 184 (14u de ancho)
+            // - Tramo C: X: 184 a X: 228 (44u de largo, superficie en Y: 0.17, rampa y salida a la aldea)
             // ------------------------------------------------------------------
             CreateGroundSegment(act1Env, "Ground_Forest_West", -6f, 58f, groundLayer, groundSprite);
-            CreateGroundSegment(act1Env, "Ground_Forest_East", 68f, 92f, groundLayer, groundSprite);
+            CreateGroundSegment(act1Env, "Ground_Forest_East", 68f, 102f, groundLayer, groundSprite);
+            CreateGroundSegment(act1Env, "Ground_ShadowGorge_Rampart", 184f, 44f, groundLayer, groundSprite);
 
             // Muro límite izquierdo en X: -4 para impedir caer fuera del mapa
             CreateSolidWall(act1Env, "Boundary_WestWall", new Vector2(-4.5f, 6f), new Vector2(1.5f, 14f), groundLayer, null);
@@ -814,7 +817,10 @@ namespace Level3.Editor
                 gateSprite,
                 groundLayer);
 
-            log.AppendLine("  - Tramo 1 (X: 0..34): Spawn (2,1), Sign inicial, 2 Pociones Sleep (X:6, X:10), Hideout (X:16), Aldeano, Guardia Portador #1 (X:18..28) y Portón #1 (X:34).");
+            // Ruta Aérea Alta de las Copas (X: 10..32, Y: 5.2..7.5) con Reliquia Secreta #1
+            BuildAct1HighCanopyRoute(act1Env, act1Gameplay, act1Pickups, groundLayer, logASprite, logCSprite, potBlindPrefab, heartPrefab);
+
+            log.AppendLine("  - Tramo 1 (X: 0..34): Spawn (2,1), Sign inicial, 2 Pociones Sleep (X:6, X:10), Hideout (X:16), Aldeano, Guardia Portador #1 (X:18..28), Portón #1 (X:34) y Ruta Aérea Alta con Reliquia #1 (Grimorio).");
 
             // ------------------------------------------------------------------
             // 2. RETO 1: EL TRONCO HUECO (GATO) Y EL BARRANCO DE ESPINAS (X: 35 a 72)
@@ -920,11 +926,12 @@ namespace Level3.Editor
         }
 
         // =========================================================================
-        // CONSTRUCCIÓN DEL ACTO 2: EL CLARO Y LA CASA DE LA BRUJA (X: 112 a X: 150)
+        // CONSTRUCCIÓN DEL ACTO 2: EL CLARO Y LA CASA DE LA BRUJA (X: 112 a X: 226)
         // =========================================================================
-        private static void BuildAct2WitchCabinAndClearing(Transform envRoot, Transform gameplayRoot, StringBuilder log)
+        private static void BuildAct2WitchCabinAndClearing(Transform envRoot, Transform gameplayRoot, Transform npcsRoot, StringBuilder log)
         {
             int groundLayer = LayerMask.NameToLayer("Ground");
+            LayerMask groundMask = 1 << groundLayer;
 
             Sprite logASprite = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Platform_Log_A.png");
             Sprite logBSprite = AssetDatabase.LoadAssetAtPath<Sprite>(EnvPath + "Env_Platform_Log_B.png");
@@ -934,6 +941,9 @@ namespace Level3.Editor
 
             GameObject checkpointPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(CheckpointPrefabPath);
             GameObject potSleepPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PotionSleepPath);
+            GameObject potBlindPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PotionBlindPath);
+            GameObject heartPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(HeartPickupPath);
+            GameObject guardPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(GuardPrefabPath);
             Sprite[] cainosSprites = AssetDatabase.LoadAllAssetsAtPath(CainosAtlasPath).OfType<Sprite>().ToArray();
 
             Transform act2Env = new GameObject("Act2_WitchCabin_Env").transform;
@@ -1079,20 +1089,240 @@ namespace Level3.Editor
             restCol.size = new Vector2(11f, 4.4f);
             restGo.AddComponent<Level3CabinRestZone>();
 
-            // 7. Sendero de Regreso (X: 146 a 158): fin de la Parte 1 -> escena Level3_Village
-            CreateWorldSign(
+            // 7. Desfiladero de las Sombras y Reto de Regreso a la Aldea (X: 146 a 226)
+            BuildAct2ShadowGorge(
+                act2Env,
                 act2Gameplay,
-                "Sign_Act2_ReturnTrail",
-                new Vector2(149.6f, 0.9f),
+                npcsRoot,
+                groundLayer,
+                groundMask,
+                logASprite,
+                logBSprite,
+                logCSprite,
                 signSprite,
-                "Sendero de Regreso: la Aldea de Salem está al final del camino.");
+                checkpointPrefab,
+                potSleepPrefab,
+                potBlindPrefab,
+                heartPrefab,
+                guardPrefab,
+                cainosSprites);
 
+            log.AppendLine("  - Acto 2 (X: 112..226): Claro seguro con Checkpoint (X:116), descanso en la Casa de la Bruja (X:124..136), WitchCauldronInteractable (X:130), Portón de Regreso (X:146), Desfiladero de las Sombras (X:146..226) con Checkpoints (X:152, X:203), Plataforma Móvil sobre ciénaga, Géiser ambiental, Guardia Élite, túnel de gato con pociones, Reliquia #3 (Cáliz), Mecanismo de Rastra de Salem y salida en X:218.");
+        }
+
+        // =========================================================================
+        // CONSTRUCCIÓN DEL DESFILADERO DE LAS SOMBRAS (PARTE 1 — FINAL EXPANDIDO, X: 146 a X: 226)
+        // =========================================================================
+        private static void BuildAct2ShadowGorge(
+            Transform envParent,
+            Transform gameplayParent,
+            Transform npcsParent,
+            int groundLayer,
+            LayerMask groundMask,
+            Sprite logASprite,
+            Sprite logBSprite,
+            Sprite logCSprite,
+            Sprite signSprite,
+            GameObject checkpointPrefab,
+            GameObject potSleepPrefab,
+            GameObject potBlindPrefab,
+            GameObject heartPrefab,
+            GameObject guardPrefab,
+            Sprite[] cainosSprites)
+        {
+            Transform gorgeEnv = new GameObject("Act2_ShadowGorge_Env").transform;
+            gorgeEnv.SetParent(envParent, false);
+
+            Transform gorgeGameplay = new GameObject("Act2_ShadowGorge_Gameplay").transform;
+            gorgeGameplay.SetParent(gameplayParent, false);
+
+            Transform gorgePickups = new GameObject("Act2_ShadowGorge_Pickups").transform;
+            gorgePickups.SetParent(gorgeGameplay, false);
+
+            // 1. Checkpoint 5 al entrar al Desfiladero (X: 152, Y: 0.17)
+            CreateCheckpoint(gorgeGameplay, checkpointPrefab, "Checkpoint_Act2_ShadowGorge", new Vector3(152f, 0.17f, 0f));
+
+            // 2. Cartel del Desfiladero
+            CreateWorldSign(
+                gorgeGameplay,
+                "Sign_Act2_ShadowGorge",
+                new Vector2(154.5f, 0.9f),
+                signSprite,
+                "Desfiladero de las Sombras: La Inquisición patrulla el camino a Salem. Vuela sobre la ciénaga con tu Escoba o infíltrate con forma de Gato.");
+
+            // 3. Pociones de apoyo antes del foso
+            InstantiatePickup(gorgePickups, potSleepPrefab, "PotionPickup_Gorge_Sleep", new Vector3(158f, 0.72f, 0f));
+            InstantiatePickup(gorgePickups, potBlindPrefab, "PotionPickup_Gorge_Blind", new Vector3(164f, 0.72f, 0f));
+
+            // 4. Gran Foso de Ciénaga Oscura / Pantano de Espinas (X: 170 a 184)
+            GameObject kzGorge = new GameObject("KillZone_ShadowSwamp");
+            kzGorge.transform.SetParent(gorgeGameplay, false);
+            kzGorge.transform.position = new Vector3(177f, -4.5f, 0f);
+            BoxCollider2D kzGCol = kzGorge.AddComponent<BoxCollider2D>();
+            kzGCol.isTrigger = true;
+            kzGCol.size = new Vector2(16f, 2.5f);
+            kzGorge.AddComponent<KillZone>();
+
+            // Peligro ambiental: Géiser de Vaho en la orilla oeste del foso
+            GameObject hazSwamp = new GameObject("EnvironmentalHazard_SwampGeyser");
+            hazSwamp.transform.SetParent(gorgeGameplay, false);
+            hazSwamp.transform.position = new Vector3(168.8f, 0.35f, 0f);
+            BoxCollider2D hazSCol = hazSwamp.AddComponent<BoxCollider2D>();
+            hazSCol.isTrigger = true;
+            hazSCol.size = new Vector2(2.0f, 2.2f);
+            SpriteRenderer hazSSr = hazSwamp.AddComponent<SpriteRenderer>();
+            hazSSr.sprite = EnsureSoftFogSprite();
+            hazSSr.color = new Color(0.7f, 0.2f, 0.85f, 0.8f);
+            hazSSr.sortingLayerName = "Gameplay";
+            hazSSr.sortingOrder = 6;
+            Light2D hazSLight = new GameObject("HazardLight").AddComponent<Light2D>();
+            hazSLight.transform.SetParent(hazSwamp.transform, false);
+            hazSLight.lightType = Light2D.LightType.Point;
+            hazSLight.color = new Color(0.7f, 0.2f, 0.85f, 1f);
+            hazSLight.intensity = 1.1f;
+            hazSLight.pointLightOuterRadius = 3.0f;
+            hazSwamp.AddComponent<Level3EnvironmentalHazard>();
+
+            // Plataformas aéreas sobre el foso de ciénaga
+            CreateOneWayPlatform(gorgeEnv, "Ledge_Swamp_West", logASprite, new Vector2(168f, 3.2f), 1.3f, groundLayer);
+            CreateOneWayPlatform(gorgeEnv, "Ledge_Swamp_HighSpire", logCSprite, new Vector2(176f, 5.8f), 1.5f, groundLayer);
+            CreateOneWayPlatform(gorgeEnv, "Ledge_Swamp_East", logASprite, new Vector2(184f, 3.2f), 1.3f, groundLayer);
+
+            // Plataforma Móvil sobre el pantano (oscila entre X: 172 y 180, Y: 2.4 a 3.6)
+            GameObject movSwamp = new GameObject("MovingPlatform_ShadowSwamp");
+            movSwamp.transform.SetParent(gorgeEnv, false);
+            movSwamp.layer = groundLayer;
+            movSwamp.transform.position = new Vector3(172f, 2.4f, 0f);
+            BoxCollider2D movSCol = movSwamp.AddComponent<BoxCollider2D>();
+            movSCol.size = new Vector2(3.6f, 0.45f);
+            movSCol.usedByEffector = true;
+            PlatformEffector2D movSEff = movSwamp.AddComponent<PlatformEffector2D>();
+            movSEff.useOneWay = true;
+            movSEff.surfaceArc = 170f;
+            SpriteRenderer movSSr = movSwamp.AddComponent<SpriteRenderer>();
+            movSSr.sprite = logCSprite;
+            movSSr.color = new Color(0.85f, 0.7f, 1f, 1f);
+            movSSr.sortingLayerName = "Gameplay";
+            movSSr.sortingOrder = 2;
+            Light2D movSLight = new GameObject("Glow").AddComponent<Light2D>();
+            movSLight.transform.SetParent(movSwamp.transform, false);
+            movSLight.lightType = Light2D.LightType.Point;
+            movSLight.color = new Color(0.8f, 0.4f, 1f, 1f);
+            movSLight.intensity = 1.0f;
+            movSLight.pointLightOuterRadius = 3f;
+            Level3MovingPlatform movSComp = movSwamp.AddComponent<Level3MovingPlatform>();
+            movSComp.Configure(new Vector3(172f, 2.4f, 0f), new Vector3(180f, 3.6f, 0f), 2.4f, 0.75f);
+
+            // 5. Bastión y Rampart del Desfiladero (X: 184 a 202)
+            // Piso elevado de la muralla (Y: 3.8)
+            GameObject rampartFloor = new GameObject("Rampart_Upper_Floor");
+            rampartFloor.transform.SetParent(gorgeEnv, false);
+            rampartFloor.layer = groundLayer;
+            rampartFloor.transform.position = new Vector3(193f, 3.8f, 0f);
+            BoxCollider2D rampartCol = rampartFloor.AddComponent<BoxCollider2D>();
+            rampartCol.size = new Vector2(16.5f, 0.45f);
+            rampartCol.usedByEffector = true;
+            PlatformEffector2D rampartEff = rampartFloor.AddComponent<PlatformEffector2D>();
+            rampartEff.useOneWay = true;
+            rampartEff.surfaceArc = 170f;
+
+            for (int i = 0; i < 4; i++)
+            {
+                GameObject tile = new GameObject($"Rampart_Visual_{i}");
+                tile.transform.SetParent(rampartFloor.transform, false);
+                tile.transform.localPosition = new Vector3(-6f + i * 4.0f, 0f, 0f);
+                tile.transform.localScale = new Vector3(1.25f, 0.55f, 1f);
+                SpriteRenderer sr = tile.AddComponent<SpriteRenderer>();
+                sr.sprite = logCSprite;
+                sr.sortingLayerName = "Gameplay";
+                sr.sortingOrder = 2;
+            }
+
+            // Guardia Élite en la muralla (X: 188 a 198, Y: 3.82)
+            Transform[] wpElite = CreateWaypoints(npcsParent, "Waypoints_Guard_ShadowElite", new Vector2(188f, 3.82f), new Vector2(198f, 3.82f));
+            CreateGuard(npcsParent, guardPrefab, "Guard_ShadowGorge_Elite", new Vector3(193f, 3.82f, 0f), wpElite, PatrolMode.PingPong, groundMask);
+
+            // Túnel bajo para Gato (X: 186 a 198, Y: 0.17 a 1.15)
+            AddSolidBox(gorgeEnv, "Underpass_Roof_Solid", new Vector2(186f, 1.35f), new Vector2(198f, 2.4f), groundLayer, new Color(0.28f, 0.2f, 0.15f, 1f));
+            CreateCatOnlyTrigger(gorgeGameplay, "CatOnlyPassage_ShadowEntry", new Vector3(185.5f, 0.95f, 0f),
+                "Paso estrecho: Infíltrate en forma de Gato [T] para pasar bajo la muralla.");
+            CreateCatOnlyTrigger(gorgeGameplay, "CatOnlyPassage_ShadowExit", new Vector3(198.5f, 0.95f, 0f),
+                "Paso estrecho: Infíltrate en forma de Gato [T] para pasar bajo la muralla.");
+
+            // Recompensas dentro del túnel de infiltración
+            InstantiatePickup(gorgePickups, potSleepPrefab, "PotionPickup_Underpass_Sleep", new Vector3(190f, 0.58f, 0f));
+            InstantiatePickup(gorgePickups, heartPrefab, "HeartPickup_Underpass", new Vector3(194f, 0.58f, 0f));
+            ShrinkPickupTriggers(gorgePickups, "PotionPickup_Underpass_Sleep", "HeartPickup_Underpass");
+
+            // 6. Risco Alto y Reliquia Secreta #3: Cáliz de Plata del Aquelarre (X: 192, Y: 7.2)
+            CreateOneWayPlatform(gorgeEnv, "Ledge_HighSpire_Relic", logCSprite, new Vector2(192f, 7.2f), 1.4f, groundLayer);
+            Sprite chaliceSprite = LoadFirstSprite(Level2ArtPath + "Interactive_Chest_Closed.png");
+            GameObject relic3Go = new GameObject("SecretRelic_Chalice");
+            relic3Go.transform.SetParent(gorgeGameplay, false);
+            relic3Go.transform.position = new Vector3(192f, 7.85f, 0f);
+            BoxCollider2D relic3Col = relic3Go.AddComponent<BoxCollider2D>();
+            relic3Col.isTrigger = true;
+            relic3Col.size = new Vector2(1.2f, 1.2f);
+            SpriteRenderer relic3Sr = relic3Go.AddComponent<SpriteRenderer>();
+            relic3Sr.sprite = chaliceSprite;
+            relic3Sr.color = new Color(0.9f, 0.75f, 1f, 1f);
+            relic3Sr.sortingLayerName = "Gameplay";
+            relic3Sr.sortingOrder = 5;
+            Light2D relic3Light = new GameObject("RelicLight").AddComponent<Light2D>();
+            relic3Light.transform.SetParent(relic3Go.transform, false);
+            relic3Light.lightType = Light2D.LightType.Point;
+            relic3Light.color = new Color(0.85f, 0.65f, 1f, 1f);
+            relic3Light.intensity = 1.2f;
+            relic3Light.pointLightOuterRadius = 3f;
+            Level3SecretRelic relic3 = relic3Go.AddComponent<Level3SecretRelic>();
+            relic3.Configure("relic_chalice", "Cáliz de Plata del Aquelarre", 400, chaliceSprite, new Color(0.85f, 0.65f, 1f, 1f));
+
+            // 7. Checkpoint 6 en la aproximación final (X: 203, Y: 0.17)
+            CreateCheckpoint(gorgeGameplay, checkpointPrefab, "Checkpoint_Act2_FinalApproach", new Vector3(203f, 0.17f, 0f));
+
+            // 8. Mecanismo de Salida: Runa y Rastra de Salem (X: 206 y X: 211)
+            GameObject finalGateGo = new GameObject("MechanismGate_SalemApproach");
+            finalGateGo.transform.SetParent(gorgeEnv, false);
+            finalGateGo.layer = groundLayer;
+            finalGateGo.transform.position = new Vector3(211f, 2.2f, 0f);
+            BoxCollider2D finalGateCol = finalGateGo.AddComponent<BoxCollider2D>();
+            finalGateCol.size = new Vector2(0.9f, 4.0f);
+            SpriteRenderer finalGateSr = finalGateGo.AddComponent<SpriteRenderer>();
+            finalGateSr.sprite = logBSprite;
+            finalGateSr.color = new Color(0.5f, 0.35f, 0.65f, 1f);
+            finalGateSr.sortingLayerName = "Gameplay";
+            finalGateSr.sortingOrder = 3;
+            Level3MechanismGate finalGate = finalGateGo.AddComponent<Level3MechanismGate>();
+            finalGate.Configure("gate_salem_approach", "Rastra del Portal de Salem", finalGateGo.transform, finalGateCol, 4.0f);
+
+            Sprite leverSprite = FindAtlasSprite(cainosSprites, "TX Village Props - Lever 01") ?? logASprite;
+            GameObject finalSwitchGo = new GameObject("RuneSwitch_SalemPortal");
+            finalSwitchGo.transform.SetParent(gorgeGameplay, false);
+            finalSwitchGo.transform.position = new Vector3(205.5f, 0.85f, 0f);
+            BoxCollider2D finalSwCol = finalSwitchGo.AddComponent<BoxCollider2D>();
+            finalSwCol.isTrigger = true;
+            finalSwCol.size = new Vector2(1.8f, 1.8f);
+            SpriteRenderer finalSwSr = finalSwitchGo.AddComponent<SpriteRenderer>();
+            finalSwSr.sprite = leverSprite;
+            finalSwSr.sortingLayerName = "Gameplay";
+            finalSwSr.sortingOrder = 4;
+            Light2D finalSwLight = new GameObject("SwitchLight").AddComponent<Light2D>();
+            finalSwLight.transform.SetParent(finalSwitchGo.transform, false);
+            finalSwLight.lightType = Light2D.LightType.Point;
+            finalSwLight.color = new Color(0.3f, 1f, 0.7f, 1f);
+            finalSwLight.intensity = 1.0f;
+            finalSwLight.pointLightOuterRadius = 2.5f;
+            Level3RuneSwitch finalSw = finalSwitchGo.AddComponent<Level3RuneSwitch>();
+            finalSw.Configure("switch_salem_portal", "Mecanismo del Portal", finalGate);
+            finalGate.AddRequiredSwitch(finalSw);
+
+            // 9. Portal de Salida hacia la Aldea (Level3_Village) en Part1ExitX (218)
             GameObject exitGo = new GameObject("Part1_Exit_ToVillage");
-            exitGo.transform.SetParent(act2Gameplay, false);
+            exitGo.transform.SetParent(gorgeGameplay, false);
             exitGo.transform.position = new Vector3(Part1ExitX, 3f, 0f);
             BoxCollider2D exitCol = exitGo.AddComponent<BoxCollider2D>();
             exitCol.isTrigger = true;
-            exitCol.size = new Vector2(1.6f, 6f);
+            exitCol.size = new Vector2(2.0f, 6.5f);
             exitGo.AddComponent<Level3PartExit>();
 
             Light2D exitGlow = new GameObject("ExitGlow").AddComponent<Light2D>();
@@ -1100,12 +1330,15 @@ namespace Level3.Editor
             exitGlow.transform.localPosition = new Vector3(1.5f, -1.4f, 0f);
             exitGlow.lightType = Light2D.LightType.Point;
             exitGlow.color = new Color(1f, 0.82f, 0.45f, 1f);
-            exitGlow.intensity = 1.1f;
-            exitGlow.pointLightOuterRadius = 5f;
+            exitGlow.intensity = 1.3f;
+            exitGlow.pointLightOuterRadius = 6f;
 
-            CreateSolidWall(act2Env, "Boundary_EastTrailWall", new Vector2(Part1EastWallX, 6f), new Vector2(1.5f, 14f), groundLayer, null);
+            // Portal visual: dos pilares místicos enmarcando la salida
+            PlaceCainosSprite(gorgeEnv, cainosSprites, "PortalPillar_West", "TX Village Props - Stall Tent Pillar", new Vector3(Part1ExitX - 1.2f, 1.8f, 0f), 1.4f, true);
+            PlaceCainosSprite(gorgeEnv, cainosSprites, "PortalPillar_East", "TX Village Props - Stall Tent Pillar", new Vector3(Part1ExitX + 1.2f, 1.8f, 0f), 1.4f, true);
 
-            log.AppendLine("  - Acto 2 (X: 112..158): Claro seguro con Checkpoint (X:116), descanso en la Casa de la Bruja (X:124..136), WitchCauldronInteractable (X:130), Portón de Regreso (X:146) y salida a la Parte 2 (X:152.5).");
+            // 10. Muro Límite Este en Part1EastWallX (226)
+            CreateSolidWall(envParent, "Boundary_EastTrailWall", new Vector2(Part1EastWallX, 6f), new Vector2(1.5f, 14f), groundLayer, null);
         }
 
         // =========================================================================
@@ -2028,6 +2261,50 @@ namespace Level3.Editor
             return station;
         }
 
+        private static void BuildAct1HighCanopyRoute(
+            Transform envParent,
+            Transform gameplayParent,
+            Transform pickupsParent,
+            int groundLayer,
+            Sprite logASprite,
+            Sprite logCSprite,
+            GameObject potBlindPrefab,
+            GameObject heartPrefab)
+        {
+            Transform canopyRoot = new GameObject("Act1_HighCanopy_Route").transform;
+            canopyRoot.SetParent(envParent, false);
+
+            // 1. Plataforma copa oeste (X: 14.5, Y: 5.2)
+            CreateOneWayPlatform(canopyRoot, "Platform_Canopy_West1", logASprite, new Vector2(14.5f, 5.2f), 1.35f, groundLayer);
+            InstantiatePickup(pickupsParent, potBlindPrefab, "PotionPickup_Canopy_Blind", new Vector3(14.5f, 5.8f, 0f));
+
+            // 2. Plataforma copa central alta (X: 22.0, Y: 7.0) con Reliquia Secreta #1
+            CreateOneWayPlatform(canopyRoot, "Platform_Canopy_CenterHigh", logCSprite, new Vector2(22.0f, 7.0f), 1.55f, groundLayer);
+            Sprite loreBookSprite = LoadFirstSprite(Level2ArtPath + "Interactive_LoreBook.png");
+            GameObject relic1Go = new GameObject("SecretRelic_Grimoire");
+            relic1Go.transform.SetParent(gameplayParent, false);
+            relic1Go.transform.position = new Vector3(22.0f, 7.65f, 0f);
+            BoxCollider2D relic1Col = relic1Go.AddComponent<BoxCollider2D>();
+            relic1Col.isTrigger = true;
+            relic1Col.size = new Vector2(1.2f, 1.2f);
+            SpriteRenderer relic1Sr = relic1Go.AddComponent<SpriteRenderer>();
+            relic1Sr.sprite = loreBookSprite;
+            relic1Sr.sortingLayerName = "Gameplay";
+            relic1Sr.sortingOrder = 5;
+            Light2D relic1Light = new GameObject("RelicLight").AddComponent<Light2D>();
+            relic1Light.transform.SetParent(relic1Go.transform, false);
+            relic1Light.lightType = Light2D.LightType.Point;
+            relic1Light.color = new Color(0.95f, 0.78f, 0.25f, 1f);
+            relic1Light.intensity = 1.1f;
+            relic1Light.pointLightOuterRadius = 3f;
+            Level3SecretRelic relic1 = relic1Go.AddComponent<Level3SecretRelic>();
+            relic1.Configure("relic_grimoire", "Grimorio Olvidado de Salem", 350, loreBookSprite, new Color(0.95f, 0.78f, 0.25f, 1f));
+
+            // 3. Plataforma copa este (X: 29.5, Y: 5.5)
+            CreateOneWayPlatform(canopyRoot, "Platform_Canopy_East1", logASprite, new Vector2(29.5f, 5.5f), 1.35f, groundLayer);
+            InstantiatePickup(pickupsParent, heartPrefab, "HeartPickup_Canopy_West", new Vector3(29.5f, 6.05f, 0f));
+        }
+
         private static void BuildHollowRootTunnel(
             Transform envParent,
             Transform gameplayParent,
@@ -2104,6 +2381,28 @@ namespace Level3.Editor
             InstantiatePickup(pickupsParent, potBlindPrefab, "PotionPickup_Tunnel_Blind", new Vector3(47f, 0.6f, 0f));
             ShrinkPickupTriggers(pickupsParent, "PotionPickup_Tunnel_Sleep", "HeartPickup_Tunnel", "PotionPickup_Tunnel_Blind");
 
+            // Reliquia Secreta #2: Talismán de Hécate oculto dentro del tronco hueco (accesible solo como Gato)
+            Sprite relicSprite2 = LoadFirstSprite(Level2ArtPath + "Interactive_Key.png");
+            GameObject relic2Go = new GameObject("SecretRelic_Talisman");
+            relic2Go.transform.SetParent(gameplayParent, false);
+            relic2Go.transform.position = new Vector3(46f, 0.72f, 0f);
+            BoxCollider2D relic2Col = relic2Go.AddComponent<BoxCollider2D>();
+            relic2Col.isTrigger = true;
+            relic2Col.size = new Vector2(1.1f, 1.1f);
+            SpriteRenderer relic2Sr = relic2Go.AddComponent<SpriteRenderer>();
+            relic2Sr.sprite = relicSprite2;
+            relic2Sr.color = new Color(0.4f, 1f, 0.8f, 1f);
+            relic2Sr.sortingLayerName = "Gameplay";
+            relic2Sr.sortingOrder = 5;
+            Light2D relic2Light = new GameObject("RelicLight").AddComponent<Light2D>();
+            relic2Light.transform.SetParent(relic2Go.transform, false);
+            relic2Light.lightType = Light2D.LightType.Point;
+            relic2Light.color = new Color(0.35f, 0.95f, 0.75f, 1f);
+            relic2Light.intensity = 1.1f;
+            relic2Light.pointLightOuterRadius = 2.5f;
+            Level3SecretRelic relic2 = relic2Go.AddComponent<Level3SecretRelic>();
+            relic2.Configure("relic_talisman", "Talismán de Hécate", 350, relicSprite2, new Color(0.35f, 0.95f, 0.75f, 1f));
+
             // Guardia patrullando sobre el tronco (X: 41 a 49)
             Transform[] wpRoof = CreateWaypoints(npcsParent, "Waypoints_Guard_TrunkRoof", new Vector2(41.2f, roofTop + 0.02f), new Vector2(48.8f, roofTop + 0.02f));
             CreateGuard(npcsParent, guardPrefab, "Guard_TrunkRoof", new Vector3(45f, roofTop + 0.02f, 0f), wpRoof, PatrolMode.PingPong, groundMask);
@@ -2158,7 +2457,59 @@ namespace Level3.Editor
             Transform[] wpSentinel = CreateWaypoints(npcsParent, "Waypoints_Guard_RavineSentinel", new Vector2(63.6f, 4.77f), new Vector2(66.0f, 4.77f));
             CreateGuard(npcsParent, guardPrefab, "Guard_RavineSentinel", new Vector3(64.8f, 4.77f, 0f), wpSentinel, PatrolMode.PingPong, groundMask);
 
-            // 6. Peligro visible: acantilados, vallas rotas, niebla violeta y cartel
+            // 6. Plataforma Móvil Rúnica sobre el abismo (oscila entre X: 56.5 y 63.5 en Y: 2.8)
+            GameObject movPlatGo = new GameObject("MovingPlatform_DarkRiver");
+            movPlatGo.transform.SetParent(envParent, false);
+            movPlatGo.layer = groundLayer;
+            movPlatGo.transform.position = new Vector3(56.5f, 2.8f, 0f);
+
+            BoxCollider2D movCol = movPlatGo.AddComponent<BoxCollider2D>();
+            movCol.size = new Vector2(3.6f, 0.45f);
+            movCol.usedByEffector = true;
+            PlatformEffector2D movEff = movPlatGo.AddComponent<PlatformEffector2D>();
+            movEff.useOneWay = true;
+            movEff.surfaceArc = 170f;
+
+            SpriteRenderer movSr = movPlatGo.AddComponent<SpriteRenderer>();
+            movSr.sprite = logCSprite;
+            movSr.color = new Color(0.72f, 0.85f, 1f, 1f);
+            movSr.sortingLayerName = "Gameplay";
+            movSr.sortingOrder = 2;
+
+            Light2D movLight = new GameObject("RuneLight").AddComponent<Light2D>();
+            movLight.transform.SetParent(movPlatGo.transform, false);
+            movLight.lightType = Light2D.LightType.Point;
+            movLight.color = new Color(0.4f, 0.85f, 1f, 1f);
+            movLight.intensity = 1.0f;
+            movLight.pointLightOuterRadius = 3f;
+
+            Level3MovingPlatform movComp = movPlatGo.AddComponent<Level3MovingPlatform>();
+            movComp.Configure(new Vector3(56.5f, 2.8f, 0f), new Vector3(63.5f, 2.8f, 0f), 2.2f, 0.7f);
+
+            // 7. Peligro ambiental: Géiser de vaho tóxico al pie del acantilado oeste (X: 53.6, Y: 0.25)
+            GameObject hazardGo = new GameObject("EnvironmentalHazard_RavineGeyser");
+            hazardGo.transform.SetParent(gameplayParent, false);
+            hazardGo.transform.position = new Vector3(53.6f, 0.35f, 0f);
+            BoxCollider2D hazCol = hazardGo.AddComponent<BoxCollider2D>();
+            hazCol.isTrigger = true;
+            hazCol.size = new Vector2(2.2f, 2.4f);
+
+            SpriteRenderer hazSr = hazardGo.AddComponent<SpriteRenderer>();
+            hazSr.sprite = EnsureSoftFogSprite();
+            hazSr.color = new Color(0.55f, 0.15f, 0.85f, 0.8f);
+            hazSr.sortingLayerName = "Gameplay";
+            hazSr.sortingOrder = 6;
+
+            Light2D hazLight = new GameObject("HazardLight").AddComponent<Light2D>();
+            hazLight.transform.SetParent(hazardGo.transform, false);
+            hazLight.lightType = Light2D.LightType.Point;
+            hazLight.color = new Color(0.6f, 0.2f, 0.9f, 1f);
+            hazLight.intensity = 1.2f;
+            hazLight.pointLightOuterRadius = 3.2f;
+
+            hazardGo.AddComponent<Level3EnvironmentalHazard>();
+
+            // 8. Peligro visible: acantilados, vallas rotas, niebla violeta y cartel
             DecorateRavineDanger(envParent, ravineStartX, ravineEndX);
         }
 
@@ -2208,6 +2559,71 @@ namespace Level3.Editor
             // Recargas de PotionPickup (Sleep) ocultas tras el CatOnlyPassage lateral en X: 82
             InstantiatePickup(pickupsParent, potSleepPrefab, "PotionPickup_Bastion_Sleep_1", new Vector3(81.6f, 0.58f, 0f));
             InstantiatePickup(pickupsParent, potSleepPrefab, "PotionPickup_Bastion_Sleep_2", new Vector3(83.2f, 0.58f, 0f));
+
+            // Mecanismo del Acueducto: Compuerta Rúnica y Palancas (abre el paso directo bajo el bastión)
+            Sprite[] cainos = AssetDatabase.LoadAllAssetsAtPath(CainosAtlasPath).OfType<Sprite>().ToArray();
+            Sprite leverSprite = FindAtlasSprite(cainos, "TX Village Props - Lever 01") ?? logASprite;
+
+            GameObject mechGateGo = new GameObject("MechanismGate_BastionArch");
+            mechGateGo.transform.SetParent(bastionRoot.transform, false);
+            mechGateGo.layer = groundLayer;
+            mechGateGo.transform.position = new Vector3(84.8f, 2.0f, 0f);
+
+            BoxCollider2D gateCol = mechGateGo.AddComponent<BoxCollider2D>();
+            gateCol.size = new Vector2(0.8f, 3.6f);
+
+            SpriteRenderer gateSr = mechGateGo.AddComponent<SpriteRenderer>();
+            gateSr.sprite = logBSprite;
+            gateSr.color = new Color(0.35f, 0.45f, 0.55f, 1f);
+            gateSr.sortingLayerName = "Gameplay";
+            gateSr.sortingOrder = 3;
+
+            Level3MechanismGate mechGate = mechGateGo.AddComponent<Level3MechanismGate>();
+            mechGate.Configure("gate_bastion_arch", "Compuerta del Acueducto", mechGateGo.transform, gateCol, 3.6f);
+
+            // Interruptor de Runa #1: En las ruinas superiores (X: 84f, Y: 5.6f) - requiere volar con escoba
+            GameObject switch1Go = new GameObject("RuneSwitch_BastionHigh");
+            switch1Go.transform.SetParent(gameplayParent, false);
+            switch1Go.transform.position = new Vector3(84f, 5.6f, 0f);
+            BoxCollider2D sw1Col = switch1Go.AddComponent<BoxCollider2D>();
+            sw1Col.isTrigger = true;
+            sw1Col.size = new Vector2(1.8f, 1.8f);
+            SpriteRenderer sw1Sr = switch1Go.AddComponent<SpriteRenderer>();
+            sw1Sr.sprite = leverSprite;
+            sw1Sr.sortingLayerName = "Gameplay";
+            sw1Sr.sortingOrder = 4;
+            Light2D sw1Light = new GameObject("SwitchLight").AddComponent<Light2D>();
+            sw1Light.transform.SetParent(switch1Go.transform, false);
+            sw1Light.lightType = Light2D.LightType.Point;
+            sw1Light.color = new Color(0.3f, 1f, 0.7f, 1f);
+            sw1Light.intensity = 0.9f;
+            sw1Light.pointLightOuterRadius = 2.5f;
+
+            Level3RuneSwitch sw1 = switch1Go.AddComponent<Level3RuneSwitch>();
+            sw1.Configure("switch_bastion_high", "Runa de la Torre", mechGate);
+            mechGate.AddRequiredSwitch(sw1);
+
+            // Interruptor de Runa #2: En el nicho de gato (X: 81.2f, Y: 0.75f) - accesible como gato
+            GameObject switch2Go = new GameObject("RuneSwitch_BastionCat");
+            switch2Go.transform.SetParent(gameplayParent, false);
+            switch2Go.transform.position = new Vector3(81.2f, 0.75f, 0f);
+            BoxCollider2D sw2Col = switch2Go.AddComponent<BoxCollider2D>();
+            sw2Col.isTrigger = true;
+            sw2Col.size = new Vector2(1.6f, 1.6f);
+            SpriteRenderer sw2Sr = switch2Go.AddComponent<SpriteRenderer>();
+            sw2Sr.sprite = leverSprite;
+            sw2Sr.sortingLayerName = "Gameplay";
+            sw2Sr.sortingOrder = 4;
+            Light2D sw2Light = new GameObject("SwitchLight").AddComponent<Light2D>();
+            sw2Light.transform.SetParent(switch2Go.transform, false);
+            sw2Light.lightType = Light2D.LightType.Point;
+            sw2Light.color = new Color(0.3f, 1f, 0.7f, 1f);
+            sw2Light.intensity = 0.9f;
+            sw2Light.pointLightOuterRadius = 2.2f;
+
+            Level3RuneSwitch sw2 = switch2Go.AddComponent<Level3RuneSwitch>();
+            sw2.Configure("switch_bastion_cat", "Runa de las Raíces", mechGate);
+            mechGate.AddRequiredSwitch(sw2);
 
             // 2. Planta baja (Y: 0.17): 1 Guardia normal + 1 Aldeano chismoso
             Transform[] wpBastionGround = CreateWaypoints(npcsParent, "Waypoints_Guard_BastionGround", new Vector2(76.5f, 0.17f), new Vector2(88.5f, 0.17f));
