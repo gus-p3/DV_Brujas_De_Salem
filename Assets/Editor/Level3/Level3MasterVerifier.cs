@@ -158,9 +158,16 @@ namespace Level3.Editor
             PlayerController pc = Find<PlayerController>().FirstOrDefault();
             if (pc != null)
             {
-                Check(r, pc.GetComponent<PotionInventory>() != null && pc.GetComponent<BroomInventory>() != null,
+                PotionInventory pinv = pc.GetComponent<PotionInventory>();
+                Check(r, pinv != null && pc.GetComponent<BroomInventory>() != null,
                     "PotionInventory y BroomInventory viven en la Bruja",
                     "PotionInventory/BroomInventory no están en el GameObject del jugador");
+                if (pinv != null)
+                {
+                    Check(r, pinv.MasterPotionPrefab != null,
+                        "PotionInventory tiene asignado el proyectil de la Poción Maestra",
+                        "Falta asignar masterPotionPrefab en PotionInventory");
+                }
                 Check(r, pc.GetComponent<PlayerInteractor>() != null, "PlayerInteractor presente en la Bruja",
                     "Falta PlayerInteractor en la Bruja");
             }
@@ -171,6 +178,9 @@ namespace Level3.Editor
                 Check(r, hud.levelCompletePanel != null && hud.levelCompletePanel.transform.Find("WinTitle") != null,
                     "LevelCompletePanel con WinTitle listo para el mensaje de victoria final",
                     "HUDController sin LevelCompletePanel/WinTitle para la victoria del Nivel 3");
+                Check(r, hud.transform.Find("Flask_Maestra") != null && hud.masterChargesText != null,
+                    "HUD con 4 ranuras horizontales incluyendo Flask_Maestra para la Poción Maestra",
+                    "Falta la cuarta ranura Flask_Maestra o masterChargesText en el HUD");
             }
 
             Level3StateController state = Find<Level3StateController>().FirstOrDefault();
@@ -359,6 +369,12 @@ namespace Level3.Editor
             if (!part.Village)
             {
                 Check(r, cauldrons.Length == 1, "1 WitchCauldronInteractable en la Cabaña", $"Se esperaba 1 caldero, hay {cauldrons.Length}");
+                if (cauldrons.Length == 1)
+                {
+                    Check(r, cauldrons[0].GetPromptText(null) == "[E] Preparar Poción Maestra",
+                        "Caldero muestra '[E] Preparar Poción Maestra'",
+                        $"El caldero muestra '{cauldrons[0].GetPromptText(null)}'");
+                }
                 Check(r, Find<LoreObject>().Length == 0 && Find<TreasureChest>().Length == 0,
                     "Pistas y cofres reservados para la Parte 2",
                     "La Parte 1 contiene pistas o cofres de la Aldea");

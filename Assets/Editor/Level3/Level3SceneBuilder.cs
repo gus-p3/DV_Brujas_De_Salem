@@ -280,9 +280,17 @@ namespace Level3.Editor
                 witch.AddComponent<BroomInventory>();
             }
 
-            if (witch.GetComponent<PotionInventory>() == null)
+            PotionInventory potionInv = witch.GetComponent<PotionInventory>();
+            if (potionInv == null)
             {
-                witch.AddComponent<PotionInventory>();
+                potionInv = witch.AddComponent<PotionInventory>();
+            }
+            GameObject masterProjPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/PotionProjectile_Master.prefab");
+            if (masterProjPrefab != null)
+            {
+                SerializedObject soPInv = new SerializedObject(potionInv);
+                soPInv.FindProperty("masterPotionPrefab").objectReferenceValue = masterProjPrefab;
+                soPInv.ApplyModifiedPropertiesWithoutUndo();
             }
 
             if (witch.GetComponent<PlayerInvulnerability>() == null)
@@ -360,6 +368,12 @@ namespace Level3.Editor
             card.EnsureUIHierarchy();
             CanvasGroup cardGroup = cardGo.GetComponent<CanvasGroup>();
             if (cardGroup != null) cardGroup.alpha = 0f; // invisible en el editor; en juego decide Awake()
+
+            HUDController hudCtrl = uiRoot.GetComponentInChildren<HUDController>(true);
+            if (hudCtrl != null)
+            {
+                hudCtrl.EnsureFourPotionSlots();
+            }
 
             // Asegurar mínimo 3 pociones de sueño en GameManager serializado
             GameManager gm = Object.FindFirstObjectByType<GameManager>();

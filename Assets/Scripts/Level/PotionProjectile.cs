@@ -118,6 +118,14 @@ public class PotionProjectile : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Fuerza el impacto del proyectil en la posición indicada (útil para pruebas o detonación manual).
+    /// </summary>
+    public void TriggerImpact(Vector2 impactPoint)
+    {
+        HandleImpact(impactPoint);
+    }
+
     private void HandleImpact(Vector2 impactPoint)
     {
         if (hasImpacted) return;
@@ -138,7 +146,14 @@ public class PotionProjectile : MonoBehaviour
         SpawnSplashEffect(impactPoint);
         ApplySplashDamage(impactPoint);
 
-        Destroy(gameObject);
+        if (Application.isPlaying)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            DestroyImmediate(gameObject);
+        }
     }
 
     private void SpawnSplashEffect(Vector2 position)
