@@ -50,6 +50,21 @@ namespace Level3
         public bool AutoCollectOnSleep => autoCollectOnSleep;
         public bool HasDroppedKey => hasDroppedKey;
 
+        /// <summary>True si el aura dorada (halo + luz 2D) está construida y visible.</summary>
+        public bool HasActiveAura =>
+            auraRootGo != null && auraRootGo.activeInHierarchy &&
+            auraCircleRenderer != null && auraCircleRenderer.enabled && auraCircleRenderer.sprite != null &&
+            carrierLight2D != null && carrierLight2D.enabled;
+
+        /// <summary>
+        /// Garantiza que los visuales del aura existan (usado por herramientas de auditoría en Editor).
+        /// </summary>
+        public void EnsureAuraVisuals()
+        {
+            BuildSpecialGlowVisuals();
+            ApplyAuraColorToVisuals();
+        }
+
         /// <summary>
         /// Configura programáticamente el portador de llave.
         /// </summary>
@@ -125,6 +140,22 @@ namespace Level3
             {
                 auraRootGo = existing.gameObject;
                 auraCircleRenderer = auraRootGo.GetComponent<SpriteRenderer>();
+
+                // Re-cachear referencias de los hijos visuales si el aura ya existía
+                Transform ring = existing.Find("KeyCarrierHaloRing");
+                if (ring != null) outerRingRenderer = ring.GetComponent<SpriteRenderer>();
+                orbitContainer = existing.Find("KeyCarrierOrbitSparks");
+                if (orbitContainer != null)
+                {
+                    for (int i = 0; i < orbitSparkRenderers.Length && i < orbitContainer.childCount; i++)
+                    {
+                        orbitSparkRenderers[i] = orbitContainer.GetChild(i).GetComponent<SpriteRenderer>();
+                    }
+                }
+                floatingKeyBadge = existing.Find("FloatingKeyBadge");
+                if (floatingKeyBadge != null) floatingKeyRenderer = floatingKeyBadge.GetComponent<SpriteRenderer>();
+                Transform lightTr = existing.Find("KeyCarrierLight2D");
+                if (lightTr != null) carrierLight2D = lightTr.GetComponent<Light2D>();
                 return;
             }
 

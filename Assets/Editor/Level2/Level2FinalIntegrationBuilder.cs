@@ -177,7 +177,7 @@ namespace Level2.Editor
 
             // Subtítulo
             TextMeshProUGUI subtitleTmp = CreateTMPText(panelObj.transform, "SubtitleText",
-                "Has recolectado los ingredientes requeridos para el aquelarre colonial.\n<color=#D4AF37>(Acto 3: La Iglesia — Próximamente)</color>",
+                "Has recolectado los ingredientes requeridos para el aquelarre colonial.\n<color=#D4AF37>Siguiente: Nivel 3 — El Bosque, la Cabaña y la Iglesia de Salem</color>",
                 17, FontStyles.Normal,
                 new Color(0.9f, 0.9f, 0.9f, 1f),
                 new Vector2(0f, 130f), new Vector2(700, 55));
@@ -213,7 +213,7 @@ namespace Level2.Editor
 
             // Botones de acción
             Button btnContinue = CreateButton(panelObj.transform, "Btn_Continue",
-                "Continuar (Próximamente: Acto 3)",
+                "Continuar al Nivel 3",
                 new Vector2(0f, -100f), new Vector2(400, 42),
                 new Color(0.20f, 0.45f, 0.25f, 1f));
 
@@ -230,6 +230,7 @@ namespace Level2.Editor
             // Configurar referencias en el componente
             screen.SetReferences(panelObj, titleTmp, subtitleTmp, ingrTmp, timeTmp, scoreTmp,
                 btnContinue, btnRetry, btnMenu);
+            screen.SetNextScene(Level2CompleteScreen.DefaultNextSceneName);
 
             // Ocultar panel por defecto para que no se vea al iniciar el nivel
             panelObj.SetActive(false);

@@ -30,7 +30,30 @@ namespace Level2
 
         [Header("Configuración de Destino")]
         [Tooltip("Nombre de la escena a cargar al pulsar Continuar. Si no existe en Build Settings, carga MainMenu.")]
-        [SerializeField] private string nextSceneName = "MainMenu";
+        [SerializeField] private string nextSceneName = DefaultNextSceneName;
+
+        /// <summary>Escena siguiente en la progresión oficial (Nivel 3: El Bosque y la Iglesia de Salem).</summary>
+        public const string DefaultNextSceneName = "Level3";
+
+        public string NextSceneName => ResolveNextSceneName();
+
+        public void SetNextScene(string sceneName)
+        {
+            nextSceneName = sceneName;
+        }
+
+        /// <summary>
+        /// Devuelve la escena destino de Continuar. Si el valor serializado es el antiguo "MainMenu"
+        /// (cuando el Acto 3 no existía) o está vacío, se usa Level3.
+        /// </summary>
+        private string ResolveNextSceneName()
+        {
+            if (string.IsNullOrEmpty(nextSceneName) || nextSceneName == "MainMenu")
+            {
+                return DefaultNextSceneName;
+            }
+            return nextSceneName;
+        }
 
         private void Awake()
         {
@@ -107,7 +130,7 @@ namespace Level2
 
             if (subtitleText != null)
             {
-                subtitleText.text = "Has recolectado los ingredientes requeridos para el aquelarre colonial.\n<color=#D4AF37>(Acto 3: La Iglesia — Próximamente)</color>";
+                subtitleText.text = "Has recolectado los ingredientes requeridos para el aquelarre colonial.\n<color=#D4AF37>Siguiente: Nivel 3 — El Bosque, la Cabaña y la Iglesia de Salem</color>";
             }
 
             if (ingredientsStatText != null)
@@ -134,12 +157,13 @@ namespace Level2
         public void OnContinueClicked()
         {
             Time.timeScale = 1f;
-            Debug.Log("[Level2CompleteScreen] Continuar pulsado. Volviendo a MainMenu (Acto 3 en desarrollo).");
+            string target = ResolveNextSceneName();
+            Debug.Log($"[Level2CompleteScreen] Continuar pulsado. Cargando '{target}'.");
             if (Application.isPlaying)
             {
-                if (!string.IsNullOrEmpty(nextSceneName) && Application.CanStreamedLevelBeLoaded(nextSceneName))
+                if (Application.CanStreamedLevelBeLoaded(target))
                 {
-                    SceneManager.LoadScene(nextSceneName);
+                    SceneManager.LoadScene(target);
                 }
                 else
                 {

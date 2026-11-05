@@ -187,9 +187,10 @@ namespace Level3
             {
                 StartCoroutine(OpenWingsAndCompleteRoutine());
             }
-            else if (GameManager.Instance != null)
+            else
             {
-                GameManager.Instance.CompleteLevel();
+                if (GameManager.Instance != null) GameManager.Instance.CompleteLevel();
+                PresentFinalVictoryScreen();
             }
         }
 
@@ -228,6 +229,53 @@ namespace Level3
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.CompleteLevel();
+            }
+
+            PresentFinalVictoryScreen();
+        }
+
+        public const string FinalVictoryTitle = "¡Has entrado a la Iglesia de Salem con la Poción Maestra! Nivel 3 Completado";
+
+        /// <summary>
+        /// Muestra la pantalla de nivel completado del HUD (LevelCompletePanel) con el mensaje épico del Nivel 3.
+        /// </summary>
+        public static void PresentFinalVictoryScreen()
+        {
+            HUDController hud = UnityEngine.Object.FindFirstObjectByType<HUDController>(FindObjectsInactive.Include);
+            LevelCompletePanel panel = hud != null && hud.levelCompletePanel != null
+                ? hud.levelCompletePanel
+                : UnityEngine.Object.FindFirstObjectByType<LevelCompletePanel>(FindObjectsInactive.Include);
+
+            if (panel == null)
+            {
+                Debug.Log($"[ChurchDoorGoal] {FinalVictoryTitle}");
+                return;
+            }
+
+            panel.gameObject.SetActive(true);
+            panel.HandleStateChanged(GameState.LevelComplete);
+            panel.gameObject.SetActive(true);
+
+            Transform titleTr = panel.transform.Find("WinTitle");
+            TMPro.TextMeshProUGUI title = titleTr != null ? titleTr.GetComponent<TMPro.TextMeshProUGUI>() : null;
+            if (title != null)
+            {
+                title.text = FinalVictoryTitle;
+                title.textWrappingMode = TMPro.TextWrappingModes.Normal;
+                title.enableAutoSizing = true;
+                title.fontSizeMin = 26f;
+                title.fontSizeMax = 54f;
+                title.color = new Color(1f, 0.86f, 0.32f, 1f);
+                RectTransform rt = title.rectTransform;
+                rt.sizeDelta = new Vector2(1180f, 170f);
+                rt.anchoredPosition = new Vector2(0f, 250f);
+            }
+
+            Transform nextTr = panel.transform.Find("NextLevelBtn/Text");
+            TMPro.TextMeshProUGUI nextLabel = nextTr != null ? nextTr.GetComponent<TMPro.TextMeshProUGUI>() : null;
+            if (nextLabel != null)
+            {
+                nextLabel.text = "Continuar";
             }
         }
 

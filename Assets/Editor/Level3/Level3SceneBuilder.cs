@@ -280,6 +280,13 @@ namespace Level3.Editor
             InteractionPromptUI promptUI = promptGo.AddComponent<InteractionPromptUI>();
             promptUI.EnsureUIHierarchy();
 
+            // Panel de Objetivos del Nivel 3 (fase, portones, pistas, cofres, llaves y Poción Maestra)
+            GameObject objectiveHudGo = new GameObject("Level3ObjectiveHUD_Canvas", typeof(RectTransform));
+            objectiveHudGo.transform.SetParent(uiRoot, false);
+            objectiveHudGo.layer = LayerMask.NameToLayer("UI") >= 0 ? LayerMask.NameToLayer("UI") : 0;
+            Level3ObjectiveHUD objectiveHud = objectiveHudGo.AddComponent<Level3ObjectiveHUD>();
+            objectiveHud.EnsureUIHierarchy();
+
             // Asegurar mínimo 3 pociones de sueño en GameManager serializado
             GameManager gm = Object.FindFirstObjectByType<GameManager>();
             if (gm != null)
