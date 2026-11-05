@@ -251,6 +251,10 @@ namespace Level2
             {
                 potionInventory.SelectPotion(PotionType.Sleep);
             }
+            else if (Input.GetKeyDown(KeyCode.Alpha4) || Input.GetKeyDown(KeyCode.Keypad4))
+            {
+                potionInventory.SelectPotion(PotionType.Master);
+            }
         }
 
         private void OnDrawGizmosSelected()

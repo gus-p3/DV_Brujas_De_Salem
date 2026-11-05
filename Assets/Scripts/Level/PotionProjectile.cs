@@ -121,12 +121,18 @@ public class PotionProjectile : MonoBehaviour
     private void HandleImpact(Vector2 impactPoint)
     {
         if (hasImpacted) return;
-        CameraFollow.Shake(0.08f, 0.15f);
+        float shakeIntensity = potionType == PotionType.Master ? 0.22f : 0.08f;
+        float shakeDuration = potionType == PotionType.Master ? 0.30f : 0.15f;
+        CameraFollow.Shake(shakeIntensity, shakeDuration);
         hasImpacted = true;
 
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlayPotionShatterSound();
+            if (potionType == PotionType.Master)
+            {
+                AudioManager.Instance.PlayIngredientPickupSound();
+            }
         }
 
         SpawnSplashEffect(impactPoint);
@@ -163,6 +169,7 @@ public class PotionProjectile : MonoBehaviour
             PotionType.Blind => "Splash_Blind",
             PotionType.Hypnotize => "Splash_Hypnotize",
             PotionType.Sleep => "Splash_Sleep",
+            PotionType.Master => "Splash_Sleep",
             _ => "Splash_Blind"
         };
 
@@ -205,6 +212,12 @@ public class PotionProjectile : MonoBehaviour
 
                     case PotionType.Sleep:
                         target.ApplySleep(effectDuration > 0f ? effectDuration : 6f);
+                        break;
+
+                    case PotionType.Master:
+                        float masterDuration = effectDuration > 0f ? effectDuration : 8f;
+                        target.ApplySleep(masterDuration);
+                        target.ApplyBlind(masterDuration);
                         break;
                 }
             }

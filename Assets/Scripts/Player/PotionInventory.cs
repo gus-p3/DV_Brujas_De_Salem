@@ -25,6 +25,10 @@ public class PotionInventory : MonoBehaviour
     [SerializeField] private GameObject hypnotizeProjectilePrefab;
     [Tooltip("Prefab del proyectil de Dormir.")]
     [SerializeField] private GameObject sleepProjectilePrefab;
+    [Tooltip("Prefab del proyectil de la Poción Maestra.")]
+    [SerializeField] private GameObject masterPotionPrefab;
+
+    public GameObject MasterPotionPrefab { get => masterPotionPrefab; set => masterPotionPrefab = value; }
 
     [Header("Audio")]
     [Tooltip("Sonido de lanzamiento exitoso.")]
@@ -57,6 +61,13 @@ public class PotionInventory : MonoBehaviour
         if (transformationManager == null)
         {
             transformationManager = UnityEngine.Object.FindFirstObjectByType<TransformationManager>();
+        }
+
+        if (masterPotionPrefab == null)
+        {
+#if UNITY_EDITOR
+            masterPotionPrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/PotionProjectile_Master.prefab");
+#endif
         }
     }
 
@@ -109,6 +120,10 @@ public class PotionInventory : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3))
         {
             SelectPotion(PotionType.Sleep);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha4) || Input.GetKeyDown(KeyCode.Keypad4))
+        {
+            SelectPotion(PotionType.Master);
         }
     }
 
@@ -175,7 +190,8 @@ public class PotionInventory : MonoBehaviour
         int spellIndex = (int)selectedPotion;
         if (GetChargesForType(selectedPotion) <= 0)
         {
-            if (GameManager.Instance.BlindCharges > 0) SelectPotion(PotionType.Blind);
+            if (GameManager.Instance.MasterCharges > 0) SelectPotion(PotionType.Master);
+            else if (GameManager.Instance.BlindCharges > 0) SelectPotion(PotionType.Blind);
             else if (GameManager.Instance.HypnotizeCharges > 0) SelectPotion(PotionType.Hypnotize);
             else if (GameManager.Instance.SleepCharges > 0) SelectPotion(PotionType.Sleep);
             spellIndex = (int)selectedPotion;
@@ -204,7 +220,8 @@ public class PotionInventory : MonoBehaviour
         // Si se agotaron las cargas de esta poción y hay otra disponible, cambiar selección automáticamente
         if (GetChargesForType(selectedPotion) <= 0)
         {
-            if (GameManager.Instance.BlindCharges > 0) SelectPotion(PotionType.Blind);
+            if (GameManager.Instance.MasterCharges > 0) SelectPotion(PotionType.Master);
+            else if (GameManager.Instance.BlindCharges > 0) SelectPotion(PotionType.Blind);
             else if (GameManager.Instance.HypnotizeCharges > 0) SelectPotion(PotionType.Hypnotize);
             else if (GameManager.Instance.SleepCharges > 0) SelectPotion(PotionType.Sleep);
         }
@@ -224,6 +241,7 @@ public class PotionInventory : MonoBehaviour
             PotionType.Blind => GameManager.Instance.BlindCharges,
             PotionType.Hypnotize => GameManager.Instance.HypnotizeCharges,
             PotionType.Sleep => GameManager.Instance.SleepCharges,
+            PotionType.Master => GameManager.Instance.MasterCharges,
             _ => 0
         };
     }
@@ -235,6 +253,7 @@ public class PotionInventory : MonoBehaviour
             PotionType.Blind => blindProjectilePrefab,
             PotionType.Hypnotize => hypnotizeProjectilePrefab,
             PotionType.Sleep => sleepProjectilePrefab,
+            PotionType.Master => masterPotionPrefab,
             _ => blindProjectilePrefab
         };
 
@@ -260,8 +279,32 @@ public class PotionInventory : MonoBehaviour
             CircleCollider2D col = projectileObj.AddComponent<CircleCollider2D>();
             col.radius = 0.25f;
             SpriteRenderer sr = projectileObj.AddComponent<SpriteRenderer>();
-            sr.sortingLayerName = "Default";
-            sr.sortingOrder = 10;
+            sr.sortingLayerName = "Foreground";
+            sr.sortingOrder = 14;
+
+            if (selectedPotion == PotionType.Master)
+            {
+                // Configurar proyectil de la Poción Maestra
+                Sprite[] allSprites = Resources.FindObjectsOfTypeAll<Sprite>();
+                foreach (Sprite s in allSprites)
+                {
+                    if (s != null && s.name.StartsWith("Pocion_Maestra_Caldero_Projectile"))
+                    {
+                        sr.sprite = s;
+                        break;
+                    }
+                }
+#if UNITY_EDITOR
+                if (sr.sprite == null)
+                {
+                    Object[] assets = UnityEditor.AssetDatabase.LoadAllAssetsAtPath("Assets/Prefabs/Pocion_Maestra_Caldero_Projectile.png");
+                    foreach (Object a in assets)
+                    {
+                        if (a is Sprite sp) { sr.sprite = sp; break; }
+                    }
+                }
+#endif
+            }
         }
 
         // Ignorar colisiones con la propia bruja para que el proyectil salga limpio en arco
