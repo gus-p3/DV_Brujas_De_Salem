@@ -48,6 +48,36 @@ public class GameManager : MonoBehaviour
     public int BlindCharges = 0;
     public int HypnotizeCharges = 0;
     public int SleepCharges = 0;
+    public int MasterCharges = 0;
+
+    [Header("Master Potion Progression")]
+    [Tooltip("Indica si la Poción Maestra está habilitada para ser seleccionada y lanzada en combate. En Level3 y Level3_Village permanece bloqueada y se desbloqueará formalmente al entrar a la Iglesia en el Nivel 4.")]
+    [SerializeField] private bool isMasterPotionUsable = false;
+
+    public bool IsMasterPotionUsable => isMasterPotionUsable;
+    public static event Action OnMasterPotionUsableChanged;
+
+    /// <summary>
+    /// Desbloquea el uso de la Poción Maestra para combate y selección (evento futuro de entrada a la Iglesia en Nivel 4).
+    /// El estado es persistente entre cambios de escena gracias a GameManager (DontDestroyOnLoad).
+    /// </summary>
+    public void UnlockMasterPotionUsage()
+    {
+        isMasterPotionUsable = true;
+        OnMasterPotionUsableChanged?.Invoke();
+        OnStatsUpdated?.Invoke();
+        Debug.Log("[GameManager] ¡Poción Maestra desbloqueada para combate (Evento Iglesia Nivel 4)!");
+    }
+
+    /// <summary>
+    /// Bloquea el uso de la Poción Maestra (utilizado en Level3 y Level3_Village hasta alcanzar la Iglesia en Nivel 4).
+    /// </summary>
+    public void LockMasterPotionUsage()
+    {
+        isMasterPotionUsable = false;
+        OnMasterPotionUsableChanged?.Invoke();
+        OnStatsUpdated?.Invoke();
+    }
 
     // Eventos para el HUD y el sistema de corazones
     public event Action OnStatsUpdated;
@@ -219,11 +249,12 @@ public class GameManager : MonoBehaviour
         LoseHeart(amount, "Daño");
     }
 
-    public void AddSpellCharges(int blind, int hypnotize, int sleep)
+    public void AddSpellCharges(int blind, int hypnotize, int sleep, int master = 0)
     {
         BlindCharges += blind;
         HypnotizeCharges += hypnotize;
         SleepCharges += sleep;
+        MasterCharges += master;
         OnStatsUpdated?.Invoke();
 
         // Si la ranura seleccionada actualmente no tiene cargas, seleccionar automáticamente la poción recién recogida
@@ -231,10 +262,11 @@ public class GameManager : MonoBehaviour
         if (inv != null)
         {
             int sel = (int)inv.SelectedPotion;
-            int currentSelCharges = sel == 0 ? BlindCharges : (sel == 1 ? HypnotizeCharges : SleepCharges);
+            int currentSelCharges = sel == 0 ? BlindCharges : (sel == 1 ? HypnotizeCharges : (sel == 2 ? SleepCharges : MasterCharges));
             if (currentSelCharges <= 0)
             {
-                if (blind > 0) inv.SelectPotion(PotionType.Blind);
+                if (master > 0 && isMasterPotionUsable) inv.SelectPotion(PotionType.Master);
+                else if (blind > 0) inv.SelectPotion(PotionType.Blind);
                 else if (hypnotize > 0) inv.SelectPotion(PotionType.Hypnotize);
                 else if (sleep > 0) inv.SelectPotion(PotionType.Sleep);
             }
@@ -249,11 +281,12 @@ public class GameManager : MonoBehaviour
 
     public bool TryConsumeSpell(int spellType)
     {
-        // 0: Cegar, 1: Hipnotizar, 2: Dormir
+        // 0: Cegar, 1: Hipnotizar, 2: Dormir, 3: Maestra
         bool success = false;
         if (spellType == 0 && BlindCharges > 0) { BlindCharges--; success = true; }
         else if (spellType == 1 && HypnotizeCharges > 0) { HypnotizeCharges--; success = true; }
         else if (spellType == 2 && SleepCharges > 0) { SleepCharges--; success = true; }
+        else if (spellType == 3 && MasterCharges > 0) { MasterCharges--; success = true; }
 
         if (success)
         {
@@ -294,6 +327,15 @@ public class GameManager : MonoBehaviour
             runCarryPending = false;
             Score = carriedScore;
             TimeElapsed = carriedTime;
+        }
+        else
+        {
+            // Al iniciar o reiniciar un nivel desde cero, la Poción Maestra se inicia en 0 hasta su preparación en el caldero
+            string sceneName = SceneManager.GetActiveScene().name;
+            if (sceneName == "Level3" || sceneName == "Level1" || sceneName == "Level2")
+            {
+                MasterCharges = 0;
+            }
         }
         SetState(GameState.Playing);
         if (FrenzyController.Instance != null)

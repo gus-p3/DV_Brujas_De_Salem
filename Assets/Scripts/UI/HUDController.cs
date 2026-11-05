@@ -15,11 +15,16 @@ public class HUDController : MonoBehaviour
     public TextMeshProUGUI blindChargesText;
     public TextMeshProUGUI hypnotizeChargesText;
     public TextMeshProUGUI sleepChargesText;
+    public TextMeshProUGUI masterChargesText;
+    [Tooltip("Icono del frasco de la Poción Maestra (se activa únicamente tras ser fabricada en el caldero).")]
+    public Image masterIconImage;
+    [Tooltip("Indicador visual de candado cuando la Poción Maestra está sellada (hasta entrar a la Iglesia en el Nivel 4).")]
+    public Image masterLockBadge;
 
     [Header("Potion Slots & Selection")]
-    [Tooltip("Marcos resaltadores para cada tipo de poción (0: Cegar, 1: Hipnotizar, 2: Dormir).")]
+    [Tooltip("Marcos resaltadores para cada tipo de poción (0: Cegar, 1: Hipnotizar, 2: Dormir, 3: Maestra).")]
     public Image[] potionSelectionFrames;
-    [Tooltip("Textos que indican la tecla de acceso rápido (1, 2, 3) bajo cada poción.")]
+    [Tooltip("Textos que indican la tecla de acceso rápido (1, 2, 3, 4) bajo cada poción.")]
     public TextMeshProUGUI[] potionKeyHints;
     [Tooltip("Color de resaltado para la poción seleccionada.")]
     public Color selectedFrameColor = new Color(1f, 0.85f, 0.2f, 1f);
@@ -50,6 +55,7 @@ public class HUDController : MonoBehaviour
     private void Awake()
     {
         EnsureEventSystem();
+        EnsureFourPotionSlots();
     }
 
     private void EnsureEventSystem()
@@ -247,6 +253,39 @@ public class HUDController : MonoBehaviour
         if (hypnotizeChargesText != null) hypnotizeChargesText.text = $"x {GameManager.Instance.HypnotizeCharges}";
         if (sleepChargesText != null) sleepChargesText.text = $"x {GameManager.Instance.SleepCharges}";
 
+        bool isMasterBrewed = (Level3.Level3StateController.Instance != null && Level3.Level3StateController.Instance.HasBrewedMasterPotion)
+                            || (GameManager.Instance != null && GameManager.Instance.MasterCharges > 0);
+        bool isMasterUsable = isMasterBrewed && (GameManager.Instance != null && GameManager.Instance.IsMasterPotionUsable);
+
+        if (masterIconImage != null)
+        {
+            masterIconImage.enabled = isMasterBrewed;
+            if (isMasterBrewed)
+            {
+                masterIconImage.color = isMasterUsable ? Color.white : new Color(0.45f, 0.45f, 0.55f, 0.85f);
+            }
+            else
+            {
+                masterIconImage.color = new Color(1f, 1f, 1f, 0f);
+            }
+        }
+
+        if (masterLockBadge != null)
+        {
+            masterLockBadge.gameObject.SetActive(isMasterBrewed && !isMasterUsable);
+        }
+
+        if (masterChargesText != null)
+        {
+            masterChargesText.enabled = isMasterBrewed;
+            masterChargesText.text = isMasterBrewed ? $"x {GameManager.Instance.MasterCharges}" : "";
+        }
+
+        if (potionKeyHints != null && potionKeyHints.Length > 3 && potionKeyHints[3] != null)
+        {
+            potionKeyHints[3].color = isMasterUsable ? Color.white : (isMasterBrewed ? new Color(1f, 1f, 1f, 0.45f) : new Color(1f, 1f, 1f, 0.25f));
+        }
+
         UpdatePotionSelectionVisuals();
     }
 
@@ -327,11 +366,11 @@ public class HUDController : MonoBehaviour
     }
 
     /// <summary>
-    /// Selecciona visualmente la poción activa (0: Cegar, 1: Hipnotizar, 2: Dormir) y actualiza su marco.
+    /// Selecciona visualmente la poción activa (0: Cegar, 1: Hipnotizar, 2: Dormir, 3: Maestra) y actualiza su marco.
     /// </summary>
     public void SetSelectedPotion(int index)
     {
-        selectedPotionIndex = Mathf.Clamp(index, 0, 2);
+        selectedPotionIndex = Mathf.Clamp(index, 0, 3);
         UpdatePotionSelectionVisuals();
     }
 
@@ -342,13 +381,24 @@ public class HUDController : MonoBehaviour
         int blindCharges = GameManager.Instance != null ? GameManager.Instance.BlindCharges : 0;
         int hypCharges = GameManager.Instance != null ? GameManager.Instance.HypnotizeCharges : 0;
         int sleepCharges = GameManager.Instance != null ? GameManager.Instance.SleepCharges : 0;
-        int[] charges = { blindCharges, hypCharges, sleepCharges };
+        int masterCharges = GameManager.Instance != null ? GameManager.Instance.MasterCharges : 0;
+        int[] charges = { blindCharges, hypCharges, sleepCharges, masterCharges };
+
+        bool isMasterUnlocked = (Level3.Level3StateController.Instance != null && Level3.Level3StateController.Instance.HasBrewedMasterPotion)
+                             || (GameManager.Instance != null && GameManager.Instance.MasterCharges > 0);
+        bool isMasterUsable = isMasterUnlocked && (GameManager.Instance != null && GameManager.Instance.IsMasterPotionUsable);
 
         for (int i = 0; i < potionSelectionFrames.Length; i++)
         {
             if (potionSelectionFrames[i] == null) continue;
             bool isSelected = (i == selectedPotionIndex);
             bool hasCharges = i < charges.Length && charges[i] > 0;
+
+            if (i == 3 && !isMasterUsable)
+            {
+                isSelected = false;
+                hasCharges = false;
+            }
 
             // Desactivar Image cuando la ranura no tiene sprite asignado para evitar el recuadro amarillo sólido
             if (potionSelectionFrames[i].sprite == null)
@@ -388,6 +438,7 @@ public class HUDController : MonoBehaviour
             0 => blindChargesText,
             1 => hypnotizeChargesText,
             2 => sleepChargesText,
+            3 => masterChargesText,
             _ => null
         };
 
@@ -499,6 +550,241 @@ public class HUDController : MonoBehaviour
                 frenzyAlarmIcon.enabled = (Mathf.FloorToInt(Time.time * 4f) % 2) == 0;
             }
             yield return null;
+        }
+    }
+
+    /// <summary>
+    /// Asegura la existencia y configuración de las 4 ranuras de pociones en la esquina inferior izquierda:
+    /// Slot 0: Cegar [1]
+    /// Slot 1: Hipnotizar [2]
+    /// Slot 2: Dormir [3]
+    /// Slot 3: Poción Maestra [4] (con icono Pocion_Maestra_Caldero_0 integrado y proporcionado)
+    /// </summary>
+    public void EnsureFourPotionSlots()
+    {
+        Transform flaskCegar = transform.Find("Flask_Cegar");
+        Transform flaskHipno = transform.Find("Flask_Hipnotizar");
+        Transform flaskDormir = transform.Find("Flask_Dormir");
+        Transform flaskMaestra = transform.Find("Flask_Maestra");
+        Transform template = flaskDormir != null ? flaskDormir : (flaskHipno != null ? flaskHipno : flaskCegar);
+
+        // Cargar sprite de la Poción Maestra
+        Sprite masterSprite = null;
+#if UNITY_EDITOR
+        UnityEngine.Object[] assets = UnityEditor.AssetDatabase.LoadAllAssetsAtPath("Assets/Prefabs/Pocion_Maestra_Caldero.png");
+        foreach (UnityEngine.Object a in assets)
+        {
+            if (a is Sprite sp) { masterSprite = sp; break; }
+        }
+#endif
+        if (masterSprite == null)
+        {
+            Sprite[] all = Resources.FindObjectsOfTypeAll<Sprite>();
+            foreach (Sprite s in all)
+            {
+                if (s != null && s.name.StartsWith("Pocion_Maestra_Caldero"))
+                {
+                    masterSprite = s;
+                    break;
+                }
+            }
+        }
+
+        if (flaskMaestra == null)
+        {
+            if (template != null)
+            {
+                GameObject newFlask = Instantiate(template.gameObject, transform, false);
+                newFlask.name = "Flask_Maestra";
+                flaskMaestra = newFlask.transform;
+
+                RectTransform rt = newFlask.GetComponent<RectTransform>();
+                if (rt != null)
+                {
+                    rt.anchorMin = new Vector2(0f, 0f);
+                    rt.anchorMax = new Vector2(0f, 0f);
+                    rt.pivot = new Vector2(0f, 0f);
+                    rt.anchoredPosition = new Vector2(610f, 74f);
+                    rt.sizeDelta = new Vector2(96f, 96f);
+                }
+
+                Transform keyT = newFlask.transform.Find("KeyHint");
+                if (keyT != null)
+                {
+                    TextMeshProUGUI tmp = keyT.GetComponent<TextMeshProUGUI>();
+                    if (tmp != null) tmp.text = "[4]";
+                }
+
+                Transform countT = newFlask.transform.Find("Count");
+                if (countT != null)
+                {
+                    TextMeshProUGUI tmp = countT.GetComponent<TextMeshProUGUI>();
+                    if (tmp != null)
+                    {
+                        tmp.text = "";
+                        masterChargesText = tmp;
+                    }
+                }
+            }
+        }
+
+        if (flaskMaestra != null)
+        {
+            // Ajustar el icono del frasco dentro del slot para mantener proporciones exactas y evitar desproporción
+            Transform iconTrans = flaskMaestra.Find("PotionIcon");
+            GameObject iconGo = iconTrans != null ? iconTrans.gameObject : null;
+            if (iconGo == null)
+            {
+                iconGo = new GameObject("PotionIcon", typeof(RectTransform), typeof(Image));
+                iconGo.transform.SetParent(flaskMaestra, false);
+                iconGo.transform.SetSiblingIndex(0); // Debajo de selección y contadores
+            }
+
+            RectTransform iconRt = iconGo.GetComponent<RectTransform>();
+            iconRt.anchorMin = new Vector2(0.5f, 0.5f);
+            iconRt.anchorMax = new Vector2(0.5f, 0.5f);
+            iconRt.pivot = new Vector2(0.5f, 0.5f);
+            iconRt.anchoredPosition = new Vector2(0f, 4f);
+            iconRt.sizeDelta = new Vector2(54f, 68f); // Dimensiones visuales idénticas a los frascos vecinos
+
+            masterIconImage = iconGo.GetComponent<Image>();
+            masterIconImage.preserveAspect = true;
+            masterIconImage.raycastTarget = false;
+            if (masterSprite != null)
+            {
+                masterIconImage.sprite = masterSprite;
+            }
+
+            // Fondo del marco del slot
+            Image baseImg = flaskMaestra.GetComponent<Image>();
+            if (baseImg != null && template != null)
+            {
+                Image templateImg = template.GetComponent<Image>();
+                if (templateImg != null && templateImg.sprite != null)
+                {
+                    baseImg.sprite = templateImg.sprite;
+                    baseImg.color = new Color(0.75f, 0.75f, 0.85f, 0.7f);
+                }
+            }
+
+            if (masterChargesText == null)
+            {
+                Transform countT = flaskMaestra.Find("Count");
+                if (countT != null)
+                {
+                    masterChargesText = countT.GetComponent<TextMeshProUGUI>();
+                }
+            }
+
+            // Candado indicador de bloqueo hasta entrar a la Iglesia en el Nivel 4
+            Transform lockT = flaskMaestra.Find("LockBadge");
+            GameObject lockGo = lockT != null ? lockT.gameObject : null;
+            if (lockGo == null)
+            {
+                lockGo = new GameObject("LockBadge");
+                lockGo.transform.SetParent(flaskMaestra, false);
+                RectTransform lockRt = lockGo.AddComponent<RectTransform>();
+                lockRt.anchorMin = new Vector2(0.5f, 0.5f);
+                lockRt.anchorMax = new Vector2(0.5f, 0.5f);
+                lockRt.pivot = new Vector2(0.5f, 0.5f);
+                lockRt.anchoredPosition = new Vector2(16f, -12f);
+                lockRt.sizeDelta = new Vector2(28f, 28f);
+
+                masterLockBadge = lockGo.AddComponent<Image>();
+                masterLockBadge.preserveAspect = true;
+                masterLockBadge.raycastTarget = false;
+#if UNITY_EDITOR
+                Sprite lockSp = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/UI/ui_icon_lock_badge.png");
+                if (lockSp != null) masterLockBadge.sprite = lockSp;
+#endif
+            }
+            else
+            {
+                masterLockBadge = lockGo.GetComponent<Image>();
+            }
+        }
+
+        // Vincular referencias a las 4 ranuras
+        Transform[] flaskTransforms = new Transform[] { flaskCegar, flaskHipno, flaskDormir, flaskMaestra };
+        potionSelectionFrames = new Image[4];
+        potionKeyHints = new TextMeshProUGUI[4];
+
+        for (int i = 0; i < flaskTransforms.Length; i++)
+        {
+            if (flaskTransforms[i] == null) continue;
+
+            Transform frameT = flaskTransforms[i].Find("SelectionFrame");
+            if (frameT != null) potionSelectionFrames[i] = frameT.GetComponent<Image>();
+
+            Transform keyT = flaskTransforms[i].Find("KeyHint");
+            if (keyT != null) potionKeyHints[i] = keyT.GetComponent<TextMeshProUGUI>();
+
+            // Configurar botón clickeable para selección con el ratón
+            Button btn = flaskTransforms[i].GetComponent<Button>();
+            if (btn == null)
+            {
+                btn = flaskTransforms[i].gameObject.AddComponent<Button>();
+                btn.transition = Selectable.Transition.None;
+            }
+            int slotIdx = i;
+            btn.onClick.RemoveAllListeners();
+            btn.onClick.AddListener(() =>
+            {
+                PotionInventory inv = Object.FindFirstObjectByType<PotionInventory>();
+                if (inv != null)
+                {
+                    if (slotIdx == 3)
+                    {
+                        if (!inv.HasPotionInInventory(PotionType.Master))
+                        {
+                            ShowMessage("¡Debes preparar la Poción Maestra en el Caldero Místico primero!", 1.8f);
+                            if (AudioManager.Instance != null) AudioManager.Instance.PlayErrorSound();
+                            return;
+                        }
+                        if (!inv.IsPotionUnlocked(PotionType.Master))
+                        {
+                            ShowMessage("¡La Poción Maestra está sellada! Podrás usarla al entrar a la Iglesia en el Nivel 4.", 2.2f);
+                            if (AudioManager.Instance != null) AudioManager.Instance.PlayErrorSound();
+                            return;
+                        }
+                    }
+                    inv.SelectPotion((PotionType)slotIdx);
+                }
+            });
+        }
+
+        // Refrescar visibilidad inicial según estado de desbloqueo
+        bool isMasterBrewed = (Level3.Level3StateController.Instance != null && Level3.Level3StateController.Instance.HasBrewedMasterPotion)
+                            || (GameManager.Instance != null && GameManager.Instance.MasterCharges > 0);
+        bool isMasterUsable = isMasterBrewed && (GameManager.Instance != null && GameManager.Instance.IsMasterPotionUsable);
+
+        if (masterIconImage != null)
+        {
+            masterIconImage.enabled = isMasterBrewed;
+            if (isMasterBrewed)
+            {
+                masterIconImage.color = isMasterUsable ? Color.white : new Color(0.45f, 0.45f, 0.55f, 0.85f);
+            }
+            else
+            {
+                masterIconImage.color = new Color(1f, 1f, 1f, 0f);
+            }
+        }
+
+        if (masterLockBadge != null)
+        {
+            masterLockBadge.gameObject.SetActive(isMasterBrewed && !isMasterUsable);
+        }
+
+        if (masterChargesText != null)
+        {
+            masterChargesText.enabled = isMasterBrewed;
+            masterChargesText.text = isMasterBrewed ? $"x {GameManager.Instance.MasterCharges}" : "";
+        }
+
+        if (potionKeyHints != null && potionKeyHints.Length > 3 && potionKeyHints[3] != null)
+        {
+            potionKeyHints[3].color = isMasterUsable ? Color.white : (isMasterBrewed ? new Color(1f, 1f, 1f, 0.45f) : new Color(1f, 1f, 1f, 0.25f));
         }
     }
 }

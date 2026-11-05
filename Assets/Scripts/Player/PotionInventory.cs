@@ -25,6 +25,10 @@ public class PotionInventory : MonoBehaviour
     [SerializeField] private GameObject hypnotizeProjectilePrefab;
     [Tooltip("Prefab del proyectil de Dormir.")]
     [SerializeField] private GameObject sleepProjectilePrefab;
+    [Tooltip("Prefab del proyectil de la Poción Maestra.")]
+    [SerializeField] private GameObject masterPotionPrefab;
+
+    public GameObject MasterPotionPrefab { get => masterPotionPrefab; set => masterPotionPrefab = value; }
 
     [Header("Audio")]
     [Tooltip("Sonido de lanzamiento exitoso.")]
@@ -50,6 +54,28 @@ public class PotionInventory : MonoBehaviour
 
     public PotionType SelectedPotion => selectedPotion;
 
+    /// <summary>
+    /// Comprueba si la poción ha sido preparada/obtenida y está registrada en el zurrón/inventario.
+    /// </summary>
+    public bool HasPotionInInventory(PotionType type)
+    {
+        if (type != PotionType.Master) return true;
+        bool hasCharges = GameManager.Instance != null && GameManager.Instance.MasterCharges > 0;
+        bool brewed = Level3.Level3StateController.Instance != null && Level3.Level3StateController.Instance.HasBrewedMasterPotion;
+        return hasCharges || brewed;
+    }
+
+    /// <summary>
+    /// Comprueba si la poción está habilitada para su selección y lanzamiento en combate.
+    /// En Level3 y Level3_Village, la Poción Maestra permanece sellada hasta entrar a la Iglesia en el Nivel 4.
+    /// </summary>
+    public bool IsPotionUnlocked(PotionType type)
+    {
+        if (type != PotionType.Master) return true;
+        if (!HasPotionInInventory(PotionType.Master)) return false;
+        return GameManager.Instance != null && GameManager.Instance.IsMasterPotionUsable;
+    }
+
     private void Awake()
     {
         playerController = GetComponent<PlayerController>();
@@ -58,10 +84,22 @@ public class PotionInventory : MonoBehaviour
         {
             transformationManager = UnityEngine.Object.FindFirstObjectByType<TransformationManager>();
         }
+
+        if (masterPotionPrefab == null)
+        {
+#if UNITY_EDITOR
+            masterPotionPrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/PotionProjectile_Master.prefab");
+#endif
+        }
     }
 
     private void Start()
     {
+        if (selectedPotion == PotionType.Master && !IsPotionUnlocked(PotionType.Master))
+        {
+            selectedPotion = PotionType.Blind;
+        }
+
         // Notificar selección inicial al HUD
         OnPotionSelected?.Invoke(selectedPotion);
     }
@@ -110,10 +148,39 @@ public class PotionInventory : MonoBehaviour
         {
             SelectPotion(PotionType.Sleep);
         }
+        else if (Input.GetKeyDown(KeyCode.Alpha4) || Input.GetKeyDown(KeyCode.Keypad4))
+        {
+            SelectPotion(PotionType.Master);
+        }
     }
 
     public void SelectPotion(PotionType type)
     {
+        if (type == PotionType.Master)
+        {
+            if (!HasPotionInInventory(PotionType.Master))
+            {
+                HUDController hudCtrl = UnityEngine.Object.FindFirstObjectByType<HUDController>();
+                if (hudCtrl != null)
+                {
+                    hudCtrl.ShowMessage("¡Debes preparar la Poción Maestra en el Caldero Místico primero!", 1.8f);
+                }
+                PlayErrorSound();
+                return;
+            }
+
+            if (!IsPotionUnlocked(PotionType.Master))
+            {
+                HUDController hudCtrl = UnityEngine.Object.FindFirstObjectByType<HUDController>();
+                if (hudCtrl != null)
+                {
+                    hudCtrl.ShowMessage("¡La Poción Maestra está sellada! Podrás usarla al entrar a la Iglesia en el Nivel 4.", 2.2f);
+                }
+                PlayErrorSound();
+                return;
+            }
+        }
+
         bool changed = selectedPotion != type;
         selectedPotion = type;
         OnPotionSelected?.Invoke(selectedPotion);
@@ -175,10 +242,23 @@ public class PotionInventory : MonoBehaviour
         int spellIndex = (int)selectedPotion;
         if (GetChargesForType(selectedPotion) <= 0)
         {
-            if (GameManager.Instance.BlindCharges > 0) SelectPotion(PotionType.Blind);
+            if (IsPotionUnlocked(PotionType.Master) && GameManager.Instance.MasterCharges > 0) SelectPotion(PotionType.Master);
+            else if (GameManager.Instance.BlindCharges > 0) SelectPotion(PotionType.Blind);
             else if (GameManager.Instance.HypnotizeCharges > 0) SelectPotion(PotionType.Hypnotize);
             else if (GameManager.Instance.SleepCharges > 0) SelectPotion(PotionType.Sleep);
             spellIndex = (int)selectedPotion;
+        }
+
+        // Si la poción seleccionada es la Maestra y sigue sellada, no consumir ni lanzar
+        if (selectedPotion == PotionType.Master && !IsPotionUnlocked(PotionType.Master))
+        {
+            HUDController hudCtrl = UnityEngine.Object.FindFirstObjectByType<HUDController>();
+            if (hudCtrl != null)
+            {
+                hudCtrl.ShowMessage("¡La Poción Maestra está sellada! Podrás usarla al entrar a la Iglesia en el Nivel 4.", 2.2f);
+            }
+            PlayErrorSound();
+            return;
         }
 
         // Intentar consumir carga del GameManager
@@ -204,7 +284,8 @@ public class PotionInventory : MonoBehaviour
         // Si se agotaron las cargas de esta poción y hay otra disponible, cambiar selección automáticamente
         if (GetChargesForType(selectedPotion) <= 0)
         {
-            if (GameManager.Instance.BlindCharges > 0) SelectPotion(PotionType.Blind);
+            if (IsPotionUnlocked(PotionType.Master) && GameManager.Instance.MasterCharges > 0) SelectPotion(PotionType.Master);
+            else if (GameManager.Instance.BlindCharges > 0) SelectPotion(PotionType.Blind);
             else if (GameManager.Instance.HypnotizeCharges > 0) SelectPotion(PotionType.Hypnotize);
             else if (GameManager.Instance.SleepCharges > 0) SelectPotion(PotionType.Sleep);
         }
@@ -224,6 +305,7 @@ public class PotionInventory : MonoBehaviour
             PotionType.Blind => GameManager.Instance.BlindCharges,
             PotionType.Hypnotize => GameManager.Instance.HypnotizeCharges,
             PotionType.Sleep => GameManager.Instance.SleepCharges,
+            PotionType.Master => GameManager.Instance.MasterCharges,
             _ => 0
         };
     }
@@ -235,6 +317,7 @@ public class PotionInventory : MonoBehaviour
             PotionType.Blind => blindProjectilePrefab,
             PotionType.Hypnotize => hypnotizeProjectilePrefab,
             PotionType.Sleep => sleepProjectilePrefab,
+            PotionType.Master => masterPotionPrefab,
             _ => blindProjectilePrefab
         };
 
@@ -260,8 +343,34 @@ public class PotionInventory : MonoBehaviour
             CircleCollider2D col = projectileObj.AddComponent<CircleCollider2D>();
             col.radius = 0.25f;
             SpriteRenderer sr = projectileObj.AddComponent<SpriteRenderer>();
-            sr.sortingLayerName = "Default";
-            sr.sortingOrder = 10;
+            sr.sortingLayerName = "Foreground";
+            sr.sortingOrder = 14;
+
+            if (selectedPotion == PotionType.Master)
+            {
+                projectileObj.transform.localScale = new Vector3(0.16f, 0.16f, 1f);
+                col.radius = 1.55f;
+                // Configurar proyectil de la Poción Maestra
+                Sprite[] allSprites = Resources.FindObjectsOfTypeAll<Sprite>();
+                foreach (Sprite s in allSprites)
+                {
+                    if (s != null && s.name.StartsWith("Pocion_Maestra_Caldero_Projectile"))
+                    {
+                        sr.sprite = s;
+                        break;
+                    }
+                }
+#if UNITY_EDITOR
+                if (sr.sprite == null)
+                {
+                    UnityEngine.Object[] assets = UnityEditor.AssetDatabase.LoadAllAssetsAtPath("Assets/Prefabs/Pocion_Maestra_Caldero_Projectile.png");
+                    foreach (UnityEngine.Object a in assets)
+                    {
+                        if (a is Sprite sp) { sr.sprite = sp; break; }
+                    }
+                }
+#endif
+            }
         }
 
         // Ignorar colisiones con la propia bruja para que el proyectil salga limpio en arco

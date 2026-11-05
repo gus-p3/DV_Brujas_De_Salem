@@ -89,16 +89,16 @@ namespace Level3
             bool brewed = Level3StateController.Instance != null && Level3StateController.Instance.HasBrewedMasterPotion;
             if (!brewed)
             {
-                return $"[E] Preparar Poción Maestra en {cauldronDisplayName}";
+                return "[E] Preparar Poción Maestra";
             }
 
             int sleepCount = GameManager.Instance != null ? GameManager.Instance.SleepCharges : 0;
             if (sleepCount < minSleepPotionsForRefill)
             {
-                return $"[E] Reabastecer Pociones de Sueño en {cauldronDisplayName}";
+                return $"[E] Reabastecer Pociones en {cauldronDisplayName}";
             }
 
-            return $"[E] Examinar {cauldronDisplayName} (Poción Maestra lista)";
+            return $"[E] {cauldronDisplayName} (Poción Maestra ya preparada)";
         }
 
         public void Interact(GameObject interactor)
@@ -142,16 +142,24 @@ namespace Level3
                 GameManager.Instance.GainHeart(GameManager.Instance.MaxHearts);
             }
 
-            // 2. Recarga de +3 pociones de Sueño y +2 de Cegar
+            // 2. Recarga de Poción Maestra (+1), Pociones de Sueño (+3) y Cegar (+2)
             if (GameManager.Instance != null)
             {
-                GameManager.Instance.AddSpellCharges(blindPotionsGrant, 0, sleepPotionsGrant);
+                GameManager.Instance.AddSpellCharges(blindPotionsGrant, 0, sleepPotionsGrant, 1);
             }
 
             PotionInventory potInv = Object.FindFirstObjectByType<PotionInventory>();
             if (potInv != null)
             {
-                potInv.SelectPotion(PotionType.Sleep);
+                if (GameManager.Instance != null && GameManager.Instance.IsMasterPotionUsable)
+                {
+                    potInv.SelectPotion(PotionType.Master);
+                }
+                else
+                {
+                    // En Level3 y Level3_Village permanece sellada en el zurrón hasta la Iglesia en el Nivel 4
+                    potInv.SelectPotion(PotionType.Sleep);
+                }
             }
 
             // 3. Avanzar estado del Nivel 3
@@ -170,11 +178,11 @@ namespace Level3
                 AudioManager.Instance.PlayHeartHealSound();
             }
 
-            LootPopupVisualizer.ShowPotionReward(transform.position + Vector3.up * 0.6f, PotionType.Sleep, sleepPotionsGrant);
+            LootPopupVisualizer.ShowPotionReward(transform.position + Vector3.up * 0.85f, PotionType.Master, 1);
             StartCoroutine(AlchemyBurstRoutine());
 
             // 6. Mostrar mensaje destacado en el HUD
-            ShowHUDMessage(BrewedHudMessage, 4.5f);
+            ShowHUDMessage("¡Poción Maestra preparada! Guardada y sellada en tu zurrón hasta entrar a la Iglesia. El Portón de Regreso se abre.", 5.0f);
         }
 
         private void RefillPotionsIfLow()

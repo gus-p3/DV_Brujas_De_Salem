@@ -7,7 +7,8 @@ public enum PotionType
 {
     Blind = 0,
     Hypnotize = 1,
-    Sleep = 2
+    Sleep = 2,
+    Master = 3
 }
 
 /// <summary>
@@ -21,6 +22,7 @@ public class PotionProjectile : MonoBehaviour
     [Header("Configuración de Poción")]
     [Tooltip("Tipo de poción mágica que representa este proyectil.")]
     [SerializeField] private PotionType potionType = PotionType.Blind;
+    public PotionType Type => potionType;
     [Tooltip("Duración del efecto aplicado en segundos.")]
     [SerializeField] private float effectDuration = 5f;
     [Tooltip("Radio del área de efecto de salpicadura al colisionar (u).")]
@@ -117,21 +119,42 @@ public class PotionProjectile : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Fuerza el impacto del proyectil en la posición indicada (útil para pruebas o detonación manual).
+    /// </summary>
+    public void TriggerImpact(Vector2 impactPoint)
+    {
+        HandleImpact(impactPoint);
+    }
+
     private void HandleImpact(Vector2 impactPoint)
     {
         if (hasImpacted) return;
-        CameraFollow.Shake(0.08f, 0.15f);
+        float shakeIntensity = potionType == PotionType.Master ? 0.22f : 0.08f;
+        float shakeDuration = potionType == PotionType.Master ? 0.30f : 0.15f;
+        CameraFollow.Shake(shakeIntensity, shakeDuration);
         hasImpacted = true;
 
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlayPotionShatterSound();
+            if (potionType == PotionType.Master)
+            {
+                AudioManager.Instance.PlayIngredientPickupSound();
+            }
         }
 
         SpawnSplashEffect(impactPoint);
         ApplySplashDamage(impactPoint);
 
-        Destroy(gameObject);
+        if (Application.isPlaying)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            DestroyImmediate(gameObject);
+        }
     }
 
     private void SpawnSplashEffect(Vector2 position)
@@ -162,6 +185,7 @@ public class PotionProjectile : MonoBehaviour
             PotionType.Blind => "Splash_Blind",
             PotionType.Hypnotize => "Splash_Hypnotize",
             PotionType.Sleep => "Splash_Sleep",
+            PotionType.Master => "Splash_Sleep",
             _ => "Splash_Blind"
         };
 
@@ -204,6 +228,12 @@ public class PotionProjectile : MonoBehaviour
 
                     case PotionType.Sleep:
                         target.ApplySleep(effectDuration > 0f ? effectDuration : 6f);
+                        break;
+
+                    case PotionType.Master:
+                        float masterDuration = effectDuration > 0f ? effectDuration : 8f;
+                        target.ApplySleep(masterDuration);
+                        target.ApplyBlind(masterDuration);
                         break;
                 }
             }
