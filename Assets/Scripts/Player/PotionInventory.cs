@@ -297,8 +297,8 @@ public class PotionInventory : MonoBehaviour
 #if UNITY_EDITOR
                 if (sr.sprite == null)
                 {
-                    Object[] assets = UnityEditor.AssetDatabase.LoadAllAssetsAtPath("Assets/Prefabs/Pocion_Maestra_Caldero_Projectile.png");
-                    foreach (Object a in assets)
+                    UnityEngine.Object[] assets = UnityEditor.AssetDatabase.LoadAllAssetsAtPath("Assets/Prefabs/Pocion_Maestra_Caldero_Projectile.png");
+                    foreach (UnityEngine.Object a in assets)
                     {
                         if (a is Sprite sp) { sr.sprite = sp; break; }
                     }

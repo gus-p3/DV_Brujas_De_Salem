@@ -15,11 +15,12 @@ public class HUDController : MonoBehaviour
     public TextMeshProUGUI blindChargesText;
     public TextMeshProUGUI hypnotizeChargesText;
     public TextMeshProUGUI sleepChargesText;
+    public TextMeshProUGUI masterChargesText;
 
     [Header("Potion Slots & Selection")]
-    [Tooltip("Marcos resaltadores para cada tipo de poción (0: Cegar, 1: Hipnotizar, 2: Dormir).")]
+    [Tooltip("Marcos resaltadores para cada tipo de poción (0: Cegar, 1: Hipnotizar, 2: Dormir, 3: Maestra).")]
     public Image[] potionSelectionFrames;
-    [Tooltip("Textos que indican la tecla de acceso rápido (1, 2, 3) bajo cada poción.")]
+    [Tooltip("Textos que indican la tecla de acceso rápido (1, 2, 3, 4) bajo cada poción.")]
     public TextMeshProUGUI[] potionKeyHints;
     [Tooltip("Color de resaltado para la poción seleccionada.")]
     public Color selectedFrameColor = new Color(1f, 0.85f, 0.2f, 1f);
@@ -50,6 +51,7 @@ public class HUDController : MonoBehaviour
     private void Awake()
     {
         EnsureEventSystem();
+        EnsureFourPotionSlots();
     }
 
     private void EnsureEventSystem()
@@ -246,6 +248,7 @@ public class HUDController : MonoBehaviour
         if (blindChargesText != null) blindChargesText.text = $"x {GameManager.Instance.BlindCharges}";
         if (hypnotizeChargesText != null) hypnotizeChargesText.text = $"x {GameManager.Instance.HypnotizeCharges}";
         if (sleepChargesText != null) sleepChargesText.text = $"x {GameManager.Instance.SleepCharges}";
+        if (masterChargesText != null) masterChargesText.text = $"x {GameManager.Instance.MasterCharges}";
 
         UpdatePotionSelectionVisuals();
     }
@@ -327,11 +330,11 @@ public class HUDController : MonoBehaviour
     }
 
     /// <summary>
-    /// Selecciona visualmente la poción activa (0: Cegar, 1: Hipnotizar, 2: Dormir) y actualiza su marco.
+    /// Selecciona visualmente la poción activa (0: Cegar, 1: Hipnotizar, 2: Dormir, 3: Maestra) y actualiza su marco.
     /// </summary>
     public void SetSelectedPotion(int index)
     {
-        selectedPotionIndex = Mathf.Clamp(index, 0, 2);
+        selectedPotionIndex = Mathf.Clamp(index, 0, 3);
         UpdatePotionSelectionVisuals();
     }
 
@@ -342,7 +345,8 @@ public class HUDController : MonoBehaviour
         int blindCharges = GameManager.Instance != null ? GameManager.Instance.BlindCharges : 0;
         int hypCharges = GameManager.Instance != null ? GameManager.Instance.HypnotizeCharges : 0;
         int sleepCharges = GameManager.Instance != null ? GameManager.Instance.SleepCharges : 0;
-        int[] charges = { blindCharges, hypCharges, sleepCharges };
+        int masterCharges = GameManager.Instance != null ? GameManager.Instance.MasterCharges : 0;
+        int[] charges = { blindCharges, hypCharges, sleepCharges, masterCharges };
 
         for (int i = 0; i < potionSelectionFrames.Length; i++)
         {
@@ -388,6 +392,7 @@ public class HUDController : MonoBehaviour
             0 => blindChargesText,
             1 => hypnotizeChargesText,
             2 => sleepChargesText,
+            3 => masterChargesText,
             _ => null
         };
 
@@ -499,6 +504,127 @@ public class HUDController : MonoBehaviour
                 frenzyAlarmIcon.enabled = (Mathf.FloorToInt(Time.time * 4f) % 2) == 0;
             }
             yield return null;
+        }
+    }
+
+    /// <summary>
+    /// Asegura la existencia y configuración de las 4 ranuras de pociones en la esquina inferior izquierda:
+    /// Slot 0: Cegar [1]
+    /// Slot 1: Hipnotizar [2]
+    /// Slot 2: Dormir [3]
+    /// Slot 3: Poción Maestra [4] (con icono Pocion_Maestra_Caldero_0)
+    /// </summary>
+    public void EnsureFourPotionSlots()
+    {
+        Transform flaskCegar = transform.Find("Flask_Cegar");
+        Transform flaskHipno = transform.Find("Flask_Hipnotizar");
+        Transform flaskDormir = transform.Find("Flask_Dormir");
+        Transform flaskMaestra = transform.Find("Flask_Maestra");
+
+        if (flaskMaestra == null)
+        {
+            Transform template = flaskDormir != null ? flaskDormir : (flaskHipno != null ? flaskHipno : flaskCegar);
+            if (template != null)
+            {
+                GameObject newFlask = Instantiate(template.gameObject, transform, false);
+                newFlask.name = "Flask_Maestra";
+                flaskMaestra = newFlask.transform;
+
+                RectTransform rt = newFlask.GetComponent<RectTransform>();
+                if (rt != null)
+                {
+                    rt.anchorMin = new Vector2(0f, 0f);
+                    rt.anchorMax = new Vector2(0f, 0f);
+                    rt.pivot = new Vector2(0f, 0f);
+                    rt.anchoredPosition = new Vector2(610f, 74f);
+                    rt.sizeDelta = new Vector2(96f, 96f);
+                }
+
+                // Cargar sprite de la Poción Maestra
+                Sprite masterSprite = null;
+#if UNITY_EDITOR
+                UnityEngine.Object[] assets = UnityEditor.AssetDatabase.LoadAllAssetsAtPath("Assets/Prefabs/Pocion_Maestra_Caldero.png");
+                foreach (UnityEngine.Object a in assets)
+                {
+                    if (a is Sprite sp) { masterSprite = sp; break; }
+                }
+#endif
+                if (masterSprite == null)
+                {
+                    Sprite[] all = Resources.FindObjectsOfTypeAll<Sprite>();
+                    foreach (Sprite s in all)
+                    {
+                        if (s != null && s.name.StartsWith("Pocion_Maestra_Caldero"))
+                        {
+                            masterSprite = s;
+                            break;
+                        }
+                    }
+                }
+
+                Image img = newFlask.GetComponent<Image>();
+                if (img != null && masterSprite != null)
+                {
+                    img.sprite = masterSprite;
+                }
+
+                Transform keyT = newFlask.transform.Find("KeyHint");
+                if (keyT != null)
+                {
+                    TextMeshProUGUI tmp = keyT.GetComponent<TextMeshProUGUI>();
+                    if (tmp != null) tmp.text = "[4]";
+                }
+
+                Transform countT = newFlask.transform.Find("Count");
+                if (countT != null)
+                {
+                    TextMeshProUGUI tmp = countT.GetComponent<TextMeshProUGUI>();
+                    if (tmp != null)
+                    {
+                        tmp.text = "x 0";
+                        masterChargesText = tmp;
+                    }
+                }
+            }
+        }
+        else if (masterChargesText == null)
+        {
+            Transform countT = flaskMaestra.Find("Count");
+            if (countT != null)
+            {
+                masterChargesText = countT.GetComponent<TextMeshProUGUI>();
+            }
+        }
+
+        // Vincular referencias a las 4 ranuras
+        Transform[] flaskTransforms = new Transform[] { flaskCegar, flaskHipno, flaskDormir, flaskMaestra };
+        potionSelectionFrames = new Image[4];
+        potionKeyHints = new TextMeshProUGUI[4];
+
+        for (int i = 0; i < flaskTransforms.Length; i++)
+        {
+            if (flaskTransforms[i] == null) continue;
+
+            Transform frameT = flaskTransforms[i].Find("SelectionFrame");
+            if (frameT != null) potionSelectionFrames[i] = frameT.GetComponent<Image>();
+
+            Transform keyT = flaskTransforms[i].Find("KeyHint");
+            if (keyT != null) potionKeyHints[i] = keyT.GetComponent<TextMeshProUGUI>();
+
+            // Configurar botón clickeable para selección con el ratón
+            Button btn = flaskTransforms[i].GetComponent<Button>();
+            if (btn == null)
+            {
+                btn = flaskTransforms[i].gameObject.AddComponent<Button>();
+                btn.transition = Selectable.Transition.None;
+            }
+            int slotIdx = i;
+            btn.onClick.RemoveAllListeners();
+            btn.onClick.AddListener(() =>
+            {
+                PotionInventory inv = Object.FindFirstObjectByType<PotionInventory>();
+                if (inv != null) inv.SelectPotion((PotionType)slotIdx);
+            });
         }
     }
 }
