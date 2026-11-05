@@ -145,6 +145,7 @@ public class LootPopupVisualizer : MonoBehaviour
             PotionType.Blind => "Potion_Blind",
             PotionType.Hypnotize => "Potion_Hypnotize",
             PotionType.Sleep => "Potion_Sleep",
+            PotionType.Master => "Pocion_Maestra_Caldero_0",
             _ => "Potion_Blind"
         };
         string displayName = type switch
@@ -152,6 +153,7 @@ public class LootPopupVisualizer : MonoBehaviour
             PotionType.Blind => "Poción de Ceguera",
             PotionType.Hypnotize => "Poción de Hipnosis",
             PotionType.Sleep => "Poción de Sueño",
+            PotionType.Master => "Poción Maestra",
             _ => "Poción"
         };
         Color accent = type switch
@@ -159,6 +161,7 @@ public class LootPopupVisualizer : MonoBehaviour
             PotionType.Blind => new Color(1f, 0.90f, 0.35f, 1f),
             PotionType.Hypnotize => new Color(0.85f, 0.42f, 1f, 1f),
             PotionType.Sleep => new Color(0.38f, 0.72f, 1f, 1f),
+            PotionType.Master => new Color(0.92f, 0.45f, 1f, 1f),
             _ => new Color(0.45f, 0.85f, 1f, 1f)
         };
 
@@ -660,6 +663,7 @@ public class LootPopupVisualizer : MonoBehaviour
                 PotionType.Blind => new[] { "PotionItem_Blind", "ui_icon_flask_blind", "PotionProjectile_Blind" },
                 PotionType.Hypnotize => new[] { "PotionItem_Hypnotize", "ui_icon_flask_hypnotize", "PotionProjectile_Hypnotize" },
                 PotionType.Sleep => new[] { "PotionItem_Sleep", "ui_icon_flask_sleep", "PotionProjectile_Sleep" },
+                PotionType.Master => new[] { "Pocion_Maestra_Caldero_0", "Pocion_Maestra_Caldero", "Pocion_Maestra_Caldero_Projectile_0" },
                 _ => new[] { "PotionItem_Blind", "ui_icon_flask_blind" }
             },
             _ => new[] { spriteName }

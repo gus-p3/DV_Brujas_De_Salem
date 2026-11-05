@@ -48,6 +48,9 @@ desktop.ini
 .vsconfig
 
 # Copias de recuperación que crea Unity tras un cierre inesperado
+*.unity.temp
+Build_WebGL*/
+
 [Aa]ssets/_Recovery/
 [Aa]ssets/_Recovery.meta
 

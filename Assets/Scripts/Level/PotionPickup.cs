@@ -67,6 +67,7 @@ public class PotionPickup : MonoBehaviour
             PotionType.Blind => GameManager.Instance.BlindCharges,
             PotionType.Hypnotize => GameManager.Instance.HypnotizeCharges,
             PotionType.Sleep => GameManager.Instance.SleepCharges,
+            PotionType.Master => GameManager.Instance.MasterCharges,
             _ => 0
         };
 
@@ -93,6 +94,9 @@ public class PotionPickup : MonoBehaviour
             case PotionType.Sleep:
                 GameManager.Instance.AddSpellCharges(0, 0, amount);
                 break;
+            case PotionType.Master:
+                GameManager.Instance.AddSpellCharges(0, 0, 0, amount);
+                break;
         }
 
         SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
@@ -114,6 +118,7 @@ public class PotionPickup : MonoBehaviour
         PotionType.Blind => "Ceguera",
         PotionType.Hypnotize => "Hipnosis",
         PotionType.Sleep => "Sueño",
+        PotionType.Master => "Poción Maestra",
         _ => "Magia"
     };
 }

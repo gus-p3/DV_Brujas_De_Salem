@@ -7,7 +7,8 @@ public enum PotionType
 {
     Blind = 0,
     Hypnotize = 1,
-    Sleep = 2
+    Sleep = 2,
+    Master = 3
 }
 
 /// <summary>

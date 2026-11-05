@@ -48,6 +48,7 @@ public class GameManager : MonoBehaviour
     public int BlindCharges = 0;
     public int HypnotizeCharges = 0;
     public int SleepCharges = 0;
+    public int MasterCharges = 0;
 
     // Eventos para el HUD y el sistema de corazones
     public event Action OnStatsUpdated;
@@ -219,11 +220,12 @@ public class GameManager : MonoBehaviour
         LoseHeart(amount, "Daño");
     }
 
-    public void AddSpellCharges(int blind, int hypnotize, int sleep)
+    public void AddSpellCharges(int blind, int hypnotize, int sleep, int master = 0)
     {
         BlindCharges += blind;
         HypnotizeCharges += hypnotize;
         SleepCharges += sleep;
+        MasterCharges += master;
         OnStatsUpdated?.Invoke();
 
         // Si la ranura seleccionada actualmente no tiene cargas, seleccionar automáticamente la poción recién recogida
@@ -231,10 +233,11 @@ public class GameManager : MonoBehaviour
         if (inv != null)
         {
             int sel = (int)inv.SelectedPotion;
-            int currentSelCharges = sel == 0 ? BlindCharges : (sel == 1 ? HypnotizeCharges : SleepCharges);
+            int currentSelCharges = sel == 0 ? BlindCharges : (sel == 1 ? HypnotizeCharges : (sel == 2 ? SleepCharges : MasterCharges));
             if (currentSelCharges <= 0)
             {
-                if (blind > 0) inv.SelectPotion(PotionType.Blind);
+                if (master > 0) inv.SelectPotion(PotionType.Master);
+                else if (blind > 0) inv.SelectPotion(PotionType.Blind);
                 else if (hypnotize > 0) inv.SelectPotion(PotionType.Hypnotize);
                 else if (sleep > 0) inv.SelectPotion(PotionType.Sleep);
             }
@@ -249,11 +252,12 @@ public class GameManager : MonoBehaviour
 
     public bool TryConsumeSpell(int spellType)
     {
-        // 0: Cegar, 1: Hipnotizar, 2: Dormir
+        // 0: Cegar, 1: Hipnotizar, 2: Dormir, 3: Maestra
         bool success = false;
         if (spellType == 0 && BlindCharges > 0) { BlindCharges--; success = true; }
         else if (spellType == 1 && HypnotizeCharges > 0) { HypnotizeCharges--; success = true; }
         else if (spellType == 2 && SleepCharges > 0) { SleepCharges--; success = true; }
+        else if (spellType == 3 && MasterCharges > 0) { MasterCharges--; success = true; }
 
         if (success)
         {
