@@ -1423,8 +1423,8 @@ namespace Level3.Editor
                 "Lore_Clue_1_Sacristan",
                 new Vector3(154.4f, 0.17f, 0f),
                 "clue_sacristan_1",
-                "Nota del Sacristán I",
-                "Por orden del Juez escondí la Llave de la Cripta en el Cofre de Madera de mi casa, junto a la cama. Atranqué la puerta: solo un gato podría colarse por la ventana alta, trepando por las cajas. Y que nadie haga ruido: duermo con un ojo abierto.");
+                "Diario del Sacristán",
+                "En mi casa solo guardo brebajes de sigilo para pasar desapercibido. La Santa Inquisición confiscó la Llave de la Cripta y la encerró en el cofre del Despacho del Inquisidor, en el Atrio.");
 
             InstantiatePickup(act3Pickups, potSleepPrefab, "PotionPickup_Act3_Rear_Sleep", new Vector3(156.0f, 0.65f, 0f));
 
@@ -1437,21 +1437,17 @@ namespace Level3.Editor
                 WestEntry = HouseOpening.HighWindow,
                 EastExit = HouseOpening.CatFlap,
                 FacadeSlices = new[] { "houses_sprite.png_3", "houses_sprite.png_19" },
-                EntryHint = "Entra como Gato [T]: trepa por las cajas hasta la ventana alta.",
+                EntryHint = "Entra como Gato [T]: trepa por las cajas hasta la ventana alta para saquear los elixires del sacristán.",
                 BedX = 164.8f,
                 ChestX = 168.3f,
-                ChestObjectName = "Chest_Act3_1_Wooden",
-                ChestId = "chest_act3_crypt_wooden",
-                ChestName = "Cofre de Madera del Sacristán",
-                ChestKind = "Wooden",
-                ChestNeedsKey = false,
-                RewardKeyId = "crypt_chest_key",
-                RewardKeyName = "Llave de la Cripta",
+                InsidePickupPrefab = potSleepPrefab,
+                InsidePickupName = "PotionPickup_House_Sacristan_Sleep",
             };
             sacristan.Decor.Add(new HouseDecor("Interior_Bookshelf.png", 162.5f, 1.5f, 2.0f));
             sacristan.Decor.Add(new HouseDecor("Interior_Fireplace.png", 166.7f, 1.8f, 2.2f));
             sacristan.Decor.Add(new HouseDecor("Interior_Window_Shutters.png", 164.8f, 1.1f, 0.95f, 2.35f));
             BuildInfiltrationHouse(sacristan, act3Env, act3Gameplay, act3Npcs, groundLayer, cainosSprites, chestSprites, villagerPrefab);
+            InstantiatePickup(act3Pickups, potBlindPrefab, "PotionPickup_House_Sacristan_Blind", new Vector3(162.8f, 0.65f, 0f));
 
             // ------------------------------------------------------------------
             // TRAMO 3.2: CALLE DEL CAMPANERO, PISTA #2 Y GUARDIA DEL BALCÓN (X: 170 a 194)
@@ -1466,7 +1462,7 @@ namespace Level3.Editor
                 new Vector3(173.8f, 0.17f, 0f),
                 "clue_captain_diary_2",
                 "Diario del Capitán de la Guardia",
-                "El guardia de la linterna dorada vigila el balcón y el tejado de la Casa del Campanero: él lleva la Llave de la Reja del Atrio. Dentro de la casa, junto al campanero dormido, está el Cofre de Hierro; se abre con la Llave de la Cripta y guarda la Llave del Cofre del Inquisidor. Solo se entra por la gatera.");
+                "El guardia de la linterna dorada vigila el balcón de la Casa del Campanero: él lleva la Llave de la Reja del Atrio. Tras la reja, en la Casa del Inquisidor, se oculta el cofre de madera con la Llave de la Cripta.");
 
             CreateForestHideout(act3Env, "Hideout_CryptYard_1", 176.8f, 0f, 3.0f, 3.4f, cornCluster, stalkA, stalkB, stalkC);
 
@@ -1483,23 +1479,17 @@ namespace Level3.Editor
                 EastExit = HouseOpening.CatFlap,
                 FacadeSlices = new[] { "houses_sprite.png_7", "houses_sprite.png_17" },
                 FacadeTint = new Color(0.84f, 0.82f, 0.9f, 1f),
-                EntryHint = "Entra como Gato [T] por la gatera de la pared.",
+                EntryHint = "Entra como Gato [T] por la gatera de la pared para conseguir brebajes de hipnosis.",
                 BedX = 187.6f,
                 ChestX = 191.5f,
-                ChestObjectName = "Chest_Act3_2_Iron",
-                ChestId = "chest_act3_belfry_iron",
-                ChestName = "Cofre de Hierro del Campanero",
-                ChestKind = "Iron",
-                ChestNeedsKey = true,
-                NeedKeyId = "crypt_chest_key",
-                NeedKeyName = "Llave de la Cripta",
-                RewardKeyId = "inquisitor_chest_key",
-                RewardKeyName = "Llave del Cofre del Inquisidor",
+                InsidePickupPrefab = potHypnoPrefab,
+                InsidePickupName = "PotionPickup_House_Campanero_Hypno",
             };
             campanero.Decor.Add(new HouseDecor("Interior_Table_Chairs.png", 184.7f, 2.1f, 1.25f));
             campanero.Decor.Add(new HouseDecor("Interior_Bookshelf.png", 189.8f, 1.5f, 2.0f));
             campanero.Decor.Add(new HouseDecor("Interior_Window_Shutters.png", 185.4f, 1.1f, 0.95f, 2.35f));
             BuildInfiltrationHouse(campanero, act3Env, act3Gameplay, act3Npcs, groundLayer, cainosSprites, chestSprites, villagerPrefab);
+            InstantiatePickup(act3Pickups, heartPrefab, "HeartPickup_House_Campanero", new Vector3(184.2f, 0.65f, 0f));
 
             // Balcón y escalones rústicos de madera hasta el tejado del Campanero (reemplaza la escalera problemática)
             Sprite balconySprite = LoadFirstSprite(Level2ArtPath + "Village_Balcony_Platform.png");
@@ -1563,7 +1553,7 @@ namespace Level3.Editor
                 new Vector3(217.8f, 0.17f, 0f),
                 "clue_priest_confession_3",
                 "Confesión del Párroco",
-                "La Llave Maestra de la Iglesia de Salem descansa en el Cofre Dorado de la Casa del Inquisidor; solo la Llave del Inquisidor lo abre. Él duerme con el sueño ligero: entra como gato por el conducto de ventilación y camina despacio.");
+                "La Llave de la Cripta descansa en el cofre del Despacho del Inquisidor. Esa llave abrirá el Cofre de Hierro en el Panteón Antiguo, el cual guarda el acceso a la Botica Monacal donde se oculta la Llave Maestra de la Iglesia.");
 
             var inquisidor = new VillageHouseSpec
             {
@@ -1579,15 +1569,13 @@ namespace Level3.Editor
                 EntryHint = "Entra como Gato [T] por el conducto de ventilación junto a la puerta.",
                 BedX = 228.6f,
                 ChestX = 232.6f,
-                ChestObjectName = "Chest_Act3_3_Golden",
-                ChestId = "chest_act3_sanctuary_golden",
-                ChestName = "Cofre Dorado del Inquisidor",
-                ChestKind = "Golden",
-                ChestNeedsKey = true,
-                NeedKeyId = "inquisitor_chest_key",
-                NeedKeyName = "Llave del Cofre del Inquisidor",
-                RewardKeyId = Level3StateController.ChurchMasterKeyId,
-                RewardKeyName = "Llave Maestra de la Iglesia",
+                ChestObjectName = "Chest_Act3_1_Wooden",
+                ChestId = "chest_act3_crypt_wooden",
+                ChestName = "Cofre de Madera del Inquisidor",
+                ChestKind = "Wooden",
+                ChestNeedsKey = false,
+                RewardKeyId = "crypt_chest_key",
+                RewardKeyName = "Llave de la Cripta",
             };
             inquisidor.Decor.Add(new HouseDecor("Interior_Fireplace.png", 225.4f, 1.8f, 2.2f));
             inquisidor.Decor.Add(new HouseDecor("Interior_Wardrobe.png", 230.8f, 1.2f, 2.1f));
@@ -2232,7 +2220,7 @@ namespace Level3.Editor
             // 2. Checkpoint del Panteón
             CreateCheckpoint(cemGameplay, checkpointPrefab, "Checkpoint_Act3_Cemetery", new Vector3(296.5f, 0.17f, 0f));
 
-            // 3. Casa 4: Casa del Guardián del Panteón (X: 300..312)
+            // 3. Casa 4: Casa del Guardián del Panteón (X: 300..312) - COFRE #2 (HIERRO)
             var guardian = new VillageHouseSpec
             {
                 Id = "guardian",
@@ -2246,13 +2234,21 @@ namespace Level3.Editor
                 EntryHint = "Entra como Gato [T]: trepa por las cajas junto al muro del panteón hasta la ventana alta.",
                 BedX = 305.5f,
                 ChestX = 309.5f,
-                InsidePickupPrefab = potBlindPrefab,
-                InsidePickupName = "PotionPickup_House_Guardian_Blind",
+                ChestObjectName = "Chest_Act3_2_Iron",
+                ChestId = "chest_act3_belfry_iron",
+                ChestName = "Cofre de Hierro del Panteón",
+                ChestKind = "Iron",
+                ChestNeedsKey = true,
+                NeedKeyId = "crypt_chest_key",
+                NeedKeyName = "Llave de la Cripta",
+                RewardKeyId = "inquisitor_chest_key",
+                RewardKeyName = "Llave de la Botica Monacal",
             };
             guardian.Decor.Add(new HouseDecor("Interior_Fireplace.png", 303.0f, 1.8f, 2.2f));
             guardian.Decor.Add(new HouseDecor("Interior_Bookshelf.png", 308.5f, 1.5f, 2.0f));
             guardian.Decor.Add(new HouseDecor("Interior_Window_Shutters.png", 305.5f, 1.1f, 0.95f, 2.35f));
             BuildInfiltrationHouse(guardian, cemEnv, cemGameplay, cemNpcs, groundLayer, cainosSprites, chestSprites, villagerPrefab);
+            InstantiatePickup(cemPickups, potBlindPrefab, "PotionPickup_House_Guardian_Blind", new Vector3(303.2f, 0.65f, 0f));
 
             // Recompensa y farol en el tejado de la casa del guardián
             CreateMysticLantern(cemEnv, cainosSprites, "VillageLamp_Guardian_Roof", new Vector3(306.0f, HouseRoofTop + 0.85f, 0f), new Color(0.72f, 0.84f, 1f, 1f));
@@ -2337,7 +2333,7 @@ namespace Level3.Editor
             CreateOneWayLedge(monEnv, "Boticario_Step_2", 326.7f, 328.0f, 2.70f, groundLayer, balconySprite, true);
             PlaceCainosSprite(monEnv, cainosSprites, "Boticario_Barrel_Support_2", "TX Village Props - Barrel", new Vector3(327.3f, 1.95f, 0f), 1.0f, true);
 
-            // 2. Casa 5: Botica y Almacén Monacal (X: 328..340)
+            // 2. Casa 5: Botica y Almacén Monacal (X: 328..340) - COFRE #3 (DORADO, LLAVE MAESTRA DE LA IGLESIA)
             var boticario = new VillageHouseSpec
             {
                 Id = "boticario",
@@ -2351,8 +2347,15 @@ namespace Level3.Editor
                 EntryHint = "Entra como Gato [T] por la gatera lateral bajo los estantes de ungüentos.",
                 BedX = 333.5f,
                 ChestX = 337.5f,
-                InsidePickupPrefab = potHypnoPrefab,
-                InsidePickupName = "PotionPickup_House_Boticario_Hypno",
+                ChestObjectName = "Chest_Act3_3_Golden",
+                ChestId = "chest_act3_sanctuary_golden",
+                ChestName = "Cofre Dorado de la Botica Monacal",
+                ChestKind = "Golden",
+                ChestNeedsKey = true,
+                NeedKeyId = "inquisitor_chest_key",
+                NeedKeyName = "Llave de la Botica Monacal",
+                RewardKeyId = Level3StateController.ChurchMasterKeyId,
+                RewardKeyName = "Llave Maestra de la Iglesia",
             };
             boticario.Decor.Add(new HouseDecor("Interior_Table_Chairs.png", 331.0f, 2.1f, 1.25f));
             boticario.Decor.Add(new HouseDecor("Interior_Bookshelf.png", 336.5f, 1.5f, 2.0f));
