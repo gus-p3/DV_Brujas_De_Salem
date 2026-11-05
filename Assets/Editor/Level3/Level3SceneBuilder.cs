@@ -371,11 +371,6 @@ namespace Level3.Editor
             CanvasGroup cardGroup = cardGo.GetComponent<CanvasGroup>();
             if (cardGroup != null) cardGroup.alpha = 0f; // invisible en el editor; en juego decide Awake()
 
-            if (village)
-            {
-                Sprite cathedralSprite = LoadFirstSprite(CathedralArtPath);
-                BuildLevel3VillageEndingUI(uiRoot, cathedralSprite);
-            }
 
             HUDController hudCtrl = uiRoot.GetComponentInChildren<HUDController>(true);
             if (hudCtrl != null)
@@ -1673,8 +1668,9 @@ namespace Level3.Editor
                 stalkB,
                 stalkC);
 
-            // TRAMO 3.8: LA GRAN VÍA SACRA Y FINAL DEL NIVEL 3 (X: 350 a 372)
+            // TRAMO 3.8: LA GRAN VÍA SACRA Y FINAL DEL NIVEL 3 (X: 350 a 375)
             Sprite gothicSignSprite = LoadFirstSprite(GothicSignArtPath);
+            Sprite cathedralSprite = LoadFirstSprite(CathedralArtPath);
             BuildProcessionalViaSacraAndFinalGoal(
                 act3Env,
                 act3Gameplay,
@@ -1690,6 +1686,7 @@ namespace Level3.Editor
                 villagerPreacherPrefab,
                 signSprite,
                 gothicSignSprite,
+                cathedralSprite,
                 potSleepPrefab,
                 potBlindPrefab,
                 heartPrefab);
@@ -2387,6 +2384,7 @@ namespace Level3.Editor
             GameObject villagerPreacherPrefab,
             Sprite signSprite,
             Sprite gothicSignSprite,
+            Sprite cathedralSprite,
             GameObject potSleepPrefab,
             GameObject potBlindPrefab,
             GameObject heartPrefab)
@@ -2403,7 +2401,7 @@ namespace Level3.Editor
             Transform viaNpcs = new GameObject("Act3_ViaSacra_NPCs").transform;
             viaNpcs.SetParent(npcsParent, false);
 
-            // 1. Casa 6: Residencia del Mayordomo Capitular (X: 350..361)
+            // 1. Casa 6: Residencia del Mayordomo Capitular (X: 350..361) - Última casa colonial
             var capitular = new VillageHouseSpec
             {
                 Id = "capitular",
@@ -2432,185 +2430,105 @@ namespace Level3.Editor
             // Corazón adicional dentro de la casa (en el suelo)
             InstantiatePickup(viaPickups, heartPrefab, "HeartPickup_House_Capitular", new Vector3(352.5f, 0.65f, 0f));
 
-            // 2. Portal de Entrada Ceremonial a la Gran Vía Sacra (X: 361.5..363.0)
+            // 2. Portal de Salida Ceremonial de la Aldea hacia el Sendero Oscuro (X: 361.5..363.0)
             PlaceCainosSprite(viaEnv, cainosSprites, "ViaSacra_Arch_Pillar_L", "TX Village Props - Fence 02 Pillar", new Vector3(361.8f, 1.35f, 0f), 1.35f, true);
             PlaceCainosSprite(viaEnv, cainosSprites, "ViaSacra_Arch_Pillar_R", "TX Village Props - Fence 02 Pillar", new Vector3(363.2f, 1.35f, 0f), 1.35f, true);
             CreateMysticLantern(viaEnv, cainosSprites, "VillageLamp_ViaSacra_Portal", new Vector3(362.5f, 1.95f, 0f), new Color(0.95f, 0.85f, 0.55f, 1f));
 
-            // 3. Checkpoint ceremonial de la Vía Sacra (X: 363.8)
+            // 3. Checkpoint previo al sendero del bosque oscuro (X: 363.8)
             CreateCheckpoint(viaGameplay, checkpointPrefab, "Checkpoint_Act3_ViaSacra", new Vector3(363.8f, 0.17f, 0f));
 
-            // 4. Aldeano acólito rezando en la vía sacra
+            // 4. Aldeano acólito rezando al borde de la aldea
             CreateVillager(viaNpcs, villagerPreacherPrefab != null ? villagerPreacherPrefab : villagerPrefab,
                 "Villager_ViaSacra_Acolyte", new Vector3(365.2f, 0.17f, 0f), WanderPattern.LookAround, 2.0f);
 
-            // 5. Guardia inquisidor de la guardia de honor (X: 363.5 a 367.5)
-            Transform[] wpViaGuard = CreateWaypoints(viaNpcs, "Waypoints_Guard_ViaSacra", new Vector2(363.5f, 0.17f), new Vector2(367.5f, 0.17f));
+            // 5. Guardia inquisidor de la guardia de honor (X: 363.5 a 367.0)
+            Transform[] wpViaGuard = CreateWaypoints(viaNpcs, "Waypoints_Guard_ViaSacra", new Vector2(363.5f, 0.17f), new Vector2(367.0f, 0.17f));
             CreateGuard(viaNpcs, guardPrefab, "Guard_ViaSacra", new Vector3(365.5f, 0.17f, 0f), wpViaGuard, PatrolMode.PingPong, groundMask);
 
-            // Adornos: calabazas y farol ceremonial previo al portal
-            PlaceCainosSprite(viaEnv, cainosSprites, "ViaSacra_Pumpkin_End", "TX Village Props - Pumpkin 01", new Vector3(367.0f, 0.5f, 0f), 1.0f, true);
-            CreateMysticLantern(viaEnv, cainosSprites, "VillageLamp_ViaSacra_Sanctuary", new Vector3(368.0f, 1.85f, 0f), new Color(1f, 0.9f, 0.6f, 1f));
-
-            // 6. Gran Portal de la Iglesia / Catedral de Salem (ChurchDoorGoal) y Cartel Gótico Nocturno en X: 368.5
-            PlaceCainosSprite(viaEnv, cainosSprites, "CathedralPortal_Arch_L", "TX Village Props - Fence 02 Pillar", new Vector3(366.6f, 1.35f, 0f), 1.35f, true);
-            PlaceCainosSprite(viaEnv, cainosSprites, "CathedralPortal_Arch_R", "TX Village Props - Fence 02 Pillar", new Vector3(370.4f, 1.35f, 0f), 1.35f, true);
-            CreateMysticLantern(viaEnv, cainosSprites, "VillageLamp_CathedralPortal", new Vector3(370.4f, 2.3f, 0f), new Color(0.9f, 0.92f, 1.0f, 1f));
-
-            // Cartel Gótico Nocturno de Iglesia (Recurso 1) flanqueando la entrada al templo
-            GameObject signGo = new GameObject("Cathedral_GothicSign");
-            signGo.transform.SetParent(viaEnv, false);
-            signGo.transform.position = new Vector3(365.0f, 0.17f, 0f);
-
-            AddFitted(signGo.transform, "GothicSign_Visual", gothicSignSprite,
-                new Vector2(363.8f, 0.17f), new Vector2(366.2f, 2.55f), "Gameplay", 3, Color.white);
-
-            GameObject signLightGo = new GameObject("GothicSign_Light2D");
-            signLightGo.transform.SetParent(signGo.transform, false);
-            signLightGo.transform.position = new Vector3(365.0f, 1.7f, 0f);
-            Light2D signL2d = signLightGo.AddComponent<Light2D>();
-            signL2d.lightType = Light2D.LightType.Point;
-            signL2d.color = new Color(1f, 0.9f, 0.65f, 1f);
-            signL2d.intensity = 1.55f;
-            signL2d.pointLightOuterRadius = 3.8f;
-            SnapToGround(signGo, 0.02f);
-
-            // Gran Puerta Doble de la Iglesia de Salem (ChurchDoorGoal) en X: 368.5, Y: 0.17
-            GameObject doorGo = new GameObject("Church_MainDoor_Goal");
-            doorGo.transform.SetParent(viaGameplay, false);
-            doorGo.transform.position = new Vector3(368.5f, 0.17f, 0f);
-
-            Sprite wingSp = LoadFirstSprite(Level2ArtPath + "Village_Door_Locked.png");
-            Color wingColor = new Color(0.78f, 0.62f, 0.45f, 1f);
-
-            SpriteRenderer lwSr = AddFitted(doorGo.transform, "LeftDoorWing", wingSp, new Vector2(367.1f, 0.13f), new Vector2(368.5f, 3.4f), "Gameplay", 3, wingColor);
-            SpriteRenderer rwSr = AddFitted(doorGo.transform, "RightDoorWing", wingSp, new Vector2(368.5f, 0.13f), new Vector2(369.9f, 3.4f), "Gameplay", 3, wingColor, true);
-
-            GameObject lightGo = new GameObject("SanctuaryPortal_Light2D");
-            lightGo.transform.SetParent(doorGo.transform, false);
-            lightGo.transform.localPosition = new Vector3(0f, 2.2f, 0f);
-            Light2D portalLight = lightGo.AddComponent<Light2D>();
-            portalLight.lightType = Light2D.LightType.Point;
-            portalLight.color = new Color(1f, 0.90f, 0.45f, 1f);
-            portalLight.intensity = 1.75f;
-            portalLight.pointLightOuterRadius = 6.0f;
-
-            BoxCollider2D goalTrigger = doorGo.AddComponent<BoxCollider2D>();
-            goalTrigger.isTrigger = true;
-            goalTrigger.size = new Vector2(4.2f, 4.6f);
-            goalTrigger.offset = new Vector2(0f, 2.3f);
-
-            ChurchDoorGoal goal = doorGo.AddComponent<ChurchDoorGoal>();
-            var soGoal = new SerializedObject(goal);
-            soGoal.FindProperty("doorRenderer").objectReferenceValue = lwSr;
-            soGoal.FindProperty("leftDoorWing").objectReferenceValue = lwSr != null ? lwSr.transform : null;
-            soGoal.FindProperty("rightDoorWing").objectReferenceValue = rwSr != null ? rwSr.transform : null;
-            soGoal.FindProperty("sanctuaryPortalLight").objectReferenceValue = portalLight;
-            soGoal.FindProperty("requiredKeyId").stringValue = ChurchDoorGoal.RequiredMasterKeyId;
-            soGoal.ApplyModifiedPropertiesWithoutUndo();
-
-            SnapToGround(doorGo, 0.02f);
-
-            // Casas coloniales completas que enmarcan el final del camino y la Plaza de la Catedral
-            BuildCathedralSquareHouses(viaEnv, viaGameplay, cainosSprites);
-        }
-
-        private static void BuildCathedralSquareHouses(
-            Transform envParent,
-            Transform gameplayParent,
-            Sprite[] cainosSprites)
-        {
-            const float g = StreetY;
-            Transform housesRoot = new GameObject("Cathedral_Square_Houses").transform;
-            housesRoot.SetParent(envParent, false);
-
-            Sprite[] slices = AssetDatabase.LoadAllAssetsAtPath(Level2ArtPath + "houses_sprite_clean.png").OfType<Sprite>().ToArray();
-            Sprite doorSp = LoadFirstSprite(Level2ArtPath + "Village_Door_Locked.png");
-
-            Color nightTownTint = new Color(0.76f, 0.74f, 0.86f, 1f);
-            Color midgroundTownTint = new Color(0.58f, 0.56f, 0.70f, 1f);
-
-            // 1. CASAS DE FONDO / MIDGROUND: Skyline colonial continuo que abraza la Vía Sacra y la Catedral (X: 360..376)
-            Transform bgTown = new GameObject("Midground_Colonial_Street").transform;
-            bgTown.SetParent(housesRoot, false);
-
-            // Casa Midground 1 (X: 360.5..365.2)
-            Sprite spMg1 = slices.FirstOrDefault(s => s != null && s.name == "houses_sprite.png_7");
-            AddFitted(bgTown, "Midground_House_1", spMg1, new Vector2(360.2f, g - 0.05f), new Vector2(365.2f, g + 7.8f), "Midground", 2, midgroundTownTint);
-
-            // Casa Midground 2 (X: 364.5..369.2)
-            Sprite spMg2 = slices.FirstOrDefault(s => s != null && s.name == "houses_sprite.png_2");
-            AddFitted(bgTown, "Midground_House_2", spMg2, new Vector2(364.2f, g - 0.05f), new Vector2(369.5f, g + 8.4f), "Midground", 1, midgroundTownTint);
-
-            // Casa Midground 3 (X: 368.6..373.8)
-            Sprite spMg3 = slices.FirstOrDefault(s => s != null && s.name == "houses_sprite.png_18");
-            AddFitted(bgTown, "Midground_House_3", spMg3, new Vector2(368.5f, g - 0.05f), new Vector2(373.8f, g + 9.0f), "Midground", 2, midgroundTownTint);
-
-            // Casa Midground 4 (X: 372.8..377.2)
-            Sprite spMg4 = slices.FirstOrDefault(s => s != null && s.name == "houses_sprite.png_10");
-            AddFitted(bgTown, "Midground_House_4", spMg4, new Vector2(372.6f, g - 0.05f), new Vector2(377.4f, g + 8.0f), "Midground", 1, midgroundTownTint);
-
-            // Luces cálidas en las ventanas de las casas de fondo
-            for (int i = 0; i < 4; i++)
+            // 6. FONDO ESCÉNICO: CATEDRAL GÓTICA BAJO LA LUNA (Fondo del desenlace narrativo agregado al final del mundo)
+            if (cathedralSprite != null)
             {
-                float winX = 362.5f + i * 4.2f;
-                GameObject winLight = new GameObject($"Window_WarmLight_{i}");
-                winLight.transform.SetParent(bgTown, false);
-                winLight.transform.position = new Vector3(winX, g + 3.2f, 0f);
-                Light2D wl = winLight.AddComponent<Light2D>();
-                wl.lightType = Light2D.LightType.Point;
-                wl.color = new Color(1f, 0.75f, 0.45f, 0.85f);
-                wl.intensity = 0.8f;
-                wl.pointLightOuterRadius = 2.4f;
-                winLight.AddComponent<LanternFlicker>();
+                GameObject cathedralBg = new GameObject("Cathedral_Moonlit_Backdrop");
+                cathedralBg.transform.SetParent(viaEnv, false);
+                cathedralBg.transform.position = new Vector3(372.0f, 6.2f, 0f);
+                SpriteRenderer catSr = cathedralBg.AddComponent<SpriteRenderer>();
+                catSr.sprite = cathedralSprite;
+                catSr.sortingLayerName = "Background";
+                catSr.sortingOrder = 5;
+                catSr.color = new Color(0.85f, 0.85f, 0.95f, 1f);
+                cathedralBg.transform.localScale = new Vector3(1.15f, 1.15f, 1f);
             }
 
-            // 2. CASAS EN PRIMER PLANO (Gameplay) EN LA PLAZA FINAL:
-            // Casa A: Casa de Guardia de la Catedral (Oeste de la plaza, X: 362.8..367.0)
-            Transform houseA = new GameObject("House_Cathedral_GuardStation").transform;
-            houseA.SetParent(housesRoot, false);
-            Sprite spFg1 = slices.FirstOrDefault(s => s != null && s.name == "houses_sprite.png_3");
-            AddFitted(houseA, "GuardStation_Facade", spFg1, new Vector2(362.6f, g - 0.08f), new Vector2(367.0f, g + 6.8f), "Gameplay", 2, nightTownTint);
+            // 7. BOSQUE MUY OSCURO: árboles retorcidos, niebla y transición nocturna (X: 366..378)
+            string treesPath = DarkForestPath + "env_trees";
+            Color deepNightTint = new Color(0.14f, 0.11f, 0.22f, 0.95f);
+            Color frontTreeTint = new Color(0.18f, 0.15f, 0.26f, 1f);
 
-            // Puerta con tablones y farol
-            AddFitted(houseA, "GuardStation_Door", doorSp, new Vector2(363.5f, g - 0.02f), new Vector2(364.7f, g + 1.95f), "Gameplay", 3, new Color(0.9f, 0.85f, 0.8f, 1f));
-            AddFitted(houseA, "GuardStation_DoorPlanks", FindAtlasSprite(cainosSprites, "TX Village Props - Barricade"),
-                new Vector2(363.3f, g - 0.02f), new Vector2(364.9f, g + 1.15f), "Gameplay", 4, Color.white);
-            CreateMysticLantern(houseA, cainosSprites, "Lamp_GuardStation", new Vector3(365.6f, 1.85f, 0f), new Color(1f, 0.85f, 0.45f, 1f));
-            PlaceCainosSprite(houseA, cainosSprites, "GuardStation_Barrel", "TX Village Props - Barrel", new Vector3(366.2f, 0.5f, 0f), 1.0f, true);
+            // Siluetas lejanas en el fondo entre la catedral y el sendero
+            PlaceForestDecor(viaEnv, "DarkForest_Back_1", PackSprite(DarkForestPath + "bgrd_tree1"), 368.5f, 1.55f, false, -2, deepNightTint, 0.15f);
+            PlaceForestDecor(viaEnv, "DarkForest_Back_2", PackSprite(DarkForestPath + "bgrd_tree3"), 374.0f, 1.65f, true, -2, deepNightTint, 0.15f);
 
-            // Puerta atrancada interactiva para la Casa de la Guardia
-            GameObject doorGoA = new GameObject("BarredDoor_GuardStation");
-            doorGoA.transform.SetParent(gameplayParent, false);
-            doorGoA.transform.position = new Vector3(364.1f, g, 0f);
-            BoxCollider2D colA = doorGoA.AddComponent<BoxCollider2D>();
-            colA.isTrigger = true;
-            colA.size = new Vector2(2.0f, 2.4f);
-            colA.offset = new Vector2(0f, 1.2f);
-            BarredHouseDoor barredA = doorGoA.AddComponent<BarredHouseDoor>();
-            barredA.Configure("barred_door_guardstation", "Guardia de la Catedral", "Cerrado por orden de la Santa Inquisición: la guardia vigila el pórtico de la Catedral.");
+            // Árboles retorcidos del bosque oscuro flanqueando el camino
+            PlaceForestDecor(viaEnv, "DarkForest_Tree_1", PackSprite(treesPath, "env_trees_6"), 366.5f, 1.9f, false, 2, frontTreeTint, 0.15f);
+            PlaceForestDecor(viaEnv, "DarkForest_Tree_2", PackSprite(treesPath, "env_trees_1"), 371.0f, 2.1f, true, 2, frontTreeTint, 0.15f);
+            PlaceForestDecor(viaEnv, "DarkForest_Tree_3", PackSprite(treesPath, "env_trees_5"), 375.2f, 2.3f, false, 2, frontTreeTint, 0.15f);
 
-            // Casa B: Residencia y Pórtico Capitular de la Catedral (Este de la plaza, X: 369.8..374.2)
-            Transform houseB = new GameObject("House_Cathedral_ChapterHouse").transform;
-            houseB.SetParent(housesRoot, false);
-            Sprite spFg2 = slices.FirstOrDefault(s => s != null && s.name == "houses_sprite.png_19");
-            AddFitted(houseB, "ChapterHouse_Facade", spFg2, new Vector2(369.8f, g - 0.08f), new Vector2(374.2f, g + 6.8f), "Gameplay", 2, nightTownTint);
+            // Niebla suave oscura que se adentra en el bosque
+            Sprite fogSprite = LoadFirstSprite(FogSpritePath);
+            if (fogSprite != null)
+            {
+                for (int f = 0; f < 3; f++)
+                {
+                    float fx = 366f + f * 4.5f;
+                    GameObject fogGo = new GameObject($"DarkForest_Fog_{f}");
+                    fogGo.transform.SetParent(viaEnv, false);
+                    fogGo.transform.position = new Vector3(fx, 1.8f, 0f);
+                    SpriteRenderer fogSr = fogGo.AddComponent<SpriteRenderer>();
+                    fogSr.sprite = fogSprite;
+                    fogSr.sortingLayerName = "Midground";
+                    fogSr.sortingOrder = 3;
+                    fogSr.color = new Color(0.06f, 0.05f, 0.12f, 0.70f);
+                    fogGo.transform.localScale = new Vector3(3.5f, 2.0f, 1f);
+                }
+            }
 
-            // Puerta con farol y barriles
-            AddFitted(houseB, "ChapterHouse_Door", doorSp, new Vector2(370.8f, g - 0.02f), new Vector2(372.0f, g + 1.95f), "Gameplay", 3, new Color(0.9f, 0.85f, 0.8f, 1f));
-            CreateMysticLantern(houseB, cainosSprites, "Lamp_ChapterHouse", new Vector3(372.7f, 1.85f, 0f), new Color(1f, 0.85f, 0.45f, 1f));
-            PlaceCainosSprite(houseB, cainosSprites, "ChapterHouse_Crate", "TX Village Props - Crate Small", new Vector3(372.6f, 0.65f, 0f), 1.1f, true);
+            // 8. FINAL DEL RECORRIDO: ÚNICAMENTE EL CARTEL GÓTICO NOCTURNO (Recurso 1)
+            // El cartel es el único elemento que da a entender que el camino oscuro va a la iglesia.
+            GameObject signGo = new GameObject("Church_MainDoor_Goal");
+            signGo.transform.SetParent(viaGameplay, false);
+            signGo.transform.position = new Vector3(368.5f, 0.17f, 0f);
 
-            // Puerta atrancada interactiva para la Residencia Capitular
-            GameObject doorGoB = new GameObject("BarredDoor_ChapterHouse");
-            doorGoB.transform.SetParent(gameplayParent, false);
-            doorGoB.transform.position = new Vector3(371.4f, g, 0f);
-            BoxCollider2D colB = doorGoB.AddComponent<BoxCollider2D>();
-            colB.isTrigger = true;
-            colB.size = new Vector2(2.0f, 2.4f);
-            colB.offset = new Vector2(0f, 1.2f);
-            BarredHouseDoor barredB = doorGoB.AddComponent<BarredHouseDoor>();
-            barredB.Configure("barred_door_chapterhouse", "Residencia de la Catedral", "Entrada reservada para el Alto Clero. El paso hacia la Catedral se abre al frente.");
+            SpriteRenderer signSr = AddFitted(signGo.transform, "GothicSign_Visual", gothicSignSprite,
+                new Vector2(367.3f, 0.17f), new Vector2(369.7f, 2.55f), "Gameplay", 3, Color.white);
+
+            // Luz mística focal dorada que ilumina el cartel en la penumbra
+            GameObject signLightGo = new GameObject("GothicSign_Light2D");
+            signLightGo.transform.SetParent(signGo.transform, false);
+            signLightGo.transform.position = new Vector3(368.5f, 1.7f, 0f);
+            Light2D signLight = signLightGo.AddComponent<Light2D>();
+            signLight.lightType = Light2D.LightType.Point;
+            signLight.color = new Color(1f, 0.90f, 0.65f, 1f);
+            signLight.intensity = 1.75f;
+            signLight.pointLightOuterRadius = 4.2f;
+
+            BoxCollider2D goalTrigger = signGo.AddComponent<BoxCollider2D>();
+            goalTrigger.isTrigger = true;
+            goalTrigger.size = new Vector2(3.6f, 4.4f);
+            goalTrigger.offset = new Vector2(0f, 2.2f);
+
+            ChurchDoorGoal goal = signGo.AddComponent<ChurchDoorGoal>();
+            var soGoal = new SerializedObject(goal);
+            soGoal.FindProperty("doorDisplayName").stringValue = "Sendero hacia la Iglesia de Salem";
+            soGoal.FindProperty("requiredKeyId").stringValue = ChurchDoorGoal.RequiredMasterKeyId;
+            soGoal.FindProperty("requiredKeyDisplayName").stringValue = "Llave Maestra de la Iglesia";
+            soGoal.FindProperty("doorRenderer").objectReferenceValue = signSr;
+            soGoal.FindProperty("leftDoorWing").objectReferenceValue = null;
+            soGoal.FindProperty("rightDoorWing").objectReferenceValue = null;
+            soGoal.FindProperty("sanctuaryPortalLight").objectReferenceValue = signLight;
+            soGoal.ApplyModifiedPropertiesWithoutUndo();
+
+            SnapToGround(signGo, 0.02f);
         }
 
         public static LoreObject CreateIlluminatedLoreStand(
@@ -4097,6 +4015,12 @@ namespace Level3.Editor
         }
 
         private static void BuildLevel3VillageEndingUI(Transform uiRoot, Sprite cathedralSprite)
+        {
+            // Sin UI de desenlace narrativo; la ambientación vive en el fondo del mundo.
+            return;
+        }
+
+        private static void UnusedEndingUI(Transform uiRoot, Sprite cathedralSprite)
         {
             GameObject root = new GameObject("Level3VillageEnding_Canvas", typeof(RectTransform));
             root.transform.SetParent(uiRoot, false);
