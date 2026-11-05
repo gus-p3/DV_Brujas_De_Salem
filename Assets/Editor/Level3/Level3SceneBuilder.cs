@@ -1603,8 +1603,8 @@ namespace Level3.Editor
             InstantiatePickup(act3Pickups, potHypnoPrefab, "PotionPickup_Atrium_Hypno", new Vector3(246.0f, 0.65f, 0f));
             InstantiatePickup(act3Pickups, heartPrefab, "HeartPickup_Atrium", new Vector3(250.0f, 0.65f, 0f));
 
-            // La Iglesia de Salem (X: 250 a 260) y ChurchDoorGoal en X: 255
-            BuildSalemChurchMonumentAndGoal(act3Env, act3Gameplay, cainosSprites, logBSprite, logCSprite, gateSprite);
+            // Capilla del Atrio (X: 250 a 260) — Monumento colonial central (sin ChurchDoorGoal, el final es al cierre de la aldea)
+            BuildSalemAtriumChapelMonument(act3Env, cainosSprites, logBSprite, logCSprite, gateSprite);
 
             // TRAMO 3.5: AMPLIACIÓN DE LA ALDEA — HUERTO PARROQUIAL Y CLAUSTRO (X: 260 a 292)
             BuildParishGardenAndCloisterExtension(
@@ -2031,15 +2031,14 @@ namespace Level3.Editor
             PlaceCainosSprite(deco, cainos, "Village_Pumpkin_2", "TX Village Props - Pumpkin 01", new Vector3(251.0f, 0.5f, 0f), 0.9f, true);
         }
 
-        private static void BuildSalemChurchMonumentAndGoal(
+        private static void BuildSalemAtriumChapelMonument(
             Transform envParent,
-            Transform gameplayParent,
             Sprite[] cainosSprites,
             Sprite wallSprite,
             Sprite roofSprite,
             Sprite doorSprite)
         {
-            GameObject churchRoot = new GameObject("Salem_Church_Monument");
+            GameObject churchRoot = new GameObject("Salem_Atrium_Chapel");
             churchRoot.transform.SetParent(envParent, false);
             churchRoot.transform.position = new Vector3(255f, 0.17f, 0f);
 
@@ -2048,51 +2047,29 @@ namespace Level3.Editor
             Sprite naveSp = slices.FirstOrDefault(s => s != null && s.name == "houses_sprite.png_2");
             Sprite towerSp = slices.FirstOrDefault(s => s != null && s.name == "houses_sprite.png_18");
             Color stone = new Color(0.66f, 0.65f, 0.78f, 1f);
-            AddFitted(churchRoot.transform, "Church_StoneNave", naveSp, new Vector2(249.8f, 0.07f), new Vector2(260.2f, 10.6f), "Midground", 2, stone);
-            AddFitted(churchRoot.transform, "Church_BellTower", towerSp, new Vector2(253.2f, 8.4f), new Vector2(256.8f, 15.2f), "Midground", 1, stone);
-            PlaceCainosSprite(churchRoot.transform, cainosSprites, "Church_Cross_Top", "TX Village Props - Gravestone 02", new Vector3(255.0f, 15.0f, 0f), 1.1f);
+            AddFitted(churchRoot.transform, "Chapel_StoneNave", naveSp, new Vector2(249.8f, 0.07f), new Vector2(260.2f, 10.6f), "Midground", 2, stone);
+            AddFitted(churchRoot.transform, "Chapel_BellTower", towerSp, new Vector2(253.2f, 8.4f), new Vector2(256.8f, 15.2f), "Midground", 1, stone);
+            PlaceCainosSprite(churchRoot.transform, cainosSprites, "Chapel_Cross_Top", "TX Village Props - Gravestone 02", new Vector3(255.0f, 15.0f, 0f), 1.1f);
 
             // Columnas del pórtico (apoyadas en el suelo)
-            PlaceCainosSprite(churchRoot.transform, cainosSprites, "Church_Pillar_L", "TX Village Props - Stall Tent Pillar", new Vector3(252.9f, 1.85f, 0f), 1.2f, true);
-            PlaceCainosSprite(churchRoot.transform, cainosSprites, "Church_Pillar_R", "TX Village Props - Stall Tent Pillar", new Vector3(257.1f, 1.85f, 0f), 1.2f, true);
+            PlaceCainosSprite(churchRoot.transform, cainosSprites, "Chapel_Pillar_L", "TX Village Props - Stall Tent Pillar", new Vector3(252.9f, 1.85f, 0f), 1.2f, true);
+            PlaceCainosSprite(churchRoot.transform, cainosSprites, "Chapel_Pillar_R", "TX Village Props - Stall Tent Pillar", new Vector3(257.1f, 1.85f, 0f), 1.2f, true);
 
             // Faroles consagrados a ambos lados del pórtico
-            CreateMysticLantern(churchRoot.transform, cainosSprites, "Church_Lantern_Left", new Vector3(251.5f, 1.35f, 0f), new Color(1f, 0.85f, 0.35f, 1f));
-            CreateMysticLantern(churchRoot.transform, cainosSprites, "Church_Lantern_Right", new Vector3(258.5f, 1.35f, 0f), new Color(1f, 0.85f, 0.35f, 1f));
+            CreateMysticLantern(churchRoot.transform, cainosSprites, "Chapel_Lantern_Left", new Vector3(251.5f, 1.35f, 0f), new Color(1f, 0.85f, 0.35f, 1f));
+            CreateMysticLantern(churchRoot.transform, cainosSprites, "Chapel_Lantern_Right", new Vector3(258.5f, 1.35f, 0f), new Color(1f, 0.85f, 0.35f, 1f));
 
-            // Gran Puerta de la Iglesia (ChurchDoorGoal) en X: 255, Y: 0.17
-            GameObject doorGo = new GameObject("Church_MainDoor_Goal");
-            doorGo.transform.SetParent(gameplayParent, false);
+            // Puerta colonial cerrada de la capilla (ornamental de fondo, no termina el nivel ni pide llave de iglesia)
+            GameObject doorGo = new GameObject("Chapel_ClosedDoor");
+            doorGo.transform.SetParent(churchRoot.transform, false);
             doorGo.transform.position = new Vector3(255f, 0.17f, 0f);
 
             Sprite wingSp = LoadFirstSprite(Level2ArtPath + "Village_Door_Locked.png");
             if (wingSp == null) wingSp = doorSprite;
-            Color wingColor = new Color(0.78f, 0.62f, 0.45f, 1f);
+            Color wingColor = new Color(0.70f, 0.58f, 0.45f, 1f);
 
-            SpriteRenderer lwSr = AddFitted(doorGo.transform, "LeftDoorWing", wingSp, new Vector2(253.7f, 0.13f), new Vector2(255f, 3.1f), "Gameplay", 3, wingColor);
-            SpriteRenderer rwSr = AddFitted(doorGo.transform, "RightDoorWing", wingSp, new Vector2(255f, 0.13f), new Vector2(256.3f, 3.1f), "Gameplay", 3, wingColor, true);
-
-            GameObject lightGo = new GameObject("SanctuaryPortal_Light2D");
-            lightGo.transform.SetParent(doorGo.transform, false);
-            lightGo.transform.localPosition = new Vector3(0f, 2.0f, 0f);
-            Light2D portalLight = lightGo.AddComponent<Light2D>();
-            portalLight.lightType = Light2D.LightType.Point;
-            portalLight.color = new Color(1f, 0.90f, 0.45f, 1f);
-            portalLight.intensity = 1.65f;
-            portalLight.pointLightOuterRadius = 5.0f;
-
-            BoxCollider2D goalTrigger = doorGo.AddComponent<BoxCollider2D>();
-            goalTrigger.isTrigger = true;
-            goalTrigger.size = new Vector2(3.6f, 4.4f);
-            goalTrigger.offset = new Vector2(0f, 2.2f);
-
-            ChurchDoorGoal goal = doorGo.AddComponent<ChurchDoorGoal>();
-            var soGoal = new SerializedObject(goal);
-            soGoal.FindProperty("doorRenderer").objectReferenceValue = lwSr;
-            soGoal.FindProperty("leftDoorWing").objectReferenceValue = lwSr != null ? lwSr.transform : null;
-            soGoal.FindProperty("rightDoorWing").objectReferenceValue = rwSr != null ? rwSr.transform : null;
-            soGoal.FindProperty("sanctuaryPortalLight").objectReferenceValue = portalLight;
-            soGoal.ApplyModifiedPropertiesWithoutUndo();
+            AddFitted(doorGo.transform, "LeftDoorWing", wingSp, new Vector2(253.7f, 0.13f), new Vector2(255f, 3.1f), "Gameplay", 2, wingColor);
+            AddFitted(doorGo.transform, "RightDoorWing", wingSp, new Vector2(255f, 0.13f), new Vector2(256.3f, 3.1f), "Gameplay", 2, wingColor, true);
         }
 
         private static void BuildParishGardenAndCloisterExtension(
@@ -2475,37 +2452,64 @@ namespace Level3.Editor
             PlaceCainosSprite(viaEnv, cainosSprites, "ViaSacra_Pumpkin_End", "TX Village Props - Pumpkin 01", new Vector3(367.0f, 0.5f, 0f), 1.0f, true);
             CreateMysticLantern(viaEnv, cainosSprites, "VillageLamp_ViaSacra_Sanctuary", new Vector3(368.0f, 1.85f, 0f), new Color(1f, 0.9f, 0.6f, 1f));
 
-            // 6. Portal monumental y Gran Cartel Gótico Nocturno de Iglesia (Recurso 1) en X: 368.5
-            PlaceCainosSprite(viaEnv, cainosSprites, "CathedralPortal_Arch_L", "TX Village Props - Fence 02 Pillar", new Vector3(366.8f, 1.35f, 0f), 1.35f, true);
-            PlaceCainosSprite(viaEnv, cainosSprites, "CathedralPortal_Arch_R", "TX Village Props - Fence 02 Pillar", new Vector3(370.2f, 1.35f, 0f), 1.35f, true);
-            CreateMysticLantern(viaEnv, cainosSprites, "VillageLamp_CathedralPortal", new Vector3(370.2f, 2.3f, 0f), new Color(0.9f, 0.92f, 1.0f, 1f));
+            // 6. Gran Portal de la Iglesia / Catedral de Salem (ChurchDoorGoal) y Cartel Gótico Nocturno en X: 368.5
+            PlaceCainosSprite(viaEnv, cainosSprites, "CathedralPortal_Arch_L", "TX Village Props - Fence 02 Pillar", new Vector3(366.6f, 1.35f, 0f), 1.35f, true);
+            PlaceCainosSprite(viaEnv, cainosSprites, "CathedralPortal_Arch_R", "TX Village Props - Fence 02 Pillar", new Vector3(370.4f, 1.35f, 0f), 1.35f, true);
+            CreateMysticLantern(viaEnv, cainosSprites, "VillageLamp_CathedralPortal", new Vector3(370.4f, 2.3f, 0f), new Color(0.9f, 0.92f, 1.0f, 1f));
 
-            GameObject signGo = new GameObject("EndGoal_GothicSign");
-            signGo.transform.SetParent(viaGameplay, false);
-            signGo.transform.position = new Vector3(368.5f, 0.17f, 0f);
+            // Cartel Gótico Nocturno de Iglesia (Recurso 1) flanqueando la entrada al templo
+            GameObject signGo = new GameObject("Cathedral_GothicSign");
+            signGo.transform.SetParent(viaEnv, false);
+            signGo.transform.position = new Vector3(365.0f, 0.17f, 0f);
 
-            SpriteRenderer sr = AddFitted(signGo.transform, "GothicSign_Visual", gothicSignSprite,
-                new Vector2(367.3f, 0.17f), new Vector2(369.7f, 2.55f), "Gameplay", 3, Color.white);
+            AddFitted(signGo.transform, "GothicSign_Visual", gothicSignSprite,
+                new Vector2(363.8f, 0.17f), new Vector2(366.2f, 2.55f), "Gameplay", 3, Color.white);
 
-            // Luz mística dorada focal sobre el cartel gótico
-            GameObject lightGo = new GameObject("GothicSign_Light2D");
-            lightGo.transform.SetParent(signGo.transform, false);
-            lightGo.transform.position = new Vector3(368.5f, 1.7f, 0f);
-            Light2D l2d = lightGo.AddComponent<Light2D>();
-            l2d.lightType = Light2D.LightType.Point;
-            l2d.color = new Color(1f, 0.9f, 0.65f, 1f);
-            l2d.intensity = 1.55f;
-            l2d.pointLightOuterRadius = 3.8f;
-
-            // Trigger e interactable para iniciar la cinemática final
-            BoxCollider2D trig = signGo.AddComponent<BoxCollider2D>();
-            trig.isTrigger = true;
-            trig.size = new Vector2(3.8f, 4.0f);
-            trig.offset = new Vector2(0f, 2.0f);
-
-            signGo.AddComponent<Level3VillageEndingTrigger>();
-
+            GameObject signLightGo = new GameObject("GothicSign_Light2D");
+            signLightGo.transform.SetParent(signGo.transform, false);
+            signLightGo.transform.position = new Vector3(365.0f, 1.7f, 0f);
+            Light2D signL2d = signLightGo.AddComponent<Light2D>();
+            signL2d.lightType = Light2D.LightType.Point;
+            signL2d.color = new Color(1f, 0.9f, 0.65f, 1f);
+            signL2d.intensity = 1.55f;
+            signL2d.pointLightOuterRadius = 3.8f;
             SnapToGround(signGo, 0.02f);
+
+            // Gran Puerta Doble de la Iglesia de Salem (ChurchDoorGoal) en X: 368.5, Y: 0.17
+            GameObject doorGo = new GameObject("Church_MainDoor_Goal");
+            doorGo.transform.SetParent(viaGameplay, false);
+            doorGo.transform.position = new Vector3(368.5f, 0.17f, 0f);
+
+            Sprite wingSp = LoadFirstSprite(Level2ArtPath + "Village_Door_Locked.png");
+            Color wingColor = new Color(0.78f, 0.62f, 0.45f, 1f);
+
+            SpriteRenderer lwSr = AddFitted(doorGo.transform, "LeftDoorWing", wingSp, new Vector2(367.1f, 0.13f), new Vector2(368.5f, 3.4f), "Gameplay", 3, wingColor);
+            SpriteRenderer rwSr = AddFitted(doorGo.transform, "RightDoorWing", wingSp, new Vector2(368.5f, 0.13f), new Vector2(369.9f, 3.4f), "Gameplay", 3, wingColor, true);
+
+            GameObject lightGo = new GameObject("SanctuaryPortal_Light2D");
+            lightGo.transform.SetParent(doorGo.transform, false);
+            lightGo.transform.localPosition = new Vector3(0f, 2.2f, 0f);
+            Light2D portalLight = lightGo.AddComponent<Light2D>();
+            portalLight.lightType = Light2D.LightType.Point;
+            portalLight.color = new Color(1f, 0.90f, 0.45f, 1f);
+            portalLight.intensity = 1.75f;
+            portalLight.pointLightOuterRadius = 6.0f;
+
+            BoxCollider2D goalTrigger = doorGo.AddComponent<BoxCollider2D>();
+            goalTrigger.isTrigger = true;
+            goalTrigger.size = new Vector2(4.2f, 4.6f);
+            goalTrigger.offset = new Vector2(0f, 2.3f);
+
+            ChurchDoorGoal goal = doorGo.AddComponent<ChurchDoorGoal>();
+            var soGoal = new SerializedObject(goal);
+            soGoal.FindProperty("doorRenderer").objectReferenceValue = lwSr;
+            soGoal.FindProperty("leftDoorWing").objectReferenceValue = lwSr != null ? lwSr.transform : null;
+            soGoal.FindProperty("rightDoorWing").objectReferenceValue = rwSr != null ? rwSr.transform : null;
+            soGoal.FindProperty("sanctuaryPortalLight").objectReferenceValue = portalLight;
+            soGoal.FindProperty("requiredKeyId").stringValue = ChurchDoorGoal.RequiredMasterKeyId;
+            soGoal.ApplyModifiedPropertiesWithoutUndo();
+
+            SnapToGround(doorGo, 0.02f);
 
             // Casas coloniales completas que enmarcan el final del camino y la Plaza de la Catedral
             BuildCathedralSquareHouses(viaEnv, viaGameplay, cainosSprites);
