@@ -1177,25 +1177,7 @@ namespace Level3.Editor
             kzGCol.size = new Vector2(16f, 2.5f);
             kzGorge.AddComponent<KillZone>();
 
-            // Peligro ambiental: Géiser de Vaho en la orilla oeste del foso
-            GameObject hazSwamp = new GameObject("EnvironmentalHazard_SwampGeyser");
-            hazSwamp.transform.SetParent(gorgeGameplay, false);
-            hazSwamp.transform.position = new Vector3(168.8f, 0.35f, 0f);
-            BoxCollider2D hazSCol = hazSwamp.AddComponent<BoxCollider2D>();
-            hazSCol.isTrigger = true;
-            hazSCol.size = new Vector2(2.0f, 2.2f);
-            SpriteRenderer hazSSr = hazSwamp.AddComponent<SpriteRenderer>();
-            hazSSr.sprite = EnsureSoftFogSprite();
-            hazSSr.color = new Color(0.7f, 0.2f, 0.85f, 0.8f);
-            hazSSr.sortingLayerName = "Gameplay";
-            hazSSr.sortingOrder = 6;
-            Light2D hazSLight = new GameObject("HazardLight").AddComponent<Light2D>();
-            hazSLight.transform.SetParent(hazSwamp.transform, false);
-            hazSLight.lightType = Light2D.LightType.Point;
-            hazSLight.color = new Color(0.7f, 0.2f, 0.85f, 1f);
-            hazSLight.intensity = 1.1f;
-            hazSLight.pointLightOuterRadius = 3.0f;
-            hazSwamp.AddComponent<Level3EnvironmentalHazard>();
+            // Peligro ambiental retirado de la orilla de salto para garantizar travesía limpia sin daño fantasma
 
             // Plataformas aéreas sobre el foso de ciénaga
             CreateOneWayPlatform(gorgeEnv, "Ledge_Swamp_West", logASprite, new Vector2(168f, 3.2f), 1.3f, groundLayer);
@@ -2500,28 +2482,8 @@ namespace Level3.Editor
             Level3MovingPlatform movComp = movPlatGo.AddComponent<Level3MovingPlatform>();
             movComp.Configure(new Vector3(56.5f, 2.8f, 0f), new Vector3(63.5f, 2.8f, 0f), 2.2f, 0.7f);
 
-            // 7. Peligro ambiental: Géiser de vaho tóxico al pie del acantilado oeste (X: 53.6, Y: 0.25)
-            GameObject hazardGo = new GameObject("EnvironmentalHazard_RavineGeyser");
-            hazardGo.transform.SetParent(gameplayParent, false);
-            hazardGo.transform.position = new Vector3(53.6f, 0.35f, 0f);
-            BoxCollider2D hazCol = hazardGo.AddComponent<BoxCollider2D>();
-            hazCol.isTrigger = true;
-            hazCol.size = new Vector2(2.2f, 2.4f);
-
-            SpriteRenderer hazSr = hazardGo.AddComponent<SpriteRenderer>();
-            hazSr.sprite = EnsureSoftFogSprite();
-            hazSr.color = new Color(0.55f, 0.15f, 0.85f, 0.8f);
-            hazSr.sortingLayerName = "Gameplay";
-            hazSr.sortingOrder = 6;
-
-            Light2D hazLight = new GameObject("HazardLight").AddComponent<Light2D>();
-            hazLight.transform.SetParent(hazardGo.transform, false);
-            hazLight.lightType = Light2D.LightType.Point;
-            hazLight.color = new Color(0.6f, 0.2f, 0.9f, 1f);
-            hazLight.intensity = 1.2f;
-            hazLight.pointLightOuterRadius = 3.2f;
-
-            hazardGo.AddComponent<Level3EnvironmentalHazard>();
+            // 7. Peligro ambiental eliminado de la cornisa para evitar daño fantasma al aproximarse al tronco
+            // (La zona de espera y salto al tronco flotante debe ser 100% segura; el abismo KillZone conserva el reto de caída)
 
             // 8. Peligro visible: acantilados, vallas rotas, niebla violeta y cartel
             DecorateRavineDanger(envParent, ravineStartX, ravineEndX);

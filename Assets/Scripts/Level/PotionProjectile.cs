@@ -22,6 +22,7 @@ public class PotionProjectile : MonoBehaviour
     [Header("Configuración de Poción")]
     [Tooltip("Tipo de poción mágica que representa este proyectil.")]
     [SerializeField] private PotionType potionType = PotionType.Blind;
+    public PotionType Type => potionType;
     [Tooltip("Duración del efecto aplicado en segundos.")]
     [SerializeField] private float effectDuration = 5f;
     [Tooltip("Radio del área de efecto de salpicadura al colisionar (u).")]

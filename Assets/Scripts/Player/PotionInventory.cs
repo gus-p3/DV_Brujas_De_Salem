@@ -54,6 +54,18 @@ public class PotionInventory : MonoBehaviour
 
     public PotionType SelectedPotion => selectedPotion;
 
+    /// <summary>
+    /// Comprueba si la poción indicada está desbloqueada y disponible para el jugador.
+    /// La Poción Maestra solo está disponible una vez preparada en el Caldero Místico o si tiene cargas.
+    /// </summary>
+    public bool IsPotionUnlocked(PotionType type)
+    {
+        if (type != PotionType.Master) return true;
+        bool hasCharges = GameManager.Instance != null && GameManager.Instance.MasterCharges > 0;
+        bool brewed = Level3.Level3StateController.Instance != null && Level3.Level3StateController.Instance.HasBrewedMasterPotion;
+        return hasCharges || brewed;
+    }
+
     private void Awake()
     {
         playerController = GetComponent<PlayerController>();
@@ -73,6 +85,11 @@ public class PotionInventory : MonoBehaviour
 
     private void Start()
     {
+        if (selectedPotion == PotionType.Master && !IsPotionUnlocked(PotionType.Master))
+        {
+            selectedPotion = PotionType.Blind;
+        }
+
         // Notificar selección inicial al HUD
         OnPotionSelected?.Invoke(selectedPotion);
     }
@@ -129,6 +146,17 @@ public class PotionInventory : MonoBehaviour
 
     public void SelectPotion(PotionType type)
     {
+        if (type == PotionType.Master && !IsPotionUnlocked(PotionType.Master))
+        {
+            HUDController hudCtrl = UnityEngine.Object.FindFirstObjectByType<HUDController>();
+            if (hudCtrl != null)
+            {
+                hudCtrl.ShowMessage("¡Debes preparar la Poción Maestra en el Caldero Místico primero!", 1.8f);
+            }
+            PlayErrorSound();
+            return;
+        }
+
         bool changed = selectedPotion != type;
         selectedPotion = type;
         OnPotionSelected?.Invoke(selectedPotion);
@@ -190,7 +218,7 @@ public class PotionInventory : MonoBehaviour
         int spellIndex = (int)selectedPotion;
         if (GetChargesForType(selectedPotion) <= 0)
         {
-            if (GameManager.Instance.MasterCharges > 0) SelectPotion(PotionType.Master);
+            if (IsPotionUnlocked(PotionType.Master) && GameManager.Instance.MasterCharges > 0) SelectPotion(PotionType.Master);
             else if (GameManager.Instance.BlindCharges > 0) SelectPotion(PotionType.Blind);
             else if (GameManager.Instance.HypnotizeCharges > 0) SelectPotion(PotionType.Hypnotize);
             else if (GameManager.Instance.SleepCharges > 0) SelectPotion(PotionType.Sleep);
@@ -220,7 +248,7 @@ public class PotionInventory : MonoBehaviour
         // Si se agotaron las cargas de esta poción y hay otra disponible, cambiar selección automáticamente
         if (GetChargesForType(selectedPotion) <= 0)
         {
-            if (GameManager.Instance.MasterCharges > 0) SelectPotion(PotionType.Master);
+            if (IsPotionUnlocked(PotionType.Master) && GameManager.Instance.MasterCharges > 0) SelectPotion(PotionType.Master);
             else if (GameManager.Instance.BlindCharges > 0) SelectPotion(PotionType.Blind);
             else if (GameManager.Instance.HypnotizeCharges > 0) SelectPotion(PotionType.Hypnotize);
             else if (GameManager.Instance.SleepCharges > 0) SelectPotion(PotionType.Sleep);
@@ -284,6 +312,8 @@ public class PotionInventory : MonoBehaviour
 
             if (selectedPotion == PotionType.Master)
             {
+                projectileObj.transform.localScale = new Vector3(0.16f, 0.16f, 1f);
+                col.radius = 1.55f;
                 // Configurar proyectil de la Poción Maestra
                 Sprite[] allSprites = Resources.FindObjectsOfTypeAll<Sprite>();
                 foreach (Sprite s in allSprites)

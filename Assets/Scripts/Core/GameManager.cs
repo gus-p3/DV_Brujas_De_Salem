@@ -299,6 +299,15 @@ public class GameManager : MonoBehaviour
             Score = carriedScore;
             TimeElapsed = carriedTime;
         }
+        else
+        {
+            // Al iniciar o reiniciar un nivel desde cero, la Poción Maestra se inicia en 0 hasta su preparación en el caldero
+            string sceneName = SceneManager.GetActiveScene().name;
+            if (sceneName == "Level3" || sceneName == "Level1" || sceneName == "Level2")
+            {
+                MasterCharges = 0;
+            }
+        }
         SetState(GameState.Playing);
         if (FrenzyController.Instance != null)
         {

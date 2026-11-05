@@ -16,6 +16,8 @@ public class HUDController : MonoBehaviour
     public TextMeshProUGUI hypnotizeChargesText;
     public TextMeshProUGUI sleepChargesText;
     public TextMeshProUGUI masterChargesText;
+    [Tooltip("Icono del frasco de la Poción Maestra (se activa únicamente tras ser fabricada en el caldero).")]
+    public Image masterIconImage;
 
     [Header("Potion Slots & Selection")]
     [Tooltip("Marcos resaltadores para cada tipo de poción (0: Cegar, 1: Hipnotizar, 2: Dormir, 3: Maestra).")]
@@ -248,7 +250,26 @@ public class HUDController : MonoBehaviour
         if (blindChargesText != null) blindChargesText.text = $"x {GameManager.Instance.BlindCharges}";
         if (hypnotizeChargesText != null) hypnotizeChargesText.text = $"x {GameManager.Instance.HypnotizeCharges}";
         if (sleepChargesText != null) sleepChargesText.text = $"x {GameManager.Instance.SleepCharges}";
-        if (masterChargesText != null) masterChargesText.text = $"x {GameManager.Instance.MasterCharges}";
+
+        bool isMasterUnlocked = (Level3.Level3StateController.Instance != null && Level3.Level3StateController.Instance.HasBrewedMasterPotion)
+                             || (GameManager.Instance != null && GameManager.Instance.MasterCharges > 0);
+
+        if (masterIconImage != null)
+        {
+            masterIconImage.enabled = isMasterUnlocked;
+            masterIconImage.color = isMasterUnlocked ? Color.white : new Color(1f, 1f, 1f, 0f);
+        }
+
+        if (masterChargesText != null)
+        {
+            masterChargesText.enabled = isMasterUnlocked;
+            masterChargesText.text = isMasterUnlocked ? $"x {GameManager.Instance.MasterCharges}" : "";
+        }
+
+        if (potionKeyHints != null && potionKeyHints.Length > 3 && potionKeyHints[3] != null)
+        {
+            potionKeyHints[3].color = isMasterUnlocked ? Color.white : new Color(1f, 1f, 1f, 0.25f);
+        }
 
         UpdatePotionSelectionVisuals();
     }
@@ -348,11 +369,20 @@ public class HUDController : MonoBehaviour
         int masterCharges = GameManager.Instance != null ? GameManager.Instance.MasterCharges : 0;
         int[] charges = { blindCharges, hypCharges, sleepCharges, masterCharges };
 
+        bool isMasterUnlocked = (Level3.Level3StateController.Instance != null && Level3.Level3StateController.Instance.HasBrewedMasterPotion)
+                             || (GameManager.Instance != null && GameManager.Instance.MasterCharges > 0);
+
         for (int i = 0; i < potionSelectionFrames.Length; i++)
         {
             if (potionSelectionFrames[i] == null) continue;
             bool isSelected = (i == selectedPotionIndex);
             bool hasCharges = i < charges.Length && charges[i] > 0;
+
+            if (i == 3 && !isMasterUnlocked)
+            {
+                isSelected = false;
+                hasCharges = false;
+            }
 
             // Desactivar Image cuando la ranura no tiene sprite asignado para evitar el recuadro amarillo sólido
             if (potionSelectionFrames[i].sprite == null)
@@ -512,7 +542,7 @@ public class HUDController : MonoBehaviour
     /// Slot 0: Cegar [1]
     /// Slot 1: Hipnotizar [2]
     /// Slot 2: Dormir [3]
-    /// Slot 3: Poción Maestra [4] (con icono Pocion_Maestra_Caldero_0)
+    /// Slot 3: Poción Maestra [4] (con icono Pocion_Maestra_Caldero_0 integrado y proporcionado)
     /// </summary>
     public void EnsureFourPotionSlots()
     {
@@ -520,10 +550,32 @@ public class HUDController : MonoBehaviour
         Transform flaskHipno = transform.Find("Flask_Hipnotizar");
         Transform flaskDormir = transform.Find("Flask_Dormir");
         Transform flaskMaestra = transform.Find("Flask_Maestra");
+        Transform template = flaskDormir != null ? flaskDormir : (flaskHipno != null ? flaskHipno : flaskCegar);
+
+        // Cargar sprite de la Poción Maestra
+        Sprite masterSprite = null;
+#if UNITY_EDITOR
+        UnityEngine.Object[] assets = UnityEditor.AssetDatabase.LoadAllAssetsAtPath("Assets/Prefabs/Pocion_Maestra_Caldero.png");
+        foreach (UnityEngine.Object a in assets)
+        {
+            if (a is Sprite sp) { masterSprite = sp; break; }
+        }
+#endif
+        if (masterSprite == null)
+        {
+            Sprite[] all = Resources.FindObjectsOfTypeAll<Sprite>();
+            foreach (Sprite s in all)
+            {
+                if (s != null && s.name.StartsWith("Pocion_Maestra_Caldero"))
+                {
+                    masterSprite = s;
+                    break;
+                }
+            }
+        }
 
         if (flaskMaestra == null)
         {
-            Transform template = flaskDormir != null ? flaskDormir : (flaskHipno != null ? flaskHipno : flaskCegar);
             if (template != null)
             {
                 GameObject newFlask = Instantiate(template.gameObject, transform, false);
@@ -540,34 +592,6 @@ public class HUDController : MonoBehaviour
                     rt.sizeDelta = new Vector2(96f, 96f);
                 }
 
-                // Cargar sprite de la Poción Maestra
-                Sprite masterSprite = null;
-#if UNITY_EDITOR
-                UnityEngine.Object[] assets = UnityEditor.AssetDatabase.LoadAllAssetsAtPath("Assets/Prefabs/Pocion_Maestra_Caldero.png");
-                foreach (UnityEngine.Object a in assets)
-                {
-                    if (a is Sprite sp) { masterSprite = sp; break; }
-                }
-#endif
-                if (masterSprite == null)
-                {
-                    Sprite[] all = Resources.FindObjectsOfTypeAll<Sprite>();
-                    foreach (Sprite s in all)
-                    {
-                        if (s != null && s.name.StartsWith("Pocion_Maestra_Caldero"))
-                        {
-                            masterSprite = s;
-                            break;
-                        }
-                    }
-                }
-
-                Image img = newFlask.GetComponent<Image>();
-                if (img != null && masterSprite != null)
-                {
-                    img.sprite = masterSprite;
-                }
-
                 Transform keyT = newFlask.transform.Find("KeyHint");
                 if (keyT != null)
                 {
@@ -581,18 +605,59 @@ public class HUDController : MonoBehaviour
                     TextMeshProUGUI tmp = countT.GetComponent<TextMeshProUGUI>();
                     if (tmp != null)
                     {
-                        tmp.text = "x 0";
+                        tmp.text = "";
                         masterChargesText = tmp;
                     }
                 }
             }
         }
-        else if (masterChargesText == null)
+
+        if (flaskMaestra != null)
         {
-            Transform countT = flaskMaestra.Find("Count");
-            if (countT != null)
+            // Ajustar el icono del frasco dentro del slot para mantener proporciones exactas y evitar desproporción
+            Transform iconTrans = flaskMaestra.Find("PotionIcon");
+            GameObject iconGo = iconTrans != null ? iconTrans.gameObject : null;
+            if (iconGo == null)
             {
-                masterChargesText = countT.GetComponent<TextMeshProUGUI>();
+                iconGo = new GameObject("PotionIcon", typeof(RectTransform), typeof(Image));
+                iconGo.transform.SetParent(flaskMaestra, false);
+                iconGo.transform.SetSiblingIndex(0); // Debajo de selección y contadores
+            }
+
+            RectTransform iconRt = iconGo.GetComponent<RectTransform>();
+            iconRt.anchorMin = new Vector2(0.5f, 0.5f);
+            iconRt.anchorMax = new Vector2(0.5f, 0.5f);
+            iconRt.pivot = new Vector2(0.5f, 0.5f);
+            iconRt.anchoredPosition = new Vector2(0f, 4f);
+            iconRt.sizeDelta = new Vector2(54f, 68f); // Dimensiones visuales idénticas a los frascos vecinos
+
+            masterIconImage = iconGo.GetComponent<Image>();
+            masterIconImage.preserveAspect = true;
+            masterIconImage.raycastTarget = false;
+            if (masterSprite != null)
+            {
+                masterIconImage.sprite = masterSprite;
+            }
+
+            // Fondo del marco del slot
+            Image baseImg = flaskMaestra.GetComponent<Image>();
+            if (baseImg != null && template != null)
+            {
+                Image templateImg = template.GetComponent<Image>();
+                if (templateImg != null && templateImg.sprite != null)
+                {
+                    baseImg.sprite = templateImg.sprite;
+                    baseImg.color = new Color(0.75f, 0.75f, 0.85f, 0.7f);
+                }
+            }
+
+            if (masterChargesText == null)
+            {
+                Transform countT = flaskMaestra.Find("Count");
+                if (countT != null)
+                {
+                    masterChargesText = countT.GetComponent<TextMeshProUGUI>();
+                }
             }
         }
 
@@ -623,8 +688,38 @@ public class HUDController : MonoBehaviour
             btn.onClick.AddListener(() =>
             {
                 PotionInventory inv = Object.FindFirstObjectByType<PotionInventory>();
-                if (inv != null) inv.SelectPotion((PotionType)slotIdx);
+                if (inv != null)
+                {
+                    if (slotIdx == 3 && !inv.IsPotionUnlocked(PotionType.Master))
+                    {
+                        ShowMessage("¡Debes preparar la Poción Maestra en el Caldero Místico primero!", 1.8f);
+                        if (AudioManager.Instance != null) AudioManager.Instance.PlayErrorSound();
+                        return;
+                    }
+                    inv.SelectPotion((PotionType)slotIdx);
+                }
             });
+        }
+
+        // Refrescar visibilidad inicial según estado de desbloqueo
+        bool isMasterUnlocked = (Level3.Level3StateController.Instance != null && Level3.Level3StateController.Instance.HasBrewedMasterPotion)
+                             || (GameManager.Instance != null && GameManager.Instance.MasterCharges > 0);
+
+        if (masterIconImage != null)
+        {
+            masterIconImage.enabled = isMasterUnlocked;
+            masterIconImage.color = isMasterUnlocked ? Color.white : new Color(1f, 1f, 1f, 0f);
+        }
+
+        if (masterChargesText != null)
+        {
+            masterChargesText.enabled = isMasterUnlocked;
+            masterChargesText.text = isMasterUnlocked ? $"x {GameManager.Instance.MasterCharges}" : "";
+        }
+
+        if (potionKeyHints != null && potionKeyHints.Length > 3 && potionKeyHints[3] != null)
+        {
+            potionKeyHints[3].color = isMasterUnlocked ? Color.white : new Color(1f, 1f, 1f, 0.25f);
         }
     }
 }
