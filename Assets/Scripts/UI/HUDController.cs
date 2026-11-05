@@ -18,6 +18,8 @@ public class HUDController : MonoBehaviour
     public TextMeshProUGUI masterChargesText;
     [Tooltip("Icono del frasco de la Poción Maestra (se activa únicamente tras ser fabricada en el caldero).")]
     public Image masterIconImage;
+    [Tooltip("Indicador visual de candado cuando la Poción Maestra está sellada (hasta entrar a la Iglesia en el Nivel 4).")]
+    public Image masterLockBadge;
 
     [Header("Potion Slots & Selection")]
     [Tooltip("Marcos resaltadores para cada tipo de poción (0: Cegar, 1: Hipnotizar, 2: Dormir, 3: Maestra).")]
@@ -251,24 +253,37 @@ public class HUDController : MonoBehaviour
         if (hypnotizeChargesText != null) hypnotizeChargesText.text = $"x {GameManager.Instance.HypnotizeCharges}";
         if (sleepChargesText != null) sleepChargesText.text = $"x {GameManager.Instance.SleepCharges}";
 
-        bool isMasterUnlocked = (Level3.Level3StateController.Instance != null && Level3.Level3StateController.Instance.HasBrewedMasterPotion)
-                             || (GameManager.Instance != null && GameManager.Instance.MasterCharges > 0);
+        bool isMasterBrewed = (Level3.Level3StateController.Instance != null && Level3.Level3StateController.Instance.HasBrewedMasterPotion)
+                            || (GameManager.Instance != null && GameManager.Instance.MasterCharges > 0);
+        bool isMasterUsable = isMasterBrewed && (GameManager.Instance != null && GameManager.Instance.IsMasterPotionUsable);
 
         if (masterIconImage != null)
         {
-            masterIconImage.enabled = isMasterUnlocked;
-            masterIconImage.color = isMasterUnlocked ? Color.white : new Color(1f, 1f, 1f, 0f);
+            masterIconImage.enabled = isMasterBrewed;
+            if (isMasterBrewed)
+            {
+                masterIconImage.color = isMasterUsable ? Color.white : new Color(0.45f, 0.45f, 0.55f, 0.85f);
+            }
+            else
+            {
+                masterIconImage.color = new Color(1f, 1f, 1f, 0f);
+            }
+        }
+
+        if (masterLockBadge != null)
+        {
+            masterLockBadge.gameObject.SetActive(isMasterBrewed && !isMasterUsable);
         }
 
         if (masterChargesText != null)
         {
-            masterChargesText.enabled = isMasterUnlocked;
-            masterChargesText.text = isMasterUnlocked ? $"x {GameManager.Instance.MasterCharges}" : "";
+            masterChargesText.enabled = isMasterBrewed;
+            masterChargesText.text = isMasterBrewed ? $"x {GameManager.Instance.MasterCharges}" : "";
         }
 
         if (potionKeyHints != null && potionKeyHints.Length > 3 && potionKeyHints[3] != null)
         {
-            potionKeyHints[3].color = isMasterUnlocked ? Color.white : new Color(1f, 1f, 1f, 0.25f);
+            potionKeyHints[3].color = isMasterUsable ? Color.white : (isMasterBrewed ? new Color(1f, 1f, 1f, 0.45f) : new Color(1f, 1f, 1f, 0.25f));
         }
 
         UpdatePotionSelectionVisuals();
@@ -371,6 +386,7 @@ public class HUDController : MonoBehaviour
 
         bool isMasterUnlocked = (Level3.Level3StateController.Instance != null && Level3.Level3StateController.Instance.HasBrewedMasterPotion)
                              || (GameManager.Instance != null && GameManager.Instance.MasterCharges > 0);
+        bool isMasterUsable = isMasterUnlocked && (GameManager.Instance != null && GameManager.Instance.IsMasterPotionUsable);
 
         for (int i = 0; i < potionSelectionFrames.Length; i++)
         {
@@ -378,7 +394,7 @@ public class HUDController : MonoBehaviour
             bool isSelected = (i == selectedPotionIndex);
             bool hasCharges = i < charges.Length && charges[i] > 0;
 
-            if (i == 3 && !isMasterUnlocked)
+            if (i == 3 && !isMasterUsable)
             {
                 isSelected = false;
                 hasCharges = false;
@@ -659,6 +675,33 @@ public class HUDController : MonoBehaviour
                     masterChargesText = countT.GetComponent<TextMeshProUGUI>();
                 }
             }
+
+            // Candado indicador de bloqueo hasta entrar a la Iglesia en el Nivel 4
+            Transform lockT = flaskMaestra.Find("LockBadge");
+            GameObject lockGo = lockT != null ? lockT.gameObject : null;
+            if (lockGo == null)
+            {
+                lockGo = new GameObject("LockBadge");
+                lockGo.transform.SetParent(flaskMaestra, false);
+                RectTransform lockRt = lockGo.AddComponent<RectTransform>();
+                lockRt.anchorMin = new Vector2(0.5f, 0.5f);
+                lockRt.anchorMax = new Vector2(0.5f, 0.5f);
+                lockRt.pivot = new Vector2(0.5f, 0.5f);
+                lockRt.anchoredPosition = new Vector2(16f, -12f);
+                lockRt.sizeDelta = new Vector2(28f, 28f);
+
+                masterLockBadge = lockGo.AddComponent<Image>();
+                masterLockBadge.preserveAspect = true;
+                masterLockBadge.raycastTarget = false;
+#if UNITY_EDITOR
+                Sprite lockSp = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/UI/ui_icon_lock_badge.png");
+                if (lockSp != null) masterLockBadge.sprite = lockSp;
+#endif
+            }
+            else
+            {
+                masterLockBadge = lockGo.GetComponent<Image>();
+            }
         }
 
         // Vincular referencias a las 4 ranuras
@@ -690,11 +733,20 @@ public class HUDController : MonoBehaviour
                 PotionInventory inv = Object.FindFirstObjectByType<PotionInventory>();
                 if (inv != null)
                 {
-                    if (slotIdx == 3 && !inv.IsPotionUnlocked(PotionType.Master))
+                    if (slotIdx == 3)
                     {
-                        ShowMessage("¡Debes preparar la Poción Maestra en el Caldero Místico primero!", 1.8f);
-                        if (AudioManager.Instance != null) AudioManager.Instance.PlayErrorSound();
-                        return;
+                        if (!inv.HasPotionInInventory(PotionType.Master))
+                        {
+                            ShowMessage("¡Debes preparar la Poción Maestra en el Caldero Místico primero!", 1.8f);
+                            if (AudioManager.Instance != null) AudioManager.Instance.PlayErrorSound();
+                            return;
+                        }
+                        if (!inv.IsPotionUnlocked(PotionType.Master))
+                        {
+                            ShowMessage("¡La Poción Maestra está sellada! Podrás usarla al entrar a la Iglesia en el Nivel 4.", 2.2f);
+                            if (AudioManager.Instance != null) AudioManager.Instance.PlayErrorSound();
+                            return;
+                        }
                     }
                     inv.SelectPotion((PotionType)slotIdx);
                 }
@@ -702,24 +754,37 @@ public class HUDController : MonoBehaviour
         }
 
         // Refrescar visibilidad inicial según estado de desbloqueo
-        bool isMasterUnlocked = (Level3.Level3StateController.Instance != null && Level3.Level3StateController.Instance.HasBrewedMasterPotion)
-                             || (GameManager.Instance != null && GameManager.Instance.MasterCharges > 0);
+        bool isMasterBrewed = (Level3.Level3StateController.Instance != null && Level3.Level3StateController.Instance.HasBrewedMasterPotion)
+                            || (GameManager.Instance != null && GameManager.Instance.MasterCharges > 0);
+        bool isMasterUsable = isMasterBrewed && (GameManager.Instance != null && GameManager.Instance.IsMasterPotionUsable);
 
         if (masterIconImage != null)
         {
-            masterIconImage.enabled = isMasterUnlocked;
-            masterIconImage.color = isMasterUnlocked ? Color.white : new Color(1f, 1f, 1f, 0f);
+            masterIconImage.enabled = isMasterBrewed;
+            if (isMasterBrewed)
+            {
+                masterIconImage.color = isMasterUsable ? Color.white : new Color(0.45f, 0.45f, 0.55f, 0.85f);
+            }
+            else
+            {
+                masterIconImage.color = new Color(1f, 1f, 1f, 0f);
+            }
+        }
+
+        if (masterLockBadge != null)
+        {
+            masterLockBadge.gameObject.SetActive(isMasterBrewed && !isMasterUsable);
         }
 
         if (masterChargesText != null)
         {
-            masterChargesText.enabled = isMasterUnlocked;
-            masterChargesText.text = isMasterUnlocked ? $"x {GameManager.Instance.MasterCharges}" : "";
+            masterChargesText.enabled = isMasterBrewed;
+            masterChargesText.text = isMasterBrewed ? $"x {GameManager.Instance.MasterCharges}" : "";
         }
 
         if (potionKeyHints != null && potionKeyHints.Length > 3 && potionKeyHints[3] != null)
         {
-            potionKeyHints[3].color = isMasterUnlocked ? Color.white : new Color(1f, 1f, 1f, 0.25f);
+            potionKeyHints[3].color = isMasterUsable ? Color.white : (isMasterBrewed ? new Color(1f, 1f, 1f, 0.45f) : new Color(1f, 1f, 1f, 0.25f));
         }
     }
 }

@@ -55,15 +55,25 @@ public class PotionInventory : MonoBehaviour
     public PotionType SelectedPotion => selectedPotion;
 
     /// <summary>
-    /// Comprueba si la poción indicada está desbloqueada y disponible para el jugador.
-    /// La Poción Maestra solo está disponible una vez preparada en el Caldero Místico o si tiene cargas.
+    /// Comprueba si la poción ha sido preparada/obtenida y está registrada en el zurrón/inventario.
     /// </summary>
-    public bool IsPotionUnlocked(PotionType type)
+    public bool HasPotionInInventory(PotionType type)
     {
         if (type != PotionType.Master) return true;
         bool hasCharges = GameManager.Instance != null && GameManager.Instance.MasterCharges > 0;
         bool brewed = Level3.Level3StateController.Instance != null && Level3.Level3StateController.Instance.HasBrewedMasterPotion;
         return hasCharges || brewed;
+    }
+
+    /// <summary>
+    /// Comprueba si la poción está habilitada para su selección y lanzamiento en combate.
+    /// En Level3 y Level3_Village, la Poción Maestra permanece sellada hasta entrar a la Iglesia en el Nivel 4.
+    /// </summary>
+    public bool IsPotionUnlocked(PotionType type)
+    {
+        if (type != PotionType.Master) return true;
+        if (!HasPotionInInventory(PotionType.Master)) return false;
+        return GameManager.Instance != null && GameManager.Instance.IsMasterPotionUsable;
     }
 
     private void Awake()
@@ -146,15 +156,29 @@ public class PotionInventory : MonoBehaviour
 
     public void SelectPotion(PotionType type)
     {
-        if (type == PotionType.Master && !IsPotionUnlocked(PotionType.Master))
+        if (type == PotionType.Master)
         {
-            HUDController hudCtrl = UnityEngine.Object.FindFirstObjectByType<HUDController>();
-            if (hudCtrl != null)
+            if (!HasPotionInInventory(PotionType.Master))
             {
-                hudCtrl.ShowMessage("¡Debes preparar la Poción Maestra en el Caldero Místico primero!", 1.8f);
+                HUDController hudCtrl = UnityEngine.Object.FindFirstObjectByType<HUDController>();
+                if (hudCtrl != null)
+                {
+                    hudCtrl.ShowMessage("¡Debes preparar la Poción Maestra en el Caldero Místico primero!", 1.8f);
+                }
+                PlayErrorSound();
+                return;
             }
-            PlayErrorSound();
-            return;
+
+            if (!IsPotionUnlocked(PotionType.Master))
+            {
+                HUDController hudCtrl = UnityEngine.Object.FindFirstObjectByType<HUDController>();
+                if (hudCtrl != null)
+                {
+                    hudCtrl.ShowMessage("¡La Poción Maestra está sellada! Podrás usarla al entrar a la Iglesia en el Nivel 4.", 2.2f);
+                }
+                PlayErrorSound();
+                return;
+            }
         }
 
         bool changed = selectedPotion != type;
@@ -223,6 +247,18 @@ public class PotionInventory : MonoBehaviour
             else if (GameManager.Instance.HypnotizeCharges > 0) SelectPotion(PotionType.Hypnotize);
             else if (GameManager.Instance.SleepCharges > 0) SelectPotion(PotionType.Sleep);
             spellIndex = (int)selectedPotion;
+        }
+
+        // Si la poción seleccionada es la Maestra y sigue sellada, no consumir ni lanzar
+        if (selectedPotion == PotionType.Master && !IsPotionUnlocked(PotionType.Master))
+        {
+            HUDController hudCtrl = UnityEngine.Object.FindFirstObjectByType<HUDController>();
+            if (hudCtrl != null)
+            {
+                hudCtrl.ShowMessage("¡La Poción Maestra está sellada! Podrás usarla al entrar a la Iglesia en el Nivel 4.", 2.2f);
+            }
+            PlayErrorSound();
+            return;
         }
 
         // Intentar consumir carga del GameManager

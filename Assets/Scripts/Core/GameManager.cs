@@ -50,6 +50,35 @@ public class GameManager : MonoBehaviour
     public int SleepCharges = 0;
     public int MasterCharges = 0;
 
+    [Header("Master Potion Progression")]
+    [Tooltip("Indica si la Poción Maestra está habilitada para ser seleccionada y lanzada en combate. En Level3 y Level3_Village permanece bloqueada y se desbloqueará formalmente al entrar a la Iglesia en el Nivel 4.")]
+    [SerializeField] private bool isMasterPotionUsable = false;
+
+    public bool IsMasterPotionUsable => isMasterPotionUsable;
+    public static event Action OnMasterPotionUsableChanged;
+
+    /// <summary>
+    /// Desbloquea el uso de la Poción Maestra para combate y selección (evento futuro de entrada a la Iglesia en Nivel 4).
+    /// El estado es persistente entre cambios de escena gracias a GameManager (DontDestroyOnLoad).
+    /// </summary>
+    public void UnlockMasterPotionUsage()
+    {
+        isMasterPotionUsable = true;
+        OnMasterPotionUsableChanged?.Invoke();
+        OnStatsUpdated?.Invoke();
+        Debug.Log("[GameManager] ¡Poción Maestra desbloqueada para combate (Evento Iglesia Nivel 4)!");
+    }
+
+    /// <summary>
+    /// Bloquea el uso de la Poción Maestra (utilizado en Level3 y Level3_Village hasta alcanzar la Iglesia en Nivel 4).
+    /// </summary>
+    public void LockMasterPotionUsage()
+    {
+        isMasterPotionUsable = false;
+        OnMasterPotionUsableChanged?.Invoke();
+        OnStatsUpdated?.Invoke();
+    }
+
     // Eventos para el HUD y el sistema de corazones
     public event Action OnStatsUpdated;
     public event Action<int, int> OnHeartsChanged; // (actual, maximo)
@@ -236,7 +265,7 @@ public class GameManager : MonoBehaviour
             int currentSelCharges = sel == 0 ? BlindCharges : (sel == 1 ? HypnotizeCharges : (sel == 2 ? SleepCharges : MasterCharges));
             if (currentSelCharges <= 0)
             {
-                if (master > 0) inv.SelectPotion(PotionType.Master);
+                if (master > 0 && isMasterPotionUsable) inv.SelectPotion(PotionType.Master);
                 else if (blind > 0) inv.SelectPotion(PotionType.Blind);
                 else if (hypnotize > 0) inv.SelectPotion(PotionType.Hypnotize);
                 else if (sleep > 0) inv.SelectPotion(PotionType.Sleep);

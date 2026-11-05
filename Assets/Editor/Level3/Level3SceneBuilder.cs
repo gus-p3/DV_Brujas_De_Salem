@@ -399,7 +399,7 @@ namespace Level3.Editor
                     var useLimitsProp = so.FindProperty("useLimits");
                     if (useLimitsProp != null) useLimitsProp.boolValue = true;
                     if (minProp != null) minProp.vector2Value = village ? new Vector2(Part2WestWallX - 1f, -1f) : new Vector2(-2f, -1f);
-                    if (maxProp != null) maxProp.vector2Value = village ? new Vector2(268f, 18f) : new Vector2(Part1EastWallX - 0.5f, 18f);
+                    if (maxProp != null) maxProp.vector2Value = village ? new Vector2(296f, 18f) : new Vector2(Part1EastWallX - 0.5f, 18f);
                     so.ApplyModifiedPropertiesWithoutUndo();
                 }
             }
@@ -1388,11 +1388,11 @@ namespace Level3.Editor
             Transform act3Npcs = new GameObject("Act3_NPCs").transform;
             act3Npcs.SetParent(npcsRoot, false);
 
-            // Suelo de la Aldea (X: 138 a 270) y muros límite: oeste (llegada desde el Sendero) y este tras la Iglesia en X: 266
+            // Suelo de la Aldea (X: 138 a 298) y muros límite: oeste (llegada desde el Sendero) y este tras el Huerto Parroquial en X: 294.5
             Sprite groundSprite = AssetDatabase.LoadAssetAtPath<Sprite>(GroundSpritePath);
-            CreateGroundSegment(act3Env, "Ground_Village", 138f, 132f, groundLayer, groundSprite);
+            CreateGroundSegment(act3Env, "Ground_Village", 138f, 160f, groundLayer, groundSprite);
             CreateSolidWall(act3Env, "Boundary_WestTrailWall", new Vector2(Part2WestWallX, 6f), new Vector2(1.5f, 14f), groundLayer, null);
-            CreateSolidWall(act3Env, "Boundary_EastChurchWall", new Vector2(266f, 6f), new Vector2(1.5f, 14f), groundLayer, null);
+            CreateSolidWall(act3Env, "Boundary_EastChurchWall", new Vector2(294.5f, 6f), new Vector2(1.5f, 14f), groundLayer, null);
 
             CreatePotionRefillStation(act3Gameplay, "PotionRefillStation_ReturnTrail", new Vector3(150.5f, 0.72f, 0f),
                 "refill_return_trail_1", "Alijo del Sendero de Regreso", PotionType.Sleep, 2, sleepFlaskSprite);
@@ -1493,10 +1493,15 @@ namespace Level3.Editor
             campanero.Decor.Add(new HouseDecor("Interior_Window_Shutters.png", 185.4f, 1.1f, 0.95f, 2.35f));
             BuildInfiltrationHouse(campanero, act3Env, act3Gameplay, act3Npcs, groundLayer, cainosSprites, chestSprites, villagerPrefab);
 
-            // Balcón y escalera hasta el tejado del Campanero: el Guardia Portador patrulla arriba
+            // Balcón y escalones rústicos de madera hasta el tejado del Campanero (reemplaza la escalera problemática)
             Sprite balconySprite = LoadFirstSprite(Level2ArtPath + "Village_Balcony_Platform.png");
-            GameObject balcony = CreateOneWayLedge(act3Env, "Campanero_Balcony", 179.9f, 181.85f, HouseRoofTop, groundLayer, balconySprite, true);
-            CreateClimbableLadder(act3Gameplay, cainosSprites, "Ladder_CampaneroBalcony", 180.5f, 0.17f, HouseRoofTop, balcony.GetComponent<Collider2D>());
+            CreateOneWayLedge(act3Env, "Balcony_Crate_Step_1", 177.8f, 179.4f, 1.45f, groundLayer, balconySprite, true);
+            PlaceCainosSprite(act3Env, cainosSprites, "Crate_Balcony_Support_1", "TX Village Props - Crate Small", new Vector3(178.6f, 0.70f, 0f), 1.1f, true);
+
+            CreateOneWayLedge(act3Env, "Balcony_Crate_Step_2", 179.5f, 181.1f, 2.70f, groundLayer, balconySprite, true);
+            PlaceCainosSprite(act3Env, cainosSprites, "Barrel_Balcony_Support_2", "TX Village Props - Barrel", new Vector3(180.3f, 1.95f, 0f), 1.0f, true);
+
+            GameObject balcony = CreateOneWayLedge(act3Env, "Campanero_Balcony", 179.9f, 182.2f, HouseRoofTop, groundLayer, balconySprite, true);
 
             Transform[] wpBalconyCarrier = CreateWaypoints(act3Npcs, "Waypoints_KeyCarrier_3_Balcony", new Vector2(182.6f, HouseRoofTop + 0.02f), new Vector2(193.4f, HouseRoofTop + 0.02f));
             GameObject guardCarrier3 = CreateGuard(act3Npcs, guardPrefab, "Guard_KeyCarrier_3_Balcony", new Vector3(188f, HouseRoofTop + 0.02f, 0f), wpBalconyCarrier, PatrolMode.PingPong, groundMask);
@@ -1605,9 +1610,30 @@ namespace Level3.Editor
             // La Iglesia de Salem (X: 250 a 260) y ChurchDoorGoal en X: 255
             BuildSalemChurchMonumentAndGoal(act3Env, act3Gameplay, cainosSprites, logBSprite, logCSprite, gateSprite);
 
+            // TRAMO 3.5: AMPLIACIÓN DE LA ALDEA — HUERTO PARROQUIAL Y CLAUSTRO (X: 260 a 292)
+            BuildParishGardenAndCloisterExtension(
+                act3Env,
+                act3Gameplay,
+                act3Pickups,
+                act3Npcs,
+                cainosSprites,
+                groundLayer,
+                groundMask,
+                guardPrefab,
+                checkpointPrefab,
+                signSprite,
+                sleepFlaskSprite,
+                potSleepPrefab,
+                potHypnoPrefab,
+                heartPrefab,
+                cornCluster,
+                stalkA,
+                stalkB,
+                stalkC);
+
             DecorateVillageStreet(act3Env, cainosSprites);
 
-            log.AppendLine("  - Acto 3 (X: 146..266): Aldea de Salem con 3 casas atrancadas (Sacristán X:160..170 ventana alta, Campanero X:182..194 gatera + guardia portador en el tejado, Inquisidor X:221.5..234.5 conducto), aldeanos dormidos con medidor de ruido, 3 cofres encadenados dentro de las casas, Reja del Atrio (X:212) e Iglesia (X:255).");
+            log.AppendLine("  - Acto 3 (X: 146..292): Aldea de Salem ampliada con 3 casas atrancadas, escalones rústicos al tejado del Campanero, Reja del Atrio (X:212), Iglesia (X:255) y Huerto Parroquial con terraza del claustro (X:260..292).");
         }
 
         // =========================================================================
@@ -1994,6 +2020,88 @@ namespace Level3.Editor
             soGoal.FindProperty("rightDoorWing").objectReferenceValue = rwSr != null ? rwSr.transform : null;
             soGoal.FindProperty("sanctuaryPortalLight").objectReferenceValue = portalLight;
             soGoal.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void BuildParishGardenAndCloisterExtension(
+            Transform envParent,
+            Transform gameplayParent,
+            Transform pickupsParent,
+            Transform npcsParent,
+            Sprite[] cainosSprites,
+            int groundLayer,
+            int groundMask,
+            GameObject guardPrefab,
+            GameObject checkpointPrefab,
+            Sprite signSprite,
+            Sprite sleepFlaskSprite,
+            GameObject potSleepPrefab,
+            GameObject potHypnoPrefab,
+            GameObject heartPrefab,
+            Sprite cornCluster,
+            Sprite stalkA,
+            Sprite stalkB,
+            Sprite stalkC)
+        {
+            Transform gardenEnv = new GameObject("Act3_ParishGarden_Env").transform;
+            gardenEnv.SetParent(envParent, false);
+
+            Transform gardenGameplay = new GameObject("Act3_ParishGarden_Gameplay").transform;
+            gardenGameplay.SetParent(gameplayParent, false);
+
+            Transform gardenPickups = new GameObject("Act3_ParishGarden_Pickups").transform;
+            gardenPickups.SetParent(pickupsParent, false);
+
+            Transform gardenNpcs = new GameObject("Act3_ParishGarden_NPCs").transform;
+            gardenNpcs.SetParent(npcsParent, false);
+
+            // 1. Pérgola de entrada al Huerto Parroquial (X: 261..263)
+            PlaceCainosSprite(gardenEnv, cainosSprites, "Pergola_Pillar_L", "TX Village Props - Stall Tent Pillar", new Vector3(261.2f, 1.85f, 0f), 1.2f, true);
+            PlaceCainosSprite(gardenEnv, cainosSprites, "Pergola_Pillar_R", "TX Village Props - Stall Tent Pillar", new Vector3(263.2f, 1.85f, 0f), 1.2f, true);
+            CreateMysticLantern(gardenEnv, cainosSprites, "VillageLamp_ParishGarden_Entry", new Vector3(262.2f, 1.6f, 0f), new Color(1f, 0.88f, 0.4f, 1f));
+
+            // 2. Checkpoint del Huerto
+            CreateCheckpoint(gardenGameplay, checkpointPrefab, "Checkpoint_Act3_ParishGarden", new Vector3(264.5f, 0.17f, 0f));
+
+            // 3. Letrero informativo del Huerto Parroquial
+            CreateWorldSign(
+                gardenGameplay,
+                "Sign_Act3_ParishGarden",
+                new Vector2(267.5f, 0.9f),
+                signSprite,
+                "Huerto del Claustro de Salem: los monjes guardaban provisiones sagradas. Las crónicas advierten que la Poción Maestra de la bruja despertará ante el altar mayor de la Iglesia (Nivel 4).");
+
+            // 4. Escondite de Maíz / Cañas en el huerto
+            CreateForestHideout(gardenEnv, "Hideout_ParishGarden", 270.5f, 0f, 3.2f, 3.4f, cornCluster, stalkA, stalkB, stalkC);
+
+            // 5. Terraza elevada del claustro (plataformas OneWay navegables)
+            CreateOneWayLedge(gardenEnv, "Cloister_Step_1", 271.8f, 273.6f, 1.55f, groundLayer, null, true);
+            PlaceCainosSprite(gardenEnv, cainosSprites, "Crate_Cloister_Support_1", "TX Village Props - Crate Small", new Vector3(272.7f, 0.75f, 0f), 1.1f, true);
+
+            GameObject terrace = CreateOneWayLedge(gardenEnv, "Cloister_Terrace", 273.8f, 280.6f, 3.10f, groundLayer, null, true);
+            PlaceCainosSprite(gardenEnv, cainosSprites, "Pillar_Cloister_L", "TX Village Props - Stall Tent Pillar", new Vector3(274.6f, 1.85f, 0f), 1.1f, true);
+            PlaceCainosSprite(gardenEnv, cainosSprites, "Pillar_Cloister_R", "TX Village Props - Stall Tent Pillar", new Vector3(279.8f, 1.85f, 0f), 1.1f, true);
+
+            // Recompensas sobre la terraza
+            InstantiatePickup(gardenPickups, heartPrefab, "HeartPickup_Cloister", new Vector3(275.5f, 3.65f, 0f));
+            InstantiatePickup(gardenPickups, potSleepPrefab, "PotionPickup_Cloister_Sleep", new Vector3(278.5f, 3.65f, 0f));
+            CreateMysticLantern(gardenEnv, cainosSprites, "VillageLamp_Cloister_Terrace", new Vector3(280.2f, 3.9f, 0f), new Color(1f, 0.85f, 0.4f, 1f));
+
+            // Pasaje bajo la celosía accesible en forma de gato
+            CreateCatOnlyTrigger(gardenGameplay, "CatOnlyPassage_CloisterTrellis", new Vector3(276.5f, 0.6f, 0f), "Entra como Gato [T] por la celosía del huerto.");
+
+            // 6. Guardia de patrulla en el camino inferior del huerto
+            Transform[] wpGardenGuard = CreateWaypoints(gardenNpcs, "Waypoints_Guard_ParishGarden", new Vector2(276.0f, 0.17f), new Vector2(283.5f, 0.17f));
+            CreateGuard(gardenNpcs, guardPrefab, "Guard_ParishGarden", new Vector3(279.5f, 0.17f, 0f), wpGardenGuard, PatrolMode.PingPong, groundMask);
+
+            // 7. Estación de reabastecimiento en el huerto
+            CreatePotionRefillStation(gardenGameplay, "PotionRefillStation_ParishGarden", new Vector3(284.5f, 0.72f, 0f),
+                "refill_parish_garden", "Alijo del Huerto Parroquial", PotionType.Sleep, 2, sleepFlaskSprite);
+
+            // 8. Santuario memorial y área de descanso al final de la aldea
+            PlaceCainosSprite(gardenEnv, cainosSprites, "Garden_Pumpkin_1", "TX Village Props - Pumpkin 01", new Vector3(287.0f, 0.5f, 0f), 1.0f, true);
+            PlaceCainosSprite(gardenEnv, cainosSprites, "Garden_Gravestone_1", "TX Village Props - Gravestone 01", new Vector3(289.0f, 0.8f, 0f), 1.1f, true);
+            InstantiatePickup(gardenPickups, potHypnoPrefab, "PotionPickup_Garden_Hypno", new Vector3(290.2f, 0.65f, 0f));
+            CreateMysticLantern(gardenEnv, cainosSprites, "VillageLamp_Garden_End", new Vector3(291.6f, 1.2f, 0f), new Color(1f, 0.82f, 0.35f, 1f));
         }
 
         public static LoreObject CreateIlluminatedLoreStand(

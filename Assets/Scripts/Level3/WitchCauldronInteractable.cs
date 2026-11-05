@@ -151,7 +151,15 @@ namespace Level3
             PotionInventory potInv = Object.FindFirstObjectByType<PotionInventory>();
             if (potInv != null)
             {
-                potInv.SelectPotion(PotionType.Master);
+                if (GameManager.Instance != null && GameManager.Instance.IsMasterPotionUsable)
+                {
+                    potInv.SelectPotion(PotionType.Master);
+                }
+                else
+                {
+                    // En Level3 y Level3_Village permanece sellada en el zurrón hasta la Iglesia en el Nivel 4
+                    potInv.SelectPotion(PotionType.Sleep);
+                }
             }
 
             // 3. Avanzar estado del Nivel 3
@@ -174,7 +182,7 @@ namespace Level3
             StartCoroutine(AlchemyBurstRoutine());
 
             // 6. Mostrar mensaje destacado en el HUD
-            ShowHUDMessage("¡Poción Maestra preparada con éxito! Equipada en ranura [4]. El Portón del Sendero de Regreso se abre.", 5.0f);
+            ShowHUDMessage("¡Poción Maestra preparada! Guardada y sellada en tu zurrón hasta entrar a la Iglesia. El Portón de Regreso se abre.", 5.0f);
         }
 
         private void RefillPotionsIfLow()
