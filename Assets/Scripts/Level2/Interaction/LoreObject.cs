@@ -43,7 +43,7 @@ namespace Level2
 
         public string GetPromptText(GameObject interactor)
         {
-            return $"Q: Examinar {objectTitle}";
+            return $"{Level2Controls.InteractKey}: Examinar {objectTitle}";
         }
 
         public void Interact(GameObject interactor)

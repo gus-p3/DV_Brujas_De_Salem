@@ -11,9 +11,9 @@ using UnityEngine.SceneManagement;
 namespace Level3.Editor
 {
     /// <summary>
-    /// Verificador Maestro del Nivel 3.
+    /// Verificador Maestro del Nivel 3 (2 escenas: Parte 1 Bosque y Cabaña, Parte 2 Aldea de Salem).
     /// Menú: Tools/Level 3/Run Level 3 Master Audit
-    /// Abre Assets/Scenes/Level3.unity y audita automáticamente infraestructura, portadores de llave,
+    /// Abre cada escena y audita automáticamente infraestructura, transición entre partes, portadores de llave,
     /// cerraduras (sin llaves huérfanas), caldero, pistas, cofres encadenados, pasajes de gato,
     /// retos de vuelo sobre KillZone, checkpoints, grounding por raycast y la progresión Level2 -> Level3.
     /// El reporte final debe arrojar 100% PASS con 0 errores y 0 warnings.
@@ -21,19 +21,54 @@ namespace Level3.Editor
     public static class Level3MasterVerifier
     {
         public const string Level3ScenePath = "Assets/Scenes/Level3.unity";
+        public const string Level3VillageScenePath = "Assets/Scenes/Level3_Village.unity";
         public const string Level2ScenePath = "Assets/Scenes/Level2.unity";
 
-        private static readonly string[] ExpectedCarrierKeys = { "forest_gate_key_1", "forest_gate_key_2", "sanctuary_gate_key" };
-
-        private static readonly Dictionary<string, string> ExpectedGates = new Dictionary<string, string>
-        {
-            { "forest_gate_1", "forest_gate_key_1" },
-            { "forest_gate_2", "forest_gate_key_2" },
-            { WitchCauldronInteractable.ReturnGateId, string.Empty }, // se abre con la Poción Maestra (caldero)
-            { "sanctuary_atrium_gate", "sanctuary_gate_key" },
-        };
-
         private static readonly string[] ExpectedChestChain = { "crypt_chest_key", "inquisitor_chest_key", "church_master_key" };
+
+        /// <summary>Qué debe contener cada escena del Nivel 3.</summary>
+        private class PartSpec
+        {
+            public string Label;
+            public string Path;
+            public bool Village;
+            public string[] CarrierKeys;
+            public Dictionary<string, string> Gates;
+            public int MinCatPassages;
+            public int MinCheckpoints;
+        }
+
+        private static readonly PartSpec[] Parts =
+        {
+            new PartSpec
+            {
+                Label = "PARTE 1 — Bosque y Cabaña (Level3)",
+                Path = Level3ScenePath,
+                Village = false,
+                CarrierKeys = new[] { "forest_gate_key_1", "forest_gate_key_2" },
+                Gates = new Dictionary<string, string>
+                {
+                    { "forest_gate_1", "forest_gate_key_1" },
+                    { "forest_gate_2", "forest_gate_key_2" },
+                    { WitchCauldronInteractable.ReturnGateId, string.Empty }, // se abre con la Poción Maestra (caldero)
+                },
+                MinCatPassages = 1,
+                MinCheckpoints = 3,
+            },
+            new PartSpec
+            {
+                Label = "PARTE 2 — La Aldea de Salem (Level3_Village)",
+                Path = Level3VillageScenePath,
+                Village = true,
+                CarrierKeys = new[] { "sanctuary_gate_key" },
+                Gates = new Dictionary<string, string>
+                {
+                    { "sanctuary_atrium_gate", "sanctuary_gate_key" },
+                },
+                MinCatPassages = 2,
+                MinCheckpoints = 4,
+            },
+        };
 
         public class AuditReport
         {
@@ -58,41 +93,47 @@ namespace Level3.Editor
             var r = new AuditReport();
             r.Log.AppendLine("=================== LEVEL 3 MASTER AUDIT ===================");
 
-            Scene scene = EditorSceneManager.OpenScene(Level3ScenePath, OpenSceneMode.Single);
-            if (!scene.IsValid())
+            foreach (PartSpec part in Parts)
             {
-                Fail(r, $"No se pudo abrir {Level3ScenePath}");
-                return Finish(r);
+                r.Log.AppendLine($"\n################ {part.Label} ################");
+                Scene scene = EditorSceneManager.OpenScene(part.Path, OpenSceneMode.Single);
+                if (!scene.IsValid())
+                {
+                    Fail(r, $"No se pudo abrir {part.Path}");
+                    continue;
+                }
+                Physics2D.SyncTransforms();
+
+                try
+                {
+                    Section(r, "1. Infraestructura del jugador, managers, HUD y transición entre partes");
+                    AuditInfrastructure(r, part);
+
+                    Section(r, "2. Guardias portadores de llave (KeyCarrierGuard)");
+                    AuditKeyCarriers(r, part);
+
+                    Section(r, "3. Cerraduras (LockedGateInteractable / ChurchDoorGoal) y llaves huérfanas");
+                    AuditLocksAndKeys(r, part);
+
+                    Section(r, "4. Caldero, pistas (LoreObject) y cofres encadenados (TreasureChest)");
+                    AuditCauldronCluesChests(r, part);
+
+                    Section(r, "5. Pasajes de gato, retos de vuelo sobre KillZone y checkpoints");
+                    AuditTraversal(r, part);
+
+                    Section(r, "6. Auditoría de Grounding (raycast hacia abajo sobre layer Ground)");
+                    AuditGrounding(r);
+                }
+                finally
+                {
+                    // Descartar cualquier cambio temporal (p. ej. visuales del aura generados para la verificación)
+                    EditorSceneManager.OpenScene(part.Path, OpenSceneMode.Single);
+                }
             }
-            Physics2D.SyncTransforms();
 
-            try
-            {
-                Section(r, "1. Infraestructura del jugador, managers y HUD");
-                AuditInfrastructure(r);
+            EditorSceneManager.OpenScene(Level3ScenePath, OpenSceneMode.Single);
 
-                Section(r, "2. Guardias portadores de llave (KeyCarrierGuard)");
-                AuditKeyCarriers(r);
-
-                Section(r, "3. Cerraduras (LockedGateInteractable / ChurchDoorGoal) y llaves huérfanas");
-                AuditLocksAndKeys(r);
-
-                Section(r, "4. Caldero, pistas (LoreObject) y cofres encadenados (TreasureChest)");
-                AuditCauldronCluesChests(r);
-
-                Section(r, "5. Pasajes de gato, retos de vuelo sobre KillZone y checkpoints");
-                AuditTraversal(r);
-
-                Section(r, "6. Auditoría de Grounding (raycast hacia abajo sobre layer Ground)");
-                AuditGrounding(r);
-            }
-            finally
-            {
-                // Descartar cualquier cambio temporal (p. ej. visuales del aura generados para la verificación)
-                EditorSceneManager.OpenScene(Level3ScenePath, OpenSceneMode.Single);
-            }
-
-            Section(r, "7. Progresión Level2 -> Level3 y Build Settings");
+            Section(r, "7. Progresión Level2 -> Level3 -> Level3_Village y Build Settings");
             AuditProgression(r);
 
             return Finish(r);
@@ -101,9 +142,10 @@ namespace Level3.Editor
         // ------------------------------------------------------------------
         // 1. Infraestructura
         // ------------------------------------------------------------------
-        private static void AuditInfrastructure(AuditReport r)
+        private static void AuditInfrastructure(AuditReport r, PartSpec part)
         {
             RequireSingle<PlayerController>(r, "PlayerController");
+            RequireSingle<Level3ChapterCard>(r, "Level3ChapterCard");
             RequireSingle<Level3Bootstrap>(r, "Level3Bootstrap");
             RequireSingle<Level3StateController>(r, "Level3StateController");
             RequireSingle<Level3ObjectiveHUD>(r, "Level3ObjectiveHUD");
@@ -131,6 +173,45 @@ namespace Level3.Editor
                     "HUDController sin LevelCompletePanel/WinTitle para la victoria del Nivel 3");
             }
 
+            Level3StateController state = Find<Level3StateController>().FirstOrDefault();
+            if (state != null)
+            {
+                bool villageFlag = new SerializedObject(state).FindProperty("villagePart").boolValue;
+                Check(r, villageFlag == part.Village,
+                    $"Level3StateController.villagePart = {villageFlag}",
+                    $"Level3StateController.villagePart = {villageFlag} (esperado {part.Village})");
+            }
+
+            Level3ChapterCard card = Find<Level3ChapterCard>().FirstOrDefault();
+            if (card != null)
+            {
+                bool intro = new SerializedObject(card).FindProperty("playIntroOnStart").boolValue;
+                Check(r, intro == part.Village,
+                    part.Village ? "Tarjeta 'Parte 2 — La Aldea de Salem' al iniciar" : "Sin tarjeta de presentación al iniciar la Parte 1",
+                    $"playIntroOnStart = {intro} en {part.Label}");
+            }
+
+            if (!part.Village)
+            {
+                Level3CabinRestZone[] rests = Find<Level3CabinRestZone>();
+                Check(r, rests.Length == 1 && rests[0].transform.position.x > 124f && rests[0].transform.position.x < 136f,
+                    "Zona de descanso 'Llegaste a la cabaña' dentro de la Cabaña",
+                    $"Se esperaba 1 Level3CabinRestZone en la cabaña, hay {rests.Length}");
+
+                Level3PartExit[] exits = Find<Level3PartExit>();
+                LockedGateInteractable returnGate = Find<LockedGateInteractable>().FirstOrDefault(g => g.GateId == WitchCauldronInteractable.ReturnGateId);
+                bool exitOk = exits.Length == 1 && exits[0].NextSceneName == Level3PartExit.VillageSceneName &&
+                              returnGate != null && exits[0].transform.position.x > returnGate.transform.position.x;
+                Check(r, exitOk, "Salida de la Parte 1 tras el Portón de Regreso -> Level3_Village",
+                    "Falta Level3PartExit tras el Portón de Regreso o no apunta a Level3_Village");
+            }
+            else
+            {
+                Check(r, Find<Level3PartExit>().Length == 0 && Find<Level3CabinRestZone>().Length == 0,
+                    "La Parte 2 no contiene salida ni zona de descanso de la Parte 1",
+                    "La Parte 2 contiene objetos de transición de la Parte 1");
+            }
+
             Level3ObjectiveHUD objHud = Find<Level3ObjectiveHUD>().FirstOrDefault();
             if (objHud != null)
             {
@@ -146,15 +227,17 @@ namespace Level3.Editor
         // ------------------------------------------------------------------
         // 2. Portadores de llave
         // ------------------------------------------------------------------
-        private static void AuditKeyCarriers(AuditReport r)
+        private static void AuditKeyCarriers(AuditReport r, PartSpec part)
         {
             KeyCarrierGuard[] carriers = Find<KeyCarrierGuard>();
-            Check(r, carriers.Length == 3, $"3 KeyCarrierGuard encontrados", $"Se esperaban 3 KeyCarrierGuard, hay {carriers.Length}");
+            int expectedCarriers = part.CarrierKeys.Length;
+            Check(r, carriers.Length == expectedCarriers, $"{expectedCarriers} KeyCarrierGuard encontrados",
+                $"Se esperaban {expectedCarriers} KeyCarrierGuard, hay {carriers.Length}");
 
             var ids = carriers.Select(c => c.KeyId).ToList();
             Check(r, ids.Distinct().Count() == ids.Count, "keyId de portadores únicos", "keyId duplicados entre portadores: " + string.Join(", ", ids));
 
-            foreach (string expected in ExpectedCarrierKeys)
+            foreach (string expected in part.CarrierKeys)
             {
                 Check(r, ids.Contains(expected), $"Portador con keyId '{expected}'", $"Ningún portador lleva '{expected}'");
             }
@@ -175,15 +258,16 @@ namespace Level3.Editor
         // ------------------------------------------------------------------
         // 3. Cerraduras y llaves huérfanas
         // ------------------------------------------------------------------
-        private static void AuditLocksAndKeys(AuditReport r)
+        private static void AuditLocksAndKeys(AuditReport r, PartSpec part)
         {
             HashSet<string> obtainable = CollectObtainableKeys();
             r.Log.AppendLine("    Llaves obtenibles en escena: " + string.Join(", ", obtainable.OrderBy(k => k)));
 
             LockedGateInteractable[] gates = Find<LockedGateInteractable>();
-            Check(r, gates.Length == 4, "4 LockedGateInteractable encontrados", $"Se esperaban 4 LockedGateInteractable, hay {gates.Length}");
+            Check(r, gates.Length == part.Gates.Count, $"{part.Gates.Count} LockedGateInteractable encontrados",
+                $"Se esperaban {part.Gates.Count} LockedGateInteractable, hay {gates.Length}");
 
-            foreach (KeyValuePair<string, string> kv in ExpectedGates)
+            foreach (KeyValuePair<string, string> kv in part.Gates)
             {
                 LockedGateInteractable g = gates.FirstOrDefault(x => x.GateId == kv.Key);
                 if (g == null)
@@ -207,7 +291,9 @@ namespace Level3.Editor
             }
 
             ChurchDoorGoal[] doors = Find<ChurchDoorGoal>();
-            Check(r, doors.Length == 1, "1 ChurchDoorGoal (Puerta de la Iglesia)", $"Se esperaba 1 ChurchDoorGoal, hay {doors.Length}");
+            int expectedDoors = part.Village ? 1 : 0;
+            Check(r, doors.Length == expectedDoors, $"{expectedDoors} ChurchDoorGoal (Puerta de la Iglesia)",
+                $"Se esperaban {expectedDoors} ChurchDoorGoal, hay {doors.Length}");
             foreach (ChurchDoorGoal d in doors)
             {
                 string req = new SerializedObject(d).FindProperty("requiredKeyId").stringValue;
@@ -267,10 +353,19 @@ namespace Level3.Editor
         // ------------------------------------------------------------------
         // 4. Caldero, pistas y cofres
         // ------------------------------------------------------------------
-        private static void AuditCauldronCluesChests(AuditReport r)
+        private static void AuditCauldronCluesChests(AuditReport r, PartSpec part)
         {
             WitchCauldronInteractable[] cauldrons = Find<WitchCauldronInteractable>();
-            Check(r, cauldrons.Length == 1, "1 WitchCauldronInteractable en la Cabaña", $"Se esperaba 1 caldero, hay {cauldrons.Length}");
+            if (!part.Village)
+            {
+                Check(r, cauldrons.Length == 1, "1 WitchCauldronInteractable en la Cabaña", $"Se esperaba 1 caldero, hay {cauldrons.Length}");
+                Check(r, Find<LoreObject>().Length == 0 && Find<TreasureChest>().Length == 0,
+                    "Pistas y cofres reservados para la Parte 2",
+                    "La Parte 1 contiene pistas o cofres de la Aldea");
+                return;
+            }
+
+            Check(r, cauldrons.Length == 0, "Sin caldero en la Aldea (la Poción Maestra viene de la Parte 1)", $"Hay {cauldrons.Length} calderos en la Parte 2");
 
             LoreObject[] lore = Find<LoreObject>();
             Check(r, lore.Length == 3, "3 pistas (LoreObject)", $"Se esperaban 3 LoreObject, hay {lore.Length}");
@@ -299,15 +394,18 @@ namespace Level3.Editor
         // ------------------------------------------------------------------
         // 5. Pasajes de gato, vuelo, checkpoints
         // ------------------------------------------------------------------
-        private static void AuditTraversal(AuditReport r)
+        private static void AuditTraversal(AuditReport r, PartSpec part)
         {
             CatOnlyPassage[] cats = Find<CatOnlyPassage>();
-            Check(r, cats.Length >= 2, $"{cats.Length} CatOnlyPassage (mínimo 2)", $"Solo {cats.Length} CatOnlyPassage (mínimo 2)");
+            Check(r, cats.Length >= part.MinCatPassages, $"{cats.Length} CatOnlyPassage (mínimo {part.MinCatPassages})",
+                $"Solo {cats.Length} CatOnlyPassage (mínimo {part.MinCatPassages})");
 
             Checkpoint[] cps = Find<Checkpoint>();
-            Check(r, cps.Length >= 4, $"{cps.Length} Checkpoints (mínimo 4)", $"Solo {cps.Length} Checkpoints (mínimo 4)");
+            Check(r, cps.Length >= part.MinCheckpoints, $"{cps.Length} Checkpoints (mínimo {part.MinCheckpoints})",
+                $"Solo {cps.Length} Checkpoints (mínimo {part.MinCheckpoints})");
 
             KillZone[] kills = Find<KillZone>();
+            if (part.Village) return; // el Barranco del Río Oscuro (reto de vuelo) está en la Parte 1
             Check(r, kills.Length >= 1, $"{kills.Length} KillZone(s) de reto de vuelo", "No hay KillZone para retos de vuelo");
 
             int groundMask = GroundMask();
@@ -435,8 +533,12 @@ namespace Level3.Editor
             EditorBuildSettingsScene[] scenes = EditorBuildSettings.scenes;
             int i2 = System.Array.FindIndex(scenes, s => s.path == Level2ScenePath);
             int i3 = System.Array.FindIndex(scenes, s => s.path == Level3ScenePath);
+            int i3v = System.Array.FindIndex(scenes, s => s.path == Level3VillageScenePath);
             Check(r, i3 >= 0 && scenes[i3].enabled, "Level3.unity registrada y habilitada en Build Settings", "Level3.unity no está habilitada en Build Settings");
             Check(r, i2 >= 0 && i3 == i2 + 1, "Level3 justo después de Level2 en Build Settings", $"Orden incorrecto (Level2={i2}, Level3={i3})");
+            Check(r, i3v >= 0 && scenes[i3v].enabled && i3v == i3 + 1,
+                "Level3_Village (Parte 2) registrada justo después de Level3",
+                $"Level3_Village no está habilitada justo después de Level3 (Level3={i3}, Level3_Village={i3v})");
 
             // Comprobación de assets en disco sin abrir la escena aditiva para evitar conflicto de Global Light 2D en URP
             string l2Text = System.IO.File.ReadAllText(Level2ScenePath);

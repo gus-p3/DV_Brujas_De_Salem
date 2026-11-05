@@ -73,8 +73,8 @@ public class PotionInventory : MonoBehaviour
             return;
         }
 
-        // Bloquear mientras haya un diálogo/tip de tutorial activo
-        if (TutorialManager.Instance != null && TutorialManager.Instance.IsOpen)
+        // Bloquear mientras haya un diálogo/tip de tutorial o una nota en pergamino abierta
+        if ((TutorialManager.Instance != null && TutorialManager.Instance.IsOpen) || Level2.Level2LoreReader.IsOpen)
         {
             lastTutorialOpenFrame = Time.frameCount;
             return;
@@ -88,6 +88,12 @@ public class PotionInventory : MonoBehaviour
 
         HandleSelectionInput();
         HandleThrowInput();
+    }
+
+    /// <summary>Ignora la entrada de lanzamiento durante los próximos frames (p. ej. el clic que cerró una nota).</summary>
+    public void BlockThrowForFrames(int frames)
+    {
+        lastTutorialOpenFrame = Mathf.Max(lastTutorialOpenFrame, Time.frameCount + Mathf.Max(0, frames - 1));
     }
 
     private void HandleSelectionInput()

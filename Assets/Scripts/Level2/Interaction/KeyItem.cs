@@ -229,7 +229,7 @@ namespace Level2
 
         public string GetPromptText(GameObject interactor)
         {
-            return $"Q: Recoger {keyDisplayName}";
+            return $"{Level2Controls.InteractKey}: Recoger {keyDisplayName}";
         }
 
         public void Interact(GameObject interactor)

@@ -12,6 +12,8 @@ public class PlayerController : MonoBehaviour, IDetectable
     [Header("Movimiento horizontal")]
     [Tooltip("Velocidad horizontal máxima en unidades por segundo.")]
     [SerializeField] private float moveSpeed = 6f;
+    [Tooltip("Velocidad relativa al caminar con sigilo (Shift mantenido).")]
+    [SerializeField] private float sneakSpeedMultiplier = 0.4f;
     [Tooltip("Aceleración al pulsar una dirección (u/s²).")]
     [SerializeField] private float acceleration = 45f;
     [Tooltip("Desaceleración al soltar la dirección (u/s²).")]
@@ -165,6 +167,11 @@ public class PlayerController : MonoBehaviour, IDetectable
     }
 
     public bool IsFlying => isFlying;
+    /// <summary>Caminar con sigilo: Shift mantenido reduce la velocidad (y el ruido en las casas del Nivel 3).</summary>
+    public bool IsSneaking => !useScriptedInput && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift));
+    public float SneakSpeedMultiplier => sneakSpeedMultiplier;
+    /// <summary>Velocidad horizontal máxima actual (incluye el multiplicador de la forma de gato).</summary>
+    public float MaxMoveSpeed => moveSpeed;
     public bool IsGrounded => isGrounded;
     public float FlightEnergy01 => flightEnergy;
 
@@ -407,7 +414,7 @@ public class PlayerController : MonoBehaviour, IDetectable
 
     private void HandleHorizontalMovement()
     {
-        float targetSpeed = moveInput * moveSpeed;
+        float targetSpeed = moveInput * moveSpeed * (IsSneaking ? sneakSpeedMultiplier : 1f);
         float rate = Mathf.Abs(moveInput) > flipDeadZone ? acceleration : deceleration;
         if (!isGrounded)
         {
@@ -523,6 +530,13 @@ public class PlayerController : MonoBehaviour, IDetectable
     }
 
     /// <summary>Restablece la velocidad y las fuerzas físicas del jugador.</summary>
+    /// <summary>Descarta el salto y el vuelo recordados (p. ej. el Espacio que cerró una nota en pausa).</summary>
+    public void ClearBufferedInput()
+    {
+        jumpBufferCounter = 0f;
+        jumpReleased = false;
+    }
+
     public void ResetPhysics(Vector2 newVelocity)
     {
         if (rb == null) rb = GetComponent<Rigidbody2D>();

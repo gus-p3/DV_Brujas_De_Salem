@@ -8,7 +8,7 @@ namespace Level3
 {
     /// <summary>
     /// La gran puerta doble de la Iglesia de Salem al final del Nivel 3 (X: 255).
-    /// Implementa Level2.IInteractable y responde a [E] o [Q].
+    /// Implementa Level2.IInteractable y responde a [E].
     /// Verifica dos condiciones antes de abrirse:
     /// 1. Level3StateController.Instance.HasBrewedMasterPotion == true
     /// 2. KeyInventory.Instance.HasKey("church_master_key") == true
@@ -69,19 +69,7 @@ namespace Level3
             }
         }
 
-        private void Update()
-        {
-            if (isOpened) return;
-
-            if (Input.GetKeyDown(KeyCode.E) && Time.unscaledTime >= lastInteractTime + 0.4f)
-            {
-                PlayerController player = UnityEngine.Object.FindFirstObjectByType<PlayerController>();
-                if (player != null && Vector2.Distance(transform.position, player.transform.position) <= 2.8f)
-                {
-                    Interact(player.gameObject);
-                }
-            }
-        }
+        // La interacción la dispara PlayerInteractor con [E]; este componente no lee el teclado.
 
         public bool CanInteract(GameObject interactor)
         {
@@ -94,7 +82,7 @@ namespace Level3
 
             if (AreVictoryConditionsMet(out _))
             {
-                return $"[E / Q] Abrir {doorDisplayName} con {requiredKeyDisplayName}";
+                return $"[E] Abrir {doorDisplayName} con {requiredKeyDisplayName}";
             }
 
             return LockedChurchMessage;
@@ -109,7 +97,7 @@ namespace Level3
             TransformationManager tm = interactor.GetComponent<TransformationManager>();
             if (tm != null && tm.IsCatForm)
             {
-                ShowHUDMessage("Necesitas tu forma humana [F] para abrir las puertas de la Iglesia.", 2.4f);
+                ShowHUDMessage("Necesitas tu forma humana [T] para abrir las puertas de la Iglesia.", 2.4f);
                 if (AudioManager.Instance != null) AudioManager.Instance.PlayErrorSound();
                 return;
             }
@@ -245,6 +233,10 @@ namespace Level3
             LevelCompletePanel panel = hud != null && hud.levelCompletePanel != null
                 ? hud.levelCompletePanel
                 : UnityEngine.Object.FindFirstObjectByType<LevelCompletePanel>(FindObjectsInactive.Include);
+
+            // Ningún aviso flotante debe quedar encima del título de victoria
+            if (hud != null) hud.ClearMessage();
+            if (InteractionPromptUI.Instance != null) InteractionPromptUI.Instance.HidePrompt();
 
             if (panel == null)
             {

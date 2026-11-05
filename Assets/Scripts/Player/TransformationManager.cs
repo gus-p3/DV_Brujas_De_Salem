@@ -48,6 +48,8 @@ public class TransformationManager : MonoBehaviour
 
     public bool CanCollect => true;
     public bool CanCastSpells => !IsCatForm;
+    /// <summary>Multiplica el gasto de energía felina (las casas del Nivel 3 lo reducen mientras se recorren con sigilo).</summary>
+    public float CatEnergyDrainMultiplier { get; set; } = 1f;
 
     public event Action<bool> OnTransformed;
 
@@ -123,6 +125,11 @@ public class TransformationManager : MonoBehaviour
     /// Comprueba si hay espacio para la altura completa de la bruja.
     /// Ignora triggers (salvo pasajes de gato) y plataformas de un solo sentido.
     /// </summary>
+    private bool IsOwnCollider(Collider2D col)
+    {
+        return col.transform == transform || col.transform.IsChildOf(transform);
+    }
+
     public bool HasRoomForHuman(out string blockerName)
     {
         blockerName = "";
@@ -135,7 +142,9 @@ public class TransformationManager : MonoBehaviour
         Collider2D[] hits = Physics2D.OverlapBoxAll(checkCenter, checkSize, 0f);
         foreach (var col in hits)
         {
-            if (col == null || col.transform.root == transform.root) continue;
+            // Solo se ignora a la propia bruja (antes se ignoraba todo lo que compartía su raíz "Gameplay":
+            // portones, cofres y pasajes de gato del Nivel 3 no contaban como techo)
+            if (col == null || IsOwnCollider(col)) continue;
             if (col.GetComponent<CatOnlyPassage>() != null || col.GetComponentInParent<CatOnlyPassage>() != null)
             {
                 blockerName = col.gameObject.name;
@@ -158,7 +167,7 @@ public class TransformationManager : MonoBehaviour
             RaycastHit2D[] rays = Physics2D.RaycastAll(origin, Vector2.up, headroom + 0.05f);
             foreach (var h in rays)
             {
-                if (h.collider == null || h.collider.isTrigger || h.collider.transform.root == transform.root) continue;
+                if (h.collider == null || h.collider.isTrigger || IsOwnCollider(h.collider)) continue;
                 if (h.collider.usedByEffector && h.collider.GetComponent<PlatformEffector2D>() != null) continue;
                 if (h.collider.attachedRigidbody != null && h.collider.attachedRigidbody.bodyType == RigidbodyType2D.Dynamic) continue;
                 blockerName = h.collider.gameObject.name;
@@ -189,7 +198,7 @@ public class TransformationManager : MonoBehaviour
         if (IsCatForm && readingTip) return;
         if (IsCatForm)
         {
-            catEnergy = Mathf.Max(0f, catEnergy - dt / Mathf.Max(0.1f, catMaxDuration));
+            catEnergy = Mathf.Max(0f, catEnergy - dt * Mathf.Max(0f, CatEnergyDrainMultiplier) / Mathf.Max(0.1f, catMaxDuration));
             if (!lowEnergyWarned && catEnergy <= catLowEnergyWarning)
             {
                 lowEnergyWarned = true;

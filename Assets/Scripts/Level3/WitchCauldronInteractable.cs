@@ -7,7 +7,7 @@ namespace Level3
 {
     /// <summary>
     /// Representa el Caldero Místico / Mesa de Alquimia dentro de la Casa de la Bruja en el Bosque (Acto 2).
-    /// Implementa Level2.IInteractable y soporta interacción con [E] o [Q].
+    /// Implementa Level2.IInteractable y se usa con [E] (la tecla de interactuar del Nivel 3).
     /// - Primera interacción: prepara la Poción Maestra Consagrada, cura toda la vida en HealthManager,
     ///   otorga +3 Pociones de Sueño y +2 de Cegar, llama a Level3StateController.Instance.CompletePotionBrewing()
     ///   y desbloquea automáticamente el Portón del Sendero de Regreso ("return_village_gate").
@@ -18,7 +18,7 @@ namespace Level3
     public class WitchCauldronInteractable : MonoBehaviour, IInteractable
     {
         public const string ReturnGateId = "return_village_gate";
-        public const string BrewedHudMessage = "¡Poción Consagrada lista! Ahora regresa hacia la Aldea, busca las pistas en los cofres y abre la Iglesia de Salem.";
+        public const string BrewedHudMessage = "¡Poción Consagrada lista! El Portón del Sendero de Regreso se abre: síguelo hasta la Aldea de Salem.";
 
         [Header("Configuración de Alquimia")]
         [SerializeField] private string cauldronId = "witch_cabin_cauldron";
@@ -77,15 +77,6 @@ namespace Level3
         {
             AnimateCauldronIdleFX();
 
-            // Permitir también la tecla E directamente cuando el jugador está junto al caldero
-            if (Input.GetKeyDown(KeyCode.E) && Time.unscaledTime >= lastInteractTime + 0.4f)
-            {
-                PlayerController player = Object.FindFirstObjectByType<PlayerController>();
-                if (player != null && Vector2.Distance(transform.position, player.transform.position) <= 2.3f)
-                {
-                    Interact(player.gameObject);
-                }
-            }
         }
 
         public bool CanInteract(GameObject interactor)
@@ -98,16 +89,16 @@ namespace Level3
             bool brewed = Level3StateController.Instance != null && Level3StateController.Instance.HasBrewedMasterPotion;
             if (!brewed)
             {
-                return $"[E / Q] Preparar Poción Maestra en {cauldronDisplayName}";
+                return $"[E] Preparar Poción Maestra en {cauldronDisplayName}";
             }
 
             int sleepCount = GameManager.Instance != null ? GameManager.Instance.SleepCharges : 0;
             if (sleepCount < minSleepPotionsForRefill)
             {
-                return $"[E / Q] Reabastecer Pociones de Sueño en {cauldronDisplayName}";
+                return $"[E] Reabastecer Pociones de Sueño en {cauldronDisplayName}";
             }
 
-            return $"[E / Q] Examinar {cauldronDisplayName} (Poción Maestra lista)";
+            return $"[E] Examinar {cauldronDisplayName} (Poción Maestra lista)";
         }
 
         public void Interact(GameObject interactor)
@@ -119,7 +110,7 @@ namespace Level3
             TransformationManager tm = interactor.GetComponent<TransformationManager>();
             if (tm != null && tm.IsCatForm)
             {
-                ShowHUDMessage("Necesitas tu forma humana [F] para preparar pociones en el caldero.", 2.4f);
+                ShowHUDMessage("Necesitas tu forma humana [T] para preparar pociones en el caldero.", 2.4f);
                 if (AudioManager.Instance != null) AudioManager.Instance.PlayErrorSound();
                 return;
             }

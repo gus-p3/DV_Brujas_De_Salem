@@ -33,7 +33,8 @@ namespace Level2
         private bool potionInventorySuppressed;
 
         public IInteractable CurrentFocus => currentFocus;
-        public KeyCode InteractKey => interactKey;
+        // Tecla del esquema activo de la escena (Q en el Nivel 2, E en el Nivel 3)
+        public KeyCode InteractKey => Level2Controls.InteractKey;
 
         private void Awake()
         {

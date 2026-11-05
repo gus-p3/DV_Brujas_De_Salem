@@ -14,6 +14,22 @@ public static class BroomAndAnimationFixVerifier
 {
     private const string ScreenshotsFolder = "Assets/Screenshots";
 
+    // TransformToCat/TryTransformToHuman pasaron a ser públicos; se buscan métodos de cualquier visibilidad.
+    private const BindingFlags AnyInstance = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+
+    /// <summary>
+    /// En modo edición Unity no ejecuta Awake/Start: se invocan a mano para que BroomVisual guarde el
+    /// renderer de la bruja y TransformationManager registre su controlador humano, como en Play Mode.
+    /// </summary>
+    private static void InitLikePlayMode(GameObject witch)
+    {
+        if (witch == null) return;
+        BroomVisual bv = witch.GetComponent<BroomVisual>();
+        if (bv != null) typeof(BroomVisual).GetMethod("Awake", AnyInstance)?.Invoke(bv, null);
+        TransformationManager tm = witch.GetComponent<TransformationManager>();
+        if (tm != null) typeof(TransformationManager).GetMethod("Start", AnyInstance)?.Invoke(tm, null);
+    }
+
     [MenuItem("Brujas/7. Correcciones/Ejecutar Verificación de Escoba y Animaciones")]
     public static void RunVerification()
     {
@@ -23,6 +39,7 @@ public static class BroomAndAnimationFixVerifier
         Debug.Log("=========================================================================");
 
         EnsureLevel1Open();
+        InitLikePlayMode(GameObject.Find("Witch"));
 
         Test1_RecoleccionProximidad();
         Test2_RestriccionEnGato();
@@ -53,7 +70,7 @@ public static class BroomAndAnimationFixVerifier
             TransformationManager tm = witch.GetComponent<TransformationManager>();
             if (tm != null && tm.IsCatForm)
             {
-                MethodInfo tryHuman = typeof(TransformationManager).GetMethod("TryTransformToHuman", BindingFlags.NonPublic | BindingFlags.Instance);
+                MethodInfo tryHuman = typeof(TransformationManager).GetMethod("TryTransformToHuman", AnyInstance);
                 tryHuman?.Invoke(tm, null);
             }
             PlayerController pc = witch.GetComponent<PlayerController>();
@@ -80,11 +97,11 @@ public static class BroomAndAnimationFixVerifier
         Physics2D.SyncTransforms();
 
         // Simular update del coleccionable estando la bruja cerca (distancia 1.0 <= proximityRadius 1.3)
-        MethodInfo updateMethod = typeof(Collectible).GetMethod("Update", BindingFlags.NonPublic | BindingFlags.Instance);
+        MethodInfo updateMethod = typeof(Collectible).GetMethod("Update", AnyInstance);
         updateMethod?.Invoke(c, null);
 
         // Si fue recogido, isCollected es true o se destruyó
-        FieldInfo isColField = typeof(Collectible).GetField("isCollected", BindingFlags.NonPublic | BindingFlags.Instance);
+        FieldInfo isColField = typeof(Collectible).GetField("isCollected", AnyInstance);
         bool collected = isColField != null && (bool)isColField.GetValue(c);
 
         if (testItem != null) UnityEngine.Object.DestroyImmediate(testItem);
@@ -95,12 +112,12 @@ public static class BroomAndAnimationFixVerifier
 
     public static void Test2_RestriccionEnGato()
     {
-        Debug.Log("--- [TEST 2: Restricción de recolección en forma de gato] ---");
+        Debug.Log("--- [TEST 2: Recolección permitida en forma de gato] ---");
         GameObject witch = GameObject.Find("Witch");
         TransformationManager tm = witch?.GetComponent<TransformationManager>();
 
-        MethodInfo transformToCat = typeof(TransformationManager).GetMethod("TransformToCat", BindingFlags.NonPublic | BindingFlags.Instance);
-        MethodInfo tryTransformToHuman = typeof(TransformationManager).GetMethod("TryTransformToHuman", BindingFlags.NonPublic | BindingFlags.Instance);
+        MethodInfo transformToCat = typeof(TransformationManager).GetMethod("TransformToCat", AnyInstance);
+        MethodInfo tryTransformToHuman = typeof(TransformationManager).GetMethod("TryTransformToHuman", AnyInstance);
 
         transformToCat?.Invoke(tm, null);
         bool canCollectInCat = tm != null && tm.CanCollect;
@@ -113,20 +130,22 @@ public static class BroomAndAnimationFixVerifier
         Collectible c = testItem.AddComponent<Collectible>();
         Physics2D.SyncTransforms();
 
-        MethodInfo updateMethod = typeof(Collectible).GetMethod("Update", BindingFlags.NonPublic | BindingFlags.Instance);
+        MethodInfo updateMethod = typeof(Collectible).GetMethod("Update", AnyInstance);
         updateMethod?.Invoke(c, null);
 
-        FieldInfo isColField = typeof(Collectible).GetField("isCollected", BindingFlags.NonPublic | BindingFlags.Instance);
+        FieldInfo isColField = typeof(Collectible).GetField("isCollected", AnyInstance);
         bool collected = isColField != null && (bool)isColField.GetValue(c);
 
-        // El objeto NO debe haberse recogido
-        bool restrictedCorrectly = !canCollectInCat && !collected;
+        // Regla vigente desde 42537e4 ("permitir recoleccion en gato"): en el Nivel 1 el gato SÍ recoge
+        // las piezas de la escoba. (En el Nivel 2 los ingredientes se bloquean aparte con Level2CatPickupGuard.)
+        bool isCatNow = tm != null && tm.IsCatForm;
+        bool restrictedCorrectly = isCatNow && canCollectInCat && collected;
 
         if (testItem != null) UnityEngine.Object.DestroyImmediate(testItem);
         tryTransformToHuman?.Invoke(tm, null);
         Physics2D.SyncTransforms();
 
-        Debug.Log($"[TEST 2 RESULTADO] En forma de gato CanCollect={canCollectInCat}, item recogido={collected} -> {(restrictedCorrectly ? "OK" : "FALLA")}");
+        Debug.Log($"[TEST 2 RESULTADO] En forma de gato (gato={isCatNow}) CanCollect={canCollectInCat}, item recogido={collected} (se espera que sí) -> {(restrictedCorrectly ? "OK" : "FALLA")}");
     }
 
     public static void Test3_InventarioYHUD()
@@ -136,7 +155,7 @@ public static class BroomAndAnimationFixVerifier
         BroomInventory bi = witch?.GetComponent<BroomInventory>();
         BroomHUD bh = UnityEngine.Object.FindFirstObjectByType<BroomHUD>();
 
-        MethodInfo biAwake = typeof(BroomInventory).GetMethod("Awake", BindingFlags.NonPublic | BindingFlags.Instance);
+        MethodInfo biAwake = typeof(BroomInventory).GetMethod("Awake", AnyInstance);
         biAwake?.Invoke(bi, null);
 
         bi?.ResetInventory();
@@ -168,7 +187,7 @@ public static class BroomAndAnimationFixVerifier
         SpriteRenderer broomSr = broomChild?.GetComponent<SpriteRenderer>();
 
         // Simular inicio de vuelo
-        MethodInfo handleFlight = typeof(BroomVisual).GetMethod("HandleFlightChanged", BindingFlags.NonPublic | BindingFlags.Instance);
+        MethodInfo handleFlight = typeof(BroomVisual).GetMethod("HandleFlightChanged", AnyInstance);
         handleFlight?.Invoke(bv, new object[] { true });
 
         bool broomActive = broomChild != null && broomChild.gameObject.activeSelf;
@@ -199,8 +218,8 @@ public static class BroomAndAnimationFixVerifier
         Transform broomChild = witch?.transform.Find("BroomVisual");
         SpriteRenderer broomSr = broomChild?.GetComponent<SpriteRenderer>();
 
-        MethodInfo handleFlight = typeof(BroomVisual).GetMethod("HandleFlightChanged", BindingFlags.NonPublic | BindingFlags.Instance);
-        MethodInfo updateOrientation = typeof(BroomVisual).GetMethod("UpdateBroomOrientation", BindingFlags.NonPublic | BindingFlags.Instance);
+        MethodInfo handleFlight = typeof(BroomVisual).GetMethod("HandleFlightChanged", AnyInstance);
+        MethodInfo updateOrientation = typeof(BroomVisual).GetMethod("UpdateBroomOrientation", AnyInstance);
 
         handleFlight?.Invoke(bv, new object[] { true });
 
@@ -303,8 +322,8 @@ public static class BroomAndAnimationFixVerifier
         TransformationManager tm = witch?.GetComponent<TransformationManager>();
         Animator anim = witch?.GetComponentInChildren<Animator>();
 
-        MethodInfo transformToCat = typeof(TransformationManager).GetMethod("TransformToCat", BindingFlags.NonPublic | BindingFlags.Instance);
-        MethodInfo tryTransformToHuman = typeof(TransformationManager).GetMethod("TryTransformToHuman", BindingFlags.NonPublic | BindingFlags.Instance);
+        MethodInfo transformToCat = typeof(TransformationManager).GetMethod("TransformToCat", AnyInstance);
+        MethodInfo tryTransformToHuman = typeof(TransformationManager).GetMethod("TryTransformToHuman", AnyInstance);
 
         transformToCat?.Invoke(tm, null);
         bool isCat = tm != null && tm.IsCatForm;

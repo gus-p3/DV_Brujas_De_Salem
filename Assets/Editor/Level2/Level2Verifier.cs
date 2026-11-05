@@ -71,10 +71,10 @@ public static class Level2Verifier
             if (!col.isTrigger)
             {
                 if (col.gameObject.layer == groundLayer) solidGroundCount++;
-                else if (col.name != "Witch" && !col.transform.IsChildOf(witch?.transform)) wrongLayerCount++;
+                else if (col.name != "Witch" && !col.transform.IsChildOf(witch?.transform) && !IsIntentionalNonGroundSolid(col)) wrongLayerCount++;
             }
         }
-        Assert("Capas de Plataformas Sólidas", wrongLayerCount == 0, $"Sólidos en Ground: {solidGroundCount}, Fuera de Ground: {wrongLayerCount}");
+        Assert("Capas de Plataformas Sólidas", wrongLayerCount == 0, $"Sólidos en Ground: {solidGroundCount}, Fuera de Ground: {wrongLayerCount} (se excluyen cuerpos de NPC y obstáculos de reto)");
 
         // 6. Pasaje Solo Gato (CatOnlyPassage) y Techo Físico
         CatOnlyPassage[] catPassages = Object.FindObjectsByType<CatOnlyPassage>(FindObjectsInactive.Include, FindObjectsSortMode.None);
@@ -110,7 +110,16 @@ public static class Level2Verifier
             "Guard_Spawn_Z6", "Waypoint_Z6_A", "Waypoint_Z6_B"
         };
         int foundNpcMarkers = expectedNpcMarkers.Count(m => GameObject.Find(m) != null);
-        Assert("Marcadores de Spawn y Waypoints de NPCs", foundNpcMarkers == expectedNpcMarkers.Length, $"Encontrados {foundNpcMarkers}/{expectedNpcMarkers.Length} marcadores");
+        // Los marcadores eran provisionales (etapa de escenario): Level2NPCBuilder los sustituye por los NPC reales.
+        // Si ya no están, se exige que existan los 6 guardias con ruta (≥2 waypoints) y los 11 aldeanos.
+        PatrolRoute[] realGuards = Object.FindObjectsByType<PatrolRoute>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        int guardsWithRoute = realGuards.Count(g => g.Waypoints != null && g.Waypoints.Count(w => w != null) >= 2);
+        int realVillagers = Object.FindObjectsByType<VillagerAI>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length;
+        bool markersOk = foundNpcMarkers == expectedNpcMarkers.Length || (guardsWithRoute >= 6 && realVillagers >= 11);
+        Assert("Marcadores de Spawn y Waypoints de NPCs", markersOk,
+            foundNpcMarkers == expectedNpcMarkers.Length
+                ? $"Encontrados {foundNpcMarkers}/{expectedNpcMarkers.Length} marcadores"
+                : $"Marcadores sustituidos por NPC reales: {guardsWithRoute} guardias con ruta, {realVillagers} aldeanos");
 
         string[] expectedIngMarkers = {
             "Ingredient_Spawn_Z1_Mushroom",
@@ -141,5 +150,17 @@ public static class Level2Verifier
         Directory.CreateDirectory("Logs");
         File.WriteAllText(OutReportPath, sb.ToString());
         Debug.Log("[Level2Verifier]\n" + sb);
+    }
+
+    /// <summary>
+    /// Sólidos que a propósito no están en la capa Ground: cuerpos físicos de guardias y aldeanos
+    /// (capa Enemy, con Rigidbody2D) y obstáculos de reto como el centinela arcano de la cripta.
+    /// </summary>
+    private static bool IsIntentionalNonGroundSolid(BoxCollider2D col)
+    {
+        bool npcBody = col.GetComponent<Rigidbody2D>() != null &&
+                       (col.GetComponent<PatrolRoute>() != null || col.GetComponent<VillagerAI>() != null);
+        bool challengeObstacle = col.GetComponent<Level2.ArcaneSentinelObstacle>() != null;
+        return npcBody || challengeObstacle;
     }
 }

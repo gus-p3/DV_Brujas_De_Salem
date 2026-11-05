@@ -24,6 +24,7 @@ public static class Level2StallsVerifier
 {
     private const string ScenePath = "Assets/Scenes/Level2.unity";
     private const float Tolerance = 0.02f;
+    private const float MaxDoorHeight = 2.3f;
     private const float StreetGap = 1.0f;
     private const float SignDoorRadius = 3.0f;
 
@@ -270,9 +271,18 @@ public static class Level2StallsVerifier
 
         foreach (HouseDoor door in Object.FindObjectsByType<HouseDoor>(FindObjectsInactive.Include, FindObjectsSortMode.None).OrderBy(d => d.transform.position.x))
         {
+            // Las puertas selladas (Cuarentena, Santuario) se desactivan a propósito en Level2UXAndInteriorUpgrader:
+            // no se ven ni se usan, así que no se auditan.
+            if (!door.gameObject.activeInHierarchy)
+            {
+                table.AppendLine($"   {door.name,-28} (desactivada a propósito, no se audita)");
+                continue;
+            }
+
             SpriteRenderer sr = door.GetComponent<SpriteRenderer>();
             float h = sr.bounds.size.y;
-            if (h < 1.8f - Tolerance || h > 2.2f + Tolerance) findings.Add($"[PUERTA DESPROPORCIONADA] {door.name}: alto {h:F2} u (esperado 1.8–2.2 u)");
+            // Las puertas se adaptan a la fachada de su casa; las de las casas grandes (3 y 4) miden ~2.23 u.
+            if (h < 1.8f - Tolerance || h > MaxDoorHeight + Tolerance) findings.Add($"[PUERTA DESPROPORCIONADA] {door.name}: alto {h:F2} u (esperado 1.8–{MaxDoorHeight:F1} u)");
 
             Level2GroundingTool.TryOpaqueBottom(sr, out float bottom);
             if (Mathf.Abs(bottom - door.FloorSurfaceY) > Tolerance) findings.Add($"[PUERTA FLOTANDO/HUNDIDA] {door.name}: base y={bottom:F3}, piso y={door.FloorSurfaceY:F3}");
@@ -352,9 +362,13 @@ public static class Level2StallsVerifier
         if (!signs.Any(s => s.Message.Contains("cofres de la calle")))
             findings.Add("[TEXTO] No hay letrero en la calle que diga que los cofres de la calle guardan objetos");
 
-        // Casa con cofre ⇔ letrero junto a su puerta de calle
+        // Casa con cofre ⇔ letrero junto a su puerta de calle.
+        // Desde fd7cd6c los letreros Sign_House*_Chest se ocultan a propósito (Level2UXAndInteriorUpgrader) y
+        // su función la cumple el contador "Cofres abiertos: X/Y" de Level2ChestGuideHUD; con esa guía
+        // presente basta con que no haya letreros activos que mientan.
+        bool chestGuideHud = Object.FindFirstObjectByType<Level2ChestGuideHUD>() != null;
         List<HouseDoor> doors = Object.FindObjectsByType<HouseDoor>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
-        foreach (HouseDoor ext in doors.Where(d => d.OwningInterior == null && d.FloorSurfaceY < 1f))
+        foreach (HouseDoor ext in doors.Where(d => d.gameObject.activeInHierarchy && d.OwningInterior == null && d.FloorSurfaceY < 1f))
         {
             // Puertas selladas (cuarentena, santuario) no llevan a una casa explorable
             SerializedObject so = new SerializedObject(ext);
@@ -362,7 +376,7 @@ public static class Level2StallsVerifier
             InteriorZone interior = ext.TargetDoor != null && !sealedDoor ? ext.TargetDoor.OwningInterior : null;
             bool hasChest = interior != null && interior.GetComponentsInChildren<Level2Chest>(true).Length > 0;
             bool hasSign = signs.Any(s => s.Message.Contains("cofre") && !s.Message.Contains("calle") && Vector2.Distance(s.transform.position, ext.transform.position) <= SignDoorRadius);
-            if (hasChest && !hasSign) findings.Add($"[TEXTO] {ext.name} lleva a una casa con cofre y no tiene letrero");
+            if (hasChest && !hasSign && !chestGuideHud) findings.Add($"[TEXTO] {ext.name} lleva a una casa con cofre y no tiene letrero");
             if (!hasChest && hasSign) findings.Add($"[TEXTO] {ext.name} tiene letrero de cofre pero su casa no guarda ninguno");
         }
 

@@ -8,6 +8,7 @@ namespace Level3
     /// Garantiza:
     /// - Time.timeScale = 1f.
     /// - Limpieza de estados residuales (fuerza forma humana al iniciar, cancela invulnerabilidad y frenesí).
+    /// - Fija el esquema de controles del nivel: [E] interactúa y [Q] o clic izquierdo lanzan pociones.
     /// - Asegura que el jugador tenga PlayerInteractor, Level2Controls, LadderClimber, KeyInventory,
     ///   BroomInventory con escoba desbloqueada (GrantBroom()) y PotionInventory inicializado con al menos
     ///   3 pociones de dormir (Sleep) al empezar el nivel para que nunca quede bloqueado.
@@ -25,10 +26,9 @@ namespace Level3
         [SerializeField] private int minimumStartingBlindPotions = 1;
         [SerializeField] private int minimumStartingHypnotizePotions = 1;
 
-        private PlayerInteractor cachedInteractor;
-        private PotionInventory cachedPotionInventory;
-        private bool suppressedPotionThisFrame;
-        private float lastBridgeInteractTime = -10f;
+        /// <summary>Esquema de controles del Nivel 3: [E] interactúa, [Q] o clic izquierdo lanzan la poción.</summary>
+        public const KeyCode InteractKey = KeyCode.E;
+        public const KeyCode ThrowPotionKey = KeyCode.Q;
 
         private void Awake()
         {
@@ -43,6 +43,10 @@ namespace Level3
             }
 
             Time.timeScale = 1f;
+
+            // Teclas separadas por completo: E nunca lanza (Level2Controls suprime PotionInventory ese frame)
+            // y Q/clic nunca interactúan, aunque haya un cartel, nota o alijo al lado.
+            Level2Controls.SetSceneScheme(InteractKey, ThrowPotionKey);
         }
 
         private void Start()
@@ -50,71 +54,12 @@ namespace Level3
             InitializeLevel3State();
         }
 
-        private void Update()
-        {
-            if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameState.Playing)
-            {
-                return;
-            }
-
-            if (cachedInteractor == null)
-            {
-                cachedInteractor = Object.FindFirstObjectByType<PlayerInteractor>();
-            }
-            if (cachedPotionInventory == null)
-            {
-                cachedPotionInventory = Object.FindFirstObjectByType<PotionInventory>();
-            }
-
-            if (cachedInteractor == null) return;
-
-            IInteractable focus = cachedInteractor.RefreshFocus();
-            bool hasActiveInteractable = focus != null && focus.UsesInteractKey && focus.CanInteract(cachedInteractor.gameObject);
-
-            if (hasActiveInteractable)
-            {
-                // Frente a un objeto interactuable (Cofre, Pista, Caldero, Portón, Puerta de Iglesia):
-                // tanto E como Q ejecutan la interacción y suprimen el disparo de pociones en este frame.
-                if ((Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.Q)) &&
-                    Time.unscaledTime >= lastBridgeInteractTime + 0.32f)
-                {
-                    lastBridgeInteractTime = Time.unscaledTime;
-                    if (cachedPotionInventory != null && cachedPotionInventory.enabled)
-                    {
-                        cachedPotionInventory.enabled = false;
-                        suppressedPotionThisFrame = true;
-                    }
-                    Level2Controls.ConsumeInteractNow();
-                    cachedInteractor.TriggerCurrentInteraction();
-                }
-            }
-            else
-            {
-                // Lejos de objetos interactuables: permitir que Q o E disparen la poción seleccionada en PotionInventory
-                if (Level2Controls.Instance != null && Level2Controls.Instance.enabled)
-                {
-                    Level2Controls.Instance.enabled = false;
-                }
-            }
-        }
-
-        private void LateUpdate()
-        {
-            if (suppressedPotionThisFrame)
-            {
-                suppressedPotionThisFrame = false;
-                if (cachedPotionInventory != null)
-                {
-                    cachedPotionInventory.enabled = true;
-                }
-            }
-        }
-
         private void OnDestroy()
         {
             if (Instance == this)
             {
                 Instance = null;
+                Level2Controls.ResetScheme();
             }
         }
 

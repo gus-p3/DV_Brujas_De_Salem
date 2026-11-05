@@ -69,6 +69,8 @@ public class AudioManager : MonoBehaviour
         }
 
         Instance = this;
+        // DontDestroyOnLoad solo funciona en objetos raíz (en Level3 el AudioManager cuelga de "Managers").
+        if (transform.parent != null) transform.SetParent(null);
         DontDestroyOnLoad(gameObject);
 
         EnsureAudioSources();

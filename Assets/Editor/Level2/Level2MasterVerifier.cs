@@ -255,7 +255,7 @@ namespace Level2.Editor
 
         public static bool Test07_IngredientsAndGate()
         {
-            Debug.Log("--- [HITO 7: Ingredientes (10), Inventario, HUD y Portón] ---");
+            Debug.Log("--- [HITO 7: Ingredientes (sueltos y en cofres), Inventario, HUD y Portón] ---");
             EnsureLevel2Open();
 
             var ingredients = UnityEngine.Object.FindObjectsByType<Ingredient>(FindObjectsInactive.Include, FindObjectsSortMode.None);
@@ -263,21 +263,37 @@ namespace Level2.Editor
             var hud = UnityEngine.Object.FindFirstObjectByType<IngredientHUD>(FindObjectsInactive.Include);
             var gate = UnityEngine.Object.FindFirstObjectByType<IngredientGate>(FindObjectsInactive.Include);
 
-            int mushrooms = ingredients.Count(i => i.Type == IngredientType.Mushroom);
-            int spiders = ingredients.Count(i => i.Type == IngredientType.Spider);
-            int flowers = ingredients.Count(i => i.Type == IngredientType.WitheredFlower);
-            int roots = ingredients.Count(i => i.Type == IngredientType.Root);
+            // Desde "ingredientes y pociones dentro de cofres" los ingredientes viven en Level2Chest.Contents;
+            // se cuentan tanto los sueltos (Ingredient) como los guardados en cofres.
+            var chestIngredients = UnityEngine.Object.FindObjectsByType<Level2Chest>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+                .SelectMany(c => c.Contents)
+                .Where(e => e.itemKind == ChestItemKind.Ingredient)
+                .Select(e => e.ingredientType)
+                .ToList();
+            var allTypes = ingredients.Select(i => i.Type).Concat(chestIngredients).ToList();
 
-            bool countsOk = ingredients.Length >= 10 && mushrooms >= 2 && spiders >= 2 && flowers >= 2 && roots >= 2;
+            int mushrooms = allTypes.Count(t => t == IngredientType.Mushroom);
+            int spiders = allTypes.Count(t => t == IngredientType.Spider);
+            int flowers = allTypes.Count(t => t == IngredientType.WitheredFlower);
+            int roots = allTypes.Count(t => t == IngredientType.Root);
+            int totalIngredients = allTypes.Count;
+
+            // Balanceo 2/2: cada tipo debe tener al menos tantos ingredientes obtenibles como exige IngredientInventory.
+            int reqM = inv != null ? inv.RequiredMushrooms : 2;
+            int reqS = inv != null ? inv.RequiredSpiders : 2;
+            int reqF = inv != null ? inv.RequiredFlowers : 2;
+            int reqR = inv != null ? inv.RequiredRoots : 2;
+            bool countsOk = mushrooms >= reqM && spiders >= reqS && flowers >= reqF && roots >= reqR &&
+                            totalIngredients >= reqM + reqS + reqF + reqR;
             bool systemsOk = inv != null && hud != null && gate != null;
 
             if (countsOk && systemsOk)
             {
-                Debug.Log($"[HITO 7 OK] Sistema de ingredientes validado: Total={ingredients.Length} (M={mushrooms}, S={spiders}, F={flowers}, R={roots}), IngredientInventory, IngredientHUD e IngredientGate integrados.");
+                Debug.Log($"[HITO 7 OK] Sistema de ingredientes validado: Total={totalIngredients} (sueltos={ingredients.Length}, en cofres={chestIngredients.Count}; M={mushrooms}, S={spiders}, F={flowers}, R={roots}), IngredientInventory, IngredientHUD e IngredientGate integrados.");
                 return true;
             }
 
-            Debug.LogError($"[HITO 7 FALLO] Ingredients={ingredients.Length}(>=10), Inv={inv != null}, HUD={hud != null}, Gate={gate != null}");
+            Debug.LogError($"[HITO 7 FALLO] Ingredients={totalIngredients}(req M{reqM}/S{reqS}/F{reqF}/R{reqR}; sueltos={ingredients.Length}, en cofres={chestIngredients.Count}; M={mushrooms}, S={spiders}, F={flowers}, R={roots}), Inv={inv != null}, HUD={hud != null}, Gate={gate != null}");
             return false;
         }
 

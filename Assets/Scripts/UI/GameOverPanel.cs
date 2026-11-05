@@ -82,6 +82,13 @@ public class GameOverPanel : MonoBehaviour
     public void OnRetryClicked()
     {
         Debug.Log("[GameOverPanel] Botón Reintentar pulsado.");
+        // Nivel 3: reaparecer en el último checkpoint conservando llaves, portones y tiempo
+        if (Level3.Level3StateController.Instance != null && Level3.Level3StateController.Instance.RetryFromLastCheckpoint())
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+
         if (GameManager.Instance != null)
         {
             GameManager.Instance.RestartLevel();

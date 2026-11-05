@@ -15,8 +15,30 @@ namespace Level2
     [DefaultExecutionOrder(-500)]
     public class Level2Controls : MonoBehaviour
     {
-        public const KeyCode InteractKey = KeyCode.Q;
-        public const KeyCode ThrowPotionKey = KeyCode.E;
+        public const KeyCode DefaultInteractKey = KeyCode.Q;
+        public const KeyCode DefaultThrowPotionKey = KeyCode.E;
+
+        // Esquema activo de la escena. El Nivel 2 usa el de siempre (Q interactúa, E lanza); el Nivel 3 lo
+        // cambia con SetSceneScheme (E interactúa, Q o clic lanzan) y lo restaura al descargarse.
+        private static KeyCode activeInteractKey = DefaultInteractKey;
+        private static KeyCode activeThrowPotionKey = DefaultThrowPotionKey;
+
+        public static KeyCode InteractKey => activeInteractKey;
+        public static KeyCode ThrowPotionKey => activeThrowPotionKey;
+
+        /// <summary>Cambia las teclas de interactuar y lanzar para la escena actual.</summary>
+        public static void SetSceneScheme(KeyCode interact, KeyCode throwPotion)
+        {
+            activeInteractKey = interact;
+            activeThrowPotionKey = throwPotion;
+        }
+
+        /// <summary>Vuelve al esquema del Nivel 2 (Q interactúa, E lanza).</summary>
+        public static void ResetScheme()
+        {
+            activeInteractKey = DefaultInteractKey;
+            activeThrowPotionKey = DefaultThrowPotionKey;
+        }
         public const KeyCode SelectBlindKey = KeyCode.Alpha1;
         public const KeyCode SelectHypnotizeKey = KeyCode.Alpha2;
         public const KeyCode SelectSleepKey = KeyCode.Alpha3;
@@ -95,6 +117,7 @@ namespace Level2
             lastConsumedFrame = -10;
             lastConsumedTime = -10f;
             _instance = null;
+            ResetScheme();
         }
 
         private void Awake()
@@ -148,9 +171,9 @@ namespace Level2
         {
             BindPotionInventory();
 
-            // Si en este frame se pulsa Q (y NO se pulsó E ni clic izquierdo),
-            // desactivamos PotionInventory durante el ciclo Update() para que la línea compartida
-            // `Input.GetKeyDown(KeyCode.Q)` en PotionInventory.cs nunca lance una poción por accidente en el Nivel 2.
+            // Si en este frame se pulsa la tecla de interactuar (y NO la de lanzar ni clic izquierdo),
+            // desactivamos PotionInventory durante el ciclo Update() para que su lectura compartida de E y Q
+            // nunca lance una poción con la tecla de interactuar (Q en el Nivel 2, E en el Nivel 3).
             bool qPressed = Input.GetKeyDown(InteractKey) || Input.GetKey(InteractKey);
             bool eOrClickPressed = Input.GetKeyDown(ThrowPotionKey) || Input.GetMouseButtonDown(0);
 

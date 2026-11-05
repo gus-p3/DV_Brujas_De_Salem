@@ -13,7 +13,7 @@ public enum BroomPart
 
 /// <summary>
 /// Ítem recolectable en el nivel (rama, paja o cuerda).
-/// Solo puede ser recogido por la bruja en forma humana (TransformationManager.CanCollect).
+/// La bruja puede recogerlo tanto en forma humana como en forma de gato (TransformationManager.CanCollect).
 /// Descansa sobre el suelo (GroundAnchor) con un brillo que lo hace notar y se recoge al entrar en contacto o proximidad.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
@@ -152,7 +152,9 @@ public class Collectible : MonoBehaviour
             BroomInventory.Instance.Collect(part);
         }
 
-        Destroy(gameObject);
+        // Las suites de verificación del editor recogen ítems fuera de Play Mode, donde Destroy no está permitido.
+        if (Application.isPlaying) Destroy(gameObject);
+        else DestroyImmediate(gameObject);
     }
 
     private void OnDrawGizmosSelected()

@@ -196,6 +196,13 @@ public class HUDController : MonoBehaviour
 
     private void HandleStateChanged(GameState state)
     {
+        // Al terminar el nivel o perder, ningún aviso flotante debe quedar encima de los paneles
+        if (state == GameState.LevelComplete || state == GameState.GameOver)
+        {
+            ClearMessage();
+            if (Level2.InteractionPromptUI.Instance != null) Level2.InteractionPromptUI.Instance.HidePrompt();
+        }
+
         if (pausePanel != null)
         {
             pausePanel.gameObject.SetActive(state == GameState.Paused);
@@ -258,6 +265,11 @@ public class HUDController : MonoBehaviour
     public void ShowMessage(string message, float duration = 2.0f)
     {
         if (messageBannerText == null) return;
+        if (GameManager.Instance != null &&
+            (GameManager.Instance.CurrentState == GameState.LevelComplete || GameManager.Instance.CurrentState == GameState.GameOver))
+        {
+            return;
+        }
         // Mensajes legibles a 1080p: letra grande y caja ancha con ajuste de línea
         if (messageBannerText.fontSize < 42f)
         {
@@ -277,6 +289,21 @@ public class HUDController : MonoBehaviour
             messageCoroutine = null;
         }
         messageCoroutine = StartCoroutine(ShowMessageRoutine(message, duration));
+    }
+
+    /// <summary>Oculta de inmediato el aviso flotante activo.</summary>
+    public void ClearMessage()
+    {
+        if (messageCoroutine != null)
+        {
+            StopCoroutine(messageCoroutine);
+            messageCoroutine = null;
+        }
+        if (messageBannerText != null)
+        {
+            messageBannerText.text = "";
+            messageBannerText.gameObject.SetActive(false);
+        }
     }
 
     private System.Collections.IEnumerator ShowMessageRoutine(string message, float duration)

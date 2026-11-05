@@ -8,7 +8,7 @@ namespace Level3
     /// <summary>
     /// Portón físico bloqueado en el Nivel 3 que implementa Level2.IInteractable.
     /// Cuenta con un BoxCollider2D sólido que bloquea el paso del jugador en X y un
-    /// BoxCollider2D trigger más ancho para la interacción con E/Q o apertura automática al acercarse con la llave.
+    /// BoxCollider2D trigger más ancho para la interacción con [E] o apertura automática al acercarse con la llave.
     /// Soporta requerir una llave de KeyInventory y opcionalmente haber preparado la Poción Maestra en la Cabaña.
     /// </summary>
     [RequireComponent(typeof(BoxCollider2D))]
@@ -35,6 +35,8 @@ namespace Level3
         [SerializeField] private Transform slidingBarsTransform;
         [SerializeField] private float openSlideHeight = 2.6f;
         [SerializeField] private float openAnimationDuration = 0.55f;
+        [Tooltip("Barricada / cadenas con candado que dejan claro que el portón está cerrado. Se oculta al abrirlo.")]
+        [SerializeField] private GameObject lockedOverlay;
 
         private bool isUnlocked;
         private bool isAnimatingOpen;
@@ -97,21 +99,6 @@ namespace Level3
             if (KeyInventory.Instance != null && KeyInventory.Instance.IsDoorUnlocked(gateId))
             {
                 UnlockGate(immediate: true);
-            }
-        }
-
-        private void Update()
-        {
-            if (isUnlocked || isAnimatingOpen) return;
-
-            // Soporte adicional para abrir o consultar con tecla E cuando el jugador está frente al portón
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                PlayerController player = UnityEngine.Object.FindFirstObjectByType<PlayerController>();
-                if (player != null && Vector2.Distance(transform.position, player.transform.position) <= 2.3f)
-                {
-                    Interact(player.gameObject);
-                }
             }
         }
 
@@ -198,7 +185,7 @@ namespace Level3
 
             if (HasRequiredKey())
             {
-                return $"[E / Q] Abrir {gateDisplayName} ({requiredKeyDisplayName})";
+                return $"[E] Abrir {gateDisplayName} ({requiredKeyDisplayName})";
             }
 
             return GetMissingKeyMessage();
@@ -211,7 +198,7 @@ namespace Level3
             TransformationManager tm = interactor.GetComponent<TransformationManager>();
             if (tm != null && tm.IsCatForm)
             {
-                ShowHUDFeedback("Necesitas forma humana [F] para abrir el portón.");
+                ShowHUDFeedback("Necesitas forma humana [T] para abrir el portón.");
                 if (AudioManager.Instance != null) AudioManager.Instance.PlayErrorSound();
                 return;
             }
@@ -274,7 +261,7 @@ namespace Level3
 
         private string GetMissingKeyMessage()
         {
-            return $"Cerrado: Necesitas {requiredKeyDisplayName} (Duerme al guardia brillante con una poción [Q])";
+            return $"Cerrado: Necesitas {requiredKeyDisplayName} (Duerme al guardia brillante: lanza una poción con [Q] o clic)";
         }
 
         private void TryShowThrottledLockedWarning(string message)
@@ -305,6 +292,11 @@ namespace Level3
             if (solidBlockerCollider != null)
             {
                 solidBlockerCollider.enabled = false;
+            }
+
+            if (lockedOverlay != null)
+            {
+                lockedOverlay.SetActive(false);
             }
 
             if (advanceToCabinPhaseOnOpen && Level3StateController.Instance != null)

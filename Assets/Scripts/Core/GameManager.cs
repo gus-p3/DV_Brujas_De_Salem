@@ -267,12 +267,34 @@ public class GameManager : MonoBehaviour
         return success;
     }
 
+    // Progreso que viaja a la siguiente escena cuando un nivel se divide en partes (Nivel 3: Bosque -> Aldea)
+    private static bool runCarryPending;
+    private static int carriedScore;
+    private static float carriedTime;
+
+    /// <summary>
+    /// Conserva puntuación y reloj para la próxima escena que se cargue (la siguiente parte del mismo nivel).
+    /// Las cargas de poción ya persisten porque el GameManager vive en DontDestroyOnLoad.
+    /// </summary>
+    public void CarryRunIntoNextScene()
+    {
+        runCarryPending = true;
+        carriedScore = Score;
+        carriedTime = TimeElapsed;
+    }
+
     public void StartLevel()
     {
         levelStartRealTime = Time.unscaledTime;
         currentHearts = maxHearts;
         Score = 0;
         TimeElapsed = 0f;
+        if (runCarryPending)
+        {
+            runCarryPending = false;
+            Score = carriedScore;
+            TimeElapsed = carriedTime;
+        }
         SetState(GameState.Playing);
         if (FrenzyController.Instance != null)
         {
@@ -295,6 +317,12 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        // Una nota en pergamino abierta ya pausa el juego y se cierra con Esc
+        if (Level2.Level2LoreReader.IsOpen)
+        {
+            return;
+        }
+
         if (CurrentState == GameState.Playing)
             SetState(GameState.Paused);
     }
@@ -303,6 +331,14 @@ public class GameManager : MonoBehaviour
     {
         if (CurrentState == GameState.Paused)
             SetState(GameState.Playing);
+    }
+
+    /// <summary>Rellena todos los corazones (reintento desde checkpoint sin recargar la escena).</summary>
+    public void RestoreAllHearts()
+    {
+        currentHearts = maxHearts;
+        OnHeartsChanged?.Invoke(currentHearts, maxHearts);
+        OnStatsUpdated?.Invoke();
     }
 
     public void RestartLevel()

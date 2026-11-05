@@ -6,8 +6,8 @@ namespace Level2
     /// <summary>
     /// Lector de crónicas del Nivel 2: diarios, grimorios y actas se leen sobre una hoja de pergamino quemado
     /// con el juego en pausa (Time.timeScale = 0), en lugar de un banner que se perdía sobre el fondo.
-    /// Se cierra con Q, Enter o clic; al cerrar restaura la escala de tiempo y consume la Q para que no se
-    /// reabra el mismo objeto en el mismo instante.
+    /// Se cierra con la tecla de interactuar (Q en el Nivel 2, E en el Nivel 3), Espacio, Enter, Esc o clic;
+    /// al cerrar restaura la escala de tiempo y consume la tecla para que no se reabra el mismo objeto.
     /// </summary>
     public class Level2LoreReader : MonoBehaviour
     {
@@ -59,12 +59,15 @@ namespace Level2
             openedFrame = Time.frameCount;
         }
 
-        private void Update()
+        // Se cierra en LateUpdate: así, el frame en que se pulsa Espacio todos los scripts del jugador
+        // ya leyeron la entrada con el juego en pausa y la bruja no salta al cerrar la hoja.
+        private void LateUpdate()
         {
-            // El mismo Q que abrió la hoja no debe cerrarla
+            // La misma tecla que abrió la hoja no debe cerrarla
             if (!open || Time.frameCount == openedFrame) return;
-            if (Input.GetKeyDown(Level2Controls.InteractKey) || Input.GetKeyDown(KeyCode.Return) ||
-                Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetMouseButtonDown(0))
+            if (Input.GetKeyDown(Level2Controls.InteractKey) || Input.GetKeyDown(KeyCode.Space) ||
+                Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) ||
+                Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(0))
             {
                 Close();
             }
@@ -75,8 +78,16 @@ namespace Level2
             if (!open) return;
             open = false;
             panel.SetActive(false);
-            Time.timeScale = previousTimeScale;
+            // Si mientras se leía se pausó y reanudó el juego, no se restaura una escala de tiempo vieja
+            bool stillPlaying = GameManager.Instance == null || GameManager.Instance.CurrentState == GameState.Playing;
+            Time.timeScale = stillPlaying ? (previousTimeScale > 0f ? previousTimeScale : 1f) : 0f;
             Level2Controls.ConsumeInteractNow();
+
+            // Espacio, E o el clic con que se cerró no deben convertirse en salto ni en lanzamiento
+            PlayerController player = Object.FindFirstObjectByType<PlayerController>();
+            if (player != null) player.ClearBufferedInput();
+            PotionInventory potions = Object.FindFirstObjectByType<PotionInventory>();
+            if (potions != null) potions.BlockThrowForFrames(2);
         }
     }
 }

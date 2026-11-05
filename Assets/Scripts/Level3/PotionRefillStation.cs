@@ -82,14 +82,6 @@ namespace Level3
                     flaskRenderer.transform.localPosition = baseFlaskLocalPos + new Vector3(0f, bob, 0f);
                 }
 
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    PlayerController player = Object.FindFirstObjectByType<PlayerController>();
-                    if (player != null && Vector2.Distance(transform.position, player.transform.position) <= 1.85f)
-                    {
-                        Interact(player.gameObject);
-                    }
-                }
                 return;
             }
 
@@ -114,7 +106,7 @@ namespace Level3
                 return $"{stationDisplayName} (Reaparece en {Mathf.CeilToInt(cooldownTimer)}s)";
             }
 
-            return $"[E / Q] Tomar +{grantAmount} Poción de {GetPotionLabel(grantedPotionType)} ({stationDisplayName})";
+            return $"[E] Tomar +{grantAmount} Poción de {GetPotionLabel(grantedPotionType)} ({stationDisplayName})";
         }
 
         public void Interact(GameObject interactor)

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 namespace Level2
@@ -44,6 +45,15 @@ namespace Level2
         [SerializeField] private Sprite closedSprite;
         [SerializeField] private Sprite openSprite;
 
+        [Header("Presentación opcional (Nivel 3)")]
+        [Tooltip("Si es verdadero, la bruja puede abrirlo en forma de gato (cofres dentro de casas con aldeanos dormidos).")]
+        [SerializeField] private bool allowCatForm = false;
+        [Tooltip("Fotogramas de la animación de apertura (del cerrado al abierto). Vacío = cambio directo de sprite.")]
+        [SerializeField] private Sprite[] openAnimationFrames;
+        [SerializeField] private float openFrameDuration = 0.07f;
+        [Tooltip("Sprite que emerge del cofre al abrirlo (p. ej. la llave). Vacío = solo el aviso de recompensa.")]
+        [SerializeField] private Sprite rewardRevealSprite;
+
         private bool isOpened = false;
 
         public string InteractionId => chestId;
@@ -56,6 +66,7 @@ namespace Level2
         public bool IsOpened => isOpened;
         public bool RequiresKey => requiresKey;
         public string RequiredKeyId => requiredKeyId;
+        public bool AllowCatForm => allowCatForm;
 
         public event Action<TreasureChest> OnChestOpened;
 
@@ -130,6 +141,15 @@ namespace Level2
             }
         }
 
+        /// <summary>Animación de apertura, objeto que emerge y acceso en forma de gato (usado por el Nivel 3).</summary>
+        public void ConfigurePresentation(bool catCanOpen, Sprite[] frames, Sprite revealSprite, float frameDuration = 0.07f)
+        {
+            allowCatForm = catCanOpen;
+            openAnimationFrames = frames;
+            rewardRevealSprite = revealSprite;
+            openFrameDuration = Mathf.Max(0.02f, frameDuration);
+        }
+
         public void ConfigureReward(
             ChestRewardType type,
             int amount = 1,
@@ -162,12 +182,12 @@ namespace Level2
             {
                 if (!string.IsNullOrEmpty(requiredKeyId) && KeyInventory.Instance != null && KeyInventory.Instance.HasKey(requiredKeyId))
                 {
-                    return $"Q: Abrir {chestDisplayName} ({requiredKeyDisplayName})";
+                    return $"{Level2Controls.InteractKey}: Abrir {chestDisplayName} ({requiredKeyDisplayName})";
                 }
-                return $"Q: {chestDisplayName} cerrado (Requiere {requiredKeyDisplayName})";
+                return $"{Level2Controls.InteractKey}: {chestDisplayName} cerrado (Requiere {requiredKeyDisplayName})";
             }
 
-            return $"Q: Abrir {chestDisplayName}";
+            return $"{Level2Controls.InteractKey}: Abrir {chestDisplayName}";
         }
 
         public void Interact(GameObject interactor)
@@ -175,7 +195,7 @@ namespace Level2
             if (isOpened || interactor == null) return;
 
             TransformationManager tm = interactor.GetComponent<TransformationManager>();
-            if (tm != null && tm.IsCatForm)
+            if (tm != null && tm.IsCatForm && !allowCatForm)
             {
                 Level2CatPickupGuard.NotifyCatBlocked(forceShow: true);
                 if (AudioManager.Instance != null) AudioManager.Instance.PlayErrorSound();
@@ -205,7 +225,15 @@ namespace Level2
                 KeyInventory.Instance.MarkChestOpened(chestId);
             }
 
-            UpdateVisuals();
+            bool animate = Application.isPlaying && gameObject.activeInHierarchy &&
+                           openAnimationFrames != null && openAnimationFrames.Length > 1;
+            if (animate) StartCoroutine(OpenAnimationRoutine());
+            else UpdateVisuals();
+            DimIdleGlow();
+            if (Application.isPlaying && gameObject.activeInHierarchy && rewardRevealSprite != null)
+            {
+                StartCoroutine(RewardRevealRoutine());
+            }
             string rewardDescription = GrantReward();
 
             if (GameManager.Instance != null && bonusScore > 0)
@@ -275,6 +303,93 @@ namespace Level2
             IngredientType.Root => "Raíz Antigua",
             _ => "Ingrediente"
         };
+
+        private IEnumerator OpenAnimationRoutine()
+        {
+            if (chestRenderer == null) chestRenderer = GetComponent<SpriteRenderer>();
+            if (chestRenderer == null) yield break;
+            for (int i = 0; i < openAnimationFrames.Length; i++)
+            {
+                if (openAnimationFrames[i] != null) chestRenderer.sprite = openAnimationFrames[i];
+                yield return new WaitForSeconds(openFrameDuration);
+            }
+            UpdateVisuals();
+        }
+
+        /// <summary>La llave (u otro premio) sale del cofre, sube girando con un destello y se desvanece.</summary>
+        private IEnumerator RewardRevealRoutine()
+        {
+            GameObject reveal = new GameObject("Chest_RewardReveal");
+            reveal.transform.SetParent(transform, false);
+            reveal.transform.localPosition = new Vector3(0f, 0.25f, 0f);
+            SpriteRenderer sr = reveal.AddComponent<SpriteRenderer>();
+            sr.sprite = rewardRevealSprite;
+            SpriteRenderer chestSr = chestRenderer != null ? chestRenderer : GetComponent<SpriteRenderer>();
+            sr.sortingLayerName = chestSr != null ? chestSr.sortingLayerName : "Gameplay";
+            sr.sortingOrder = (chestSr != null ? chestSr.sortingOrder : 4) + 6;
+
+            // Tamaño en mundo fijo (~0.7 u) aunque el cofre esté escalado
+            float native = Mathf.Max(0.01f, Mathf.Max(rewardRevealSprite.bounds.size.x, rewardRevealSprite.bounds.size.y));
+            float parentScale = Mathf.Max(0.01f, transform.lossyScale.y);
+            float targetScale = 0.7f / native / parentScale;
+
+            GameObject halo = new GameObject("Chest_RewardHalo");
+            halo.transform.SetParent(reveal.transform, false);
+            SpriteRenderer haloSr = halo.AddComponent<SpriteRenderer>();
+            haloSr.sprite = LootPopupVisualizer.GetHaloSprite();
+            haloSr.color = new Color(1f, 0.88f, 0.35f, 0.75f);
+            haloSr.sortingLayerName = sr.sortingLayerName;
+            haloSr.sortingOrder = sr.sortingOrder - 1;
+            float haloNative = haloSr.sprite != null ? Mathf.Max(0.01f, haloSr.sprite.bounds.size.x) : 1f;
+            halo.transform.localScale = Vector3.one * (1.6f * native / haloNative);
+
+            const float rise = 0.75f;
+            float t = 0f;
+            while (t < rise)
+            {
+                t += Time.deltaTime;
+                float k = Mathf.Clamp01(t / rise);
+                float ease = 1f - (1f - k) * (1f - k);
+                reveal.transform.localPosition = new Vector3(0f, 0.25f + ease * (1.3f / parentScale), 0f);
+                float pop = targetScale * (0.4f + 0.6f * ease + Mathf.Sin(k * Mathf.PI) * 0.25f);
+                reveal.transform.localScale = new Vector3(pop * Mathf.Cos(k * Mathf.PI * 2f), pop, 1f);
+                yield return null;
+            }
+            reveal.transform.localScale = new Vector3(targetScale, targetScale, 1f);
+
+            float hold = 0f;
+            Vector3 basePos = reveal.transform.localPosition;
+            while (hold < 0.9f)
+            {
+                hold += Time.deltaTime;
+                reveal.transform.localPosition = basePos + new Vector3(0f, Mathf.Sin(hold * 6f) * 0.05f, 0f);
+                haloSr.color = new Color(1f, 0.88f, 0.35f, 0.45f + Mathf.Sin(hold * 10f) * 0.3f);
+                yield return null;
+            }
+
+            float fade = 0f;
+            while (fade < 0.45f)
+            {
+                fade += Time.deltaTime;
+                float a = 1f - Mathf.Clamp01(fade / 0.45f);
+                sr.color = new Color(1f, 1f, 1f, a);
+                haloSr.color = new Color(1f, 0.88f, 0.35f, 0.6f * a);
+                reveal.transform.localPosition += new Vector3(0f, Time.deltaTime * 0.8f, 0f);
+                yield return null;
+            }
+            Destroy(reveal);
+        }
+
+        /// <summary>Un cofre abierto deja de brillar: así se distingue de un vistazo de los que faltan.</summary>
+        private void DimIdleGlow()
+        {
+            PickupGlint glint = GetComponent<PickupGlint>();
+            if (glint != null) glint.enabled = false;
+            foreach (UnityEngine.Rendering.Universal.Light2D l in GetComponentsInChildren<UnityEngine.Rendering.Universal.Light2D>())
+            {
+                if (l != null) l.intensity *= 0.3f;
+            }
+        }
 
         private void UpdateVisuals()
         {

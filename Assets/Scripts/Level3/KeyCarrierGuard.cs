@@ -620,7 +620,7 @@ namespace Level3
                 return;
             }
 
-            // Permitir recoger con tecla E además de Q o al pasar sobre la llave en forma humana
+            // Se recoge al pasar sobre la llave en forma humana o con la tecla de interactuar ([E] en el Nivel 3)
             PlayerController player = Object.FindFirstObjectByType<PlayerController>();
             if (player != null)
             {
@@ -629,7 +629,7 @@ namespace Level3
                 {
                     TransformationManager tm = player.GetComponent<TransformationManager>();
                     bool isHuman = tm == null || !tm.IsCatForm;
-                    if (isHuman && (dist <= 1.15f || Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.Q)))
+                    if (isHuman && (dist <= 1.15f || Input.GetKeyDown(Level2Controls.InteractKey)))
                     {
                         keyItem.Interact(player.gameObject);
                     }

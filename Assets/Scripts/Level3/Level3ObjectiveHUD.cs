@@ -177,19 +177,24 @@ namespace Level3
 
             string header;
             string objective;
+            bool villagePart = state != null && state.IsVillagePart;
             switch (phase)
             {
                 case Level3Phase.Phase2_BrewMasterPotion:
-                    header = "NIVEL 3  ·  ACTO 2 — La Cabaña de la Bruja";
+                    header = "NIVEL 3  ·  PARTE 1 — La Cabaña de la Bruja";
                     objective = "Objetivo: Prepara la Poción Maestra en tu Caldero [E]";
                     break;
+                case Level3Phase.Phase3_ReturnToVillageAndChurch when !villagePart:
+                    header = "NIVEL 3  ·  PARTE 1 — El Sendero de Regreso";
+                    objective = "Objetivo: Cruza el Portón del Sendero de Regreso hacia la Aldea de Salem";
+                    break;
                 case Level3Phase.Phase3_ReturnToVillageAndChurch:
-                    header = "NIVEL 3  ·  ACTO 3 — El Distrito de la Iglesia";
+                    header = "NIVEL 3  ·  PARTE 2 — La Aldea de Salem";
                     objective = $"Objetivo: Regresa a la Aldea, lee las pistas ({Mathf.Min(clues, totalClues)}/{totalClues}), abre los cofres ({Mathf.Min(ChestsOpened, totalChests)}/{totalChests}) y entra a la Iglesia";
                     break;
                 default:
-                    header = "NIVEL 3  ·  ACTO 1 — El Sendero del Bosque";
-                    objective = $"Objetivo: Cruza el bosque hasta tu Cabaña (Portones: {Mathf.Min(ForestGatesOpened, 2)}/2) — Duerme a los guardias brillantes [Q]";
+                    header = "NIVEL 3  ·  PARTE 1 — El Sendero del Bosque";
+                    objective = $"Objetivo: Cruza el bosque hasta tu Cabaña (Portones: {Mathf.Min(ForestGatesOpened, 2)}/2) — Duerme a los guardias brillantes [Q / clic]";
                     break;
             }
 
@@ -199,6 +204,9 @@ namespace Level3
             for (int i = 0; i < TrackedKeys.Length && i < keyChipImages.Count; i++)
             {
                 bool owned = keys != null && keys.HasKey(TrackedKeys[i].Key);
+                // En la Parte 2 los portones del bosque ya quedaron atrás (se abrieron en la escena anterior)
+                if (villagePart && (TrackedKeys[i].Key == Level3StateController.ForestGateKey1Id ||
+                                    TrackedKeys[i].Key == Level3StateController.ForestGateKey2Id)) owned = true;
                 keyChipImages[i].color = owned ? ChipOnColor : ChipOffColor;
                 keyChipLabels[i].color = owned ? new Color(1f, 0.98f, 0.86f, 1f) : new Color(0.62f, 0.57f, 0.50f, 0.95f);
                 keyChipLabels[i].fontStyle = owned ? FontStyles.Bold : FontStyles.Normal;
@@ -255,7 +263,7 @@ namespace Level3
             panelRect = (RectTransform)panel.transform;
             panelRect.anchorMin = panelRect.anchorMax = panelRect.pivot = new Vector2(1f, 1f);
             panelRect.anchoredPosition = new Vector2(-25f, -186f);
-            panelRect.sizeDelta = new Vector2(640f, 156f);
+            panelRect.sizeDelta = new Vector2(720f, 190f);
 
             Image border = panel.GetComponent<Image>();
             if (border == null) border = panel.AddComponent<Image>();
@@ -279,10 +287,10 @@ namespace Level3
             group.blocksRaycasts = false;
 
             headerText = MakeText(inner.transform, "HeaderText", "NIVEL 3  ·  ACTO 1 — El Sendero del Bosque",
-                new Vector2(0f, 0.80f), new Vector2(1f, 1f), 18f, GoldColor, FontStyles.Bold);
+                new Vector2(0f, 0.80f), new Vector2(1f, 1f), 22f, GoldColor, FontStyles.Bold);
             objectiveText = MakeText(inner.transform, "ObjectiveText",
-                "Objetivo: Cruza el bosque hasta tu Cabaña (Portones: 0/2) — Duerme a los guardias brillantes [Q]",
-                new Vector2(0f, 0.44f), new Vector2(1f, 0.80f), 16f, ParchmentColor, FontStyles.Normal);
+                "Objetivo: Cruza el bosque hasta tu Cabaña (Portones: 0/2) — Duerme a los guardias brillantes [Q / clic]",
+                new Vector2(0f, 0.44f), new Vector2(1f, 0.80f), 19f, ParchmentColor, FontStyles.Normal);
             objectiveText.textWrappingMode = TextWrappingModes.Normal;
 
             GameObject row = GetOrCreateChild(inner.transform, "KeyChipsRow");
@@ -293,12 +301,16 @@ namespace Level3
             rowRt.offsetMax = new Vector2(-10f, -2f);
 
             TextMeshProUGUI rowLabel = MakeText(row.transform, "KeysLabel", "Llaves:",
-                new Vector2(0f, 0f), new Vector2(0.11f, 1f), 14f, ParchmentColor, FontStyles.Bold);
+                new Vector2(0f, 0f), new Vector2(0.12f, 1f), 17f, ParchmentColor, FontStyles.Bold);
             rowLabel.alignment = TextAlignmentOptions.MidlineLeft;
+            // Sin márgenes ni ajuste de línea: antes "Llaves:" no cabía y se partía en dos renglones.
+            ((RectTransform)rowLabel.transform).offsetMin = Vector2.zero;
+            ((RectTransform)rowLabel.transform).offsetMax = Vector2.zero;
+            rowLabel.textWrappingMode = TextWrappingModes.NoWrap;
 
             keyChipImages.Clear();
             keyChipLabels.Clear();
-            float startX = 0.115f;
+            float startX = 0.125f;
             float chipW = (1f - startX) / TrackedKeys.Length;
             for (int i = 0; i < TrackedKeys.Length; i++)
             {
@@ -314,16 +326,21 @@ namespace Level3
                 chipImg.raycastTarget = false;
 
                 TextMeshProUGUI chipLabel = MakeText(chip.transform, "Label", TrackedKeys[i].Value,
-                    Vector2.zero, Vector2.one, 13f, new Color(0.62f, 0.57f, 0.50f, 0.95f), FontStyles.Normal);
-                ((RectTransform)chipLabel.transform).offsetMin = Vector2.zero;
-                ((RectTransform)chipLabel.transform).offsetMax = Vector2.zero;
+                    Vector2.zero, Vector2.one, 15f, new Color(0.62f, 0.57f, 0.50f, 0.95f), FontStyles.Normal);
+                ((RectTransform)chipLabel.transform).offsetMin = new Vector2(3f, 0f);
+                ((RectTransform)chipLabel.transform).offsetMax = new Vector2(-3f, 0f);
+                // Los nombres largos ("Inquisidor") se recortaban: se reducen solos para caber en el chip.
+                chipLabel.textWrappingMode = TextWrappingModes.NoWrap;
+                chipLabel.enableAutoSizing = true;
+                chipLabel.fontSizeMin = 10f;
+                chipLabel.fontSizeMax = 15f;
                 keyChipImages.Add(chipImg);
                 keyChipLabels.Add(chipLabel);
             }
 
             statusText = MakeText(inner.transform, "StatusText",
                 "Poción Maestra: [Pendiente]     Llave de la Iglesia: [Pendiente]",
-                new Vector2(0f, 0f), new Vector2(1f, 0.22f), 15f, ParchmentColor, FontStyles.Normal);
+                new Vector2(0f, 0f), new Vector2(1f, 0.22f), 18f, ParchmentColor, FontStyles.Normal);
             statusText.richText = true;
         }
 

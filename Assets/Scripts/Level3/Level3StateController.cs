@@ -62,12 +62,19 @@ namespace Level3
         [SerializeField] private int masterPotionBonusScore = 300;
         [SerializeField] private int masterPotionSleepChargesGrant = 2;
 
+        [Header("Parte del Nivel 3")]
+        [Tooltip("Activo en la escena Level3_Village (Parte 2): la Poción Maestra ya está preparada y se empieza en la Fase 3.")]
+        [SerializeField] private bool villagePart = false;
+
         private readonly HashSet<string> readClues = new HashSet<string>();
 
         public Level3Phase CurrentPhase { get; private set; }
         public bool HasBrewedMasterPotion { get; private set; }
         public int CluesReadCount => readClues.Count;
         public int TotalExpectedClues => Mathf.Max(1, totalExpectedClues);
+
+        /// <summary>True en la Parte 2 (escena Level3_Village); false en la Parte 1 (Bosque y Cabaña).</summary>
+        public bool IsVillagePart => villagePart;
 
         public event Action<Level3Phase> OnPhaseChanged;
         public event Action OnMasterPotionBrewed;
@@ -88,6 +95,13 @@ namespace Level3
             CurrentPhase = initialPhase;
             HasBrewedMasterPotion = false;
             readClues.Clear();
+
+            if (villagePart)
+            {
+                // La Poción Maestra se preparó al final de la Parte 1 (escena anterior)
+                CurrentPhase = Level3Phase.Phase3_ReturnToVillageAndChurch;
+                HasBrewedMasterPotion = true;
+            }
         }
 
         private void Start()
@@ -185,7 +199,9 @@ namespace Level3
             BroadcastObjectiveUpdate();
 
             ShowHUDMessage(
-                "¡Poción Maestra preparada! Regresa hacia la Aldea y la Iglesia de Salem para romper el sello final.",
+                villagePart
+                    ? "¡Poción Maestra preparada! Regresa hacia la Aldea y la Iglesia de Salem para romper el sello final."
+                    : "¡Poción Maestra preparada! El portón se abre: sigue el Sendero de Regreso hacia la Aldea de Salem.",
                 4.0f);
         }
 
@@ -207,8 +223,54 @@ namespace Level3
             BroadcastObjectiveUpdate();
 
             ShowHUDMessage(
-                $"Pista descubierta ({CluesReadCount}/{TotalExpectedClues}): Examina los cofres y tejados rumbo a la Iglesia.",
+                $"Pista descubierta ({CluesReadCount}/{TotalExpectedClues}): Infíltrate como gato en las casas atrancadas rumbo a la Iglesia.",
                 2.8f);
+        }
+
+        /// <summary>
+        /// Reintento tras "La hoguera te alcanzó…": en lugar de recargar la escena (que devolvía a la bruja a X=0
+        /// con el reloj en 00:00), la reaparece en el último checkpoint activado con los corazones llenos.
+        /// Llaves, portones abiertos, cofres, pistas, Poción Maestra, puntos y tiempo se conservan tal cual.
+        /// </summary>
+        public bool RetryFromLastCheckpoint()
+        {
+            if (GameManager.Instance == null || CheckpointManager.Instance == null) return false;
+
+            Time.timeScale = 1f;
+            GameManager.Instance.RestoreAllHearts();
+            GameManager.Instance.SetState(GameState.Playing);
+
+            if (FrenzyController.Instance != null) FrenzyController.Instance.StopFrenzy();
+
+            // Guardias de vuelta a su ronda (los dormidos por poción siguen dormidos)
+            foreach (EnemySight sight in UnityEngine.Object.FindObjectsByType<EnemySight>(FindObjectsSortMode.None))
+            {
+                if (sight == null) continue;
+                PatrolRoute patrol = sight.GetComponent<PatrolRoute>();
+                if (patrol != null && patrol.IsAffectedBySpell) continue;
+                sight.ResetState();
+                if (patrol != null) patrol.ResetToFirstWaypoint();
+            }
+
+            SleepingVillager.ResetAllToSleep();
+
+            CheckpointManager.Instance.RespawnAtCheckpoint();
+
+            // Asegurar munición mínima para no quedar bloqueado tras reaparecer
+            if (GameManager.Instance.SleepCharges <= 0)
+            {
+                GameManager.Instance.AddSpellCharges(0, 0, 2);
+            }
+
+            HUDController hud = UnityEngine.Object.FindFirstObjectByType<HUDController>();
+            if (hud != null)
+            {
+                hud.UpdateStatsUI();
+                hud.ShowMessage("Reapareces en el último punto de control. Tus llaves y avances siguen contigo.", 3.0f);
+            }
+
+            BroadcastObjectiveUpdate();
+            return true;
         }
 
         /// <summary>
@@ -227,7 +289,7 @@ namespace Level3
 
                     if (!hasKey1)
                     {
-                        return "Objetivo: Duerme al guardia brillante con una poción [Q/E] para obtener la Llave del Portón I y escapar al bosque.";
+                        return "Objetivo: Duerme al guardia brillante con una poción ([Q] o clic) para obtener la Llave del Portón I y escapar al bosque.";
                     }
 
                     if (!hasKey2)
@@ -235,7 +297,7 @@ namespace Level3
                         return "Objetivo: Avanza por el bosque y duerme al segundo guardia brillante para abrir el Portón II hacia la Cabaña.";
                     }
 
-                    return "Objetivo: Cruza el segundo portón del bosque y entra en la Cabaña de la Bruja.";
+                    return "Objetivo: Cruza el segundo portón del bosque y entra a descansar en la Cabaña de la Bruja.";
                 }
 
                 case Level3Phase.Phase2_BrewMasterPotion:
@@ -243,6 +305,11 @@ namespace Level3
 
                 case Level3Phase.Phase3_ReturnToVillageAndChurch:
                 {
+                    if (!villagePart)
+                    {
+                        return "Objetivo: Cruza el Portón del Sendero de Regreso: la Aldea de Salem te espera.";
+                    }
+
                     bool hasChurchKey = inv != null && inv.HasKey(ChurchMasterKeyId);
                     if (hasChurchKey)
                     {

@@ -58,9 +58,22 @@ public class PickupGlint : MonoBehaviour
         return sr;
     }
 
+    // Al desactivar el brillo (p. ej. un cofre ya abierto) no debe quedar el halo congelado a la vista
+    private void OnDisable()
+    {
+        if (glow != null) glow.enabled = false;
+        if (sparkle != null) sparkle.enabled = false;
+        sparkleTime = -1f;
+    }
+
+    private void OnEnable()
+    {
+        if (glow != null) glow.enabled = true;
+    }
+
     private void Update()
     {
-        float t = (Mathf.Sin((Time.time + phase) * Mathf.PI * 2f / pulsePeriod) + 1f) * 0.5f;
+        float t =(Mathf.Sin((Time.time + phase) * Mathf.PI * 2f / pulsePeriod) + 1f) * 0.5f;
         Color g = glowColor;
         g.a = Mathf.Lerp(glowAlpha.x, glowAlpha.y, t);
         glow.color = g;

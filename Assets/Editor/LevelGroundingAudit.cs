@@ -11,9 +11,12 @@ using UnityEngine;
 /// </summary>
 public static class LevelGroundingAudit
 {
-    // Tolerancias (u): más de esto por encima del suelo se ve flotando; más por debajo se ve hundido
+    // Tolerancias (u): más de esto por encima del suelo se ve flotando; más por debajo se ve hundido.
+    // El suelo del Nivel 1 lleva un borde de pasto alto que sobresale ~0.35 u sobre el collider (y=0.17):
+    // letreros, checkpoints, aldeanos y maíz se plantan a propósito dentro de ese pasto (base 0.02 / -0.18),
+    // así que hundirse hasta esa profundidad se ve bien. Flotar sigue siendo estricto.
     public const float FloatTolerance = 0.03f;
-    public const float SinkTolerance = 0.12f;
+    public const float SinkTolerance = 0.36f;
 
     [MenuItem("Tools/Nivel/Auditar apoyo en el suelo")]
     public static void Run()
