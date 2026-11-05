@@ -229,6 +229,12 @@ namespace Level3
         /// </summary>
         public static void PresentFinalVictoryScreen()
         {
+            if (Level3VillageEndingCutscene.Instance != null)
+            {
+                Level3VillageEndingCutscene.Instance.TriggerEndingSequence();
+                return;
+            }
+
             HUDController hud = UnityEngine.Object.FindFirstObjectByType<HUDController>(FindObjectsInactive.Include);
             LevelCompletePanel panel = hud != null && hud.levelCompletePanel != null
                 ? hud.levelCompletePanel

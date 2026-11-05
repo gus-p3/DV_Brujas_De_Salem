@@ -58,6 +58,8 @@ namespace Level3.Editor
         private const string CainosAtlasPath = "Assets/Cainos/Pixel Art Platformer - Village Props/Texture/TX Village Props.png";
         private const string CainosChestAtlasPath = "Assets/Cainos/Pixel Art Platformer - Village Props/Texture/TX Chest Animation.png";
         private const string VillagerPreacherPrefabPath = "Assets/Prefabs/VillagerPreacher.prefab";
+        private const string GothicSignArtPath = "Assets/Screenshots/NIVEL2/Evidencias/Cartel gótico nocturno de iglesia (1).png";
+        private const string CathedralArtPath = "Assets/Screenshots/NIVEL2/Evidencias/Catedral gótica bajo la luna(1).png";
 
         [MenuItem("Tools/Level 3/Build Complete Level 3 Scene")]
         public static void BuildCompleteLevel3Scene()
@@ -368,6 +370,12 @@ namespace Level3.Editor
             card.EnsureUIHierarchy();
             CanvasGroup cardGroup = cardGo.GetComponent<CanvasGroup>();
             if (cardGroup != null) cardGroup.alpha = 0f; // invisible en el editor; en juego decide Awake()
+
+            if (village)
+            {
+                Sprite cathedralSprite = LoadFirstSprite(CathedralArtPath);
+                BuildLevel3VillageEndingUI(uiRoot, cathedralSprite);
+            }
 
             HUDController hudCtrl = uiRoot.GetComponentInChildren<HUDController>(true);
             if (hudCtrl != null)
@@ -1631,6 +1639,10 @@ namespace Level3.Editor
                 stalkB,
                 stalkC);
 
+            // TRAMO 3.6: FINAL DEL NIVEL 3 — CARTEL GÓTICO NOCTURNO Y ACCESO A LA CATEDRAL (X: 291 a 294)
+            Sprite gothicSignSprite = LoadFirstSprite(GothicSignArtPath);
+            BuildGothicCathedralFinalGoal(act3Env, act3Gameplay, cainosSprites, gothicSignSprite);
+
             DecorateVillageStreet(act3Env, cainosSprites);
 
             log.AppendLine("  - Acto 3 (X: 146..292): Aldea de Salem ampliada con 3 casas atrancadas, escalones rústicos al tejado del Campanero, Reja del Atrio (X:212), Iglesia (X:255) y Huerto Parroquial con terraza del claustro (X:260..292).");
@@ -2102,6 +2114,54 @@ namespace Level3.Editor
             PlaceCainosSprite(gardenEnv, cainosSprites, "Garden_Gravestone_1", "TX Village Props - Gravestone 01", new Vector3(289.0f, 0.8f, 0f), 1.1f, true);
             InstantiatePickup(gardenPickups, potHypnoPrefab, "PotionPickup_Garden_Hypno", new Vector3(290.2f, 0.65f, 0f));
             CreateMysticLantern(gardenEnv, cainosSprites, "VillageLamp_Garden_End", new Vector3(291.6f, 1.2f, 0f), new Color(1f, 0.82f, 0.35f, 1f));
+        }
+
+        private static void BuildGothicCathedralFinalGoal(
+            Transform envParent,
+            Transform gameplayParent,
+            Sprite[] cainosSprites,
+            Sprite gothicSignSprite)
+        {
+            Transform goalRoot = new GameObject("Act3_GothicCathedralGoal_Env").transform;
+            goalRoot.SetParent(envParent, false);
+
+            // 1. Pilares góticos y antorchas que enmarcan la salida hacia la catedral
+            PlaceCainosSprite(goalRoot, cainosSprites, "CathedralPath_Pillar_L", "TX Village Props - Stall Tent Pillar", new Vector3(290.8f, 1.85f, 0f), 1.25f, true);
+            PlaceCainosSprite(goalRoot, cainosSprites, "CathedralPath_Pillar_R", "TX Village Props - Stall Tent Pillar", new Vector3(293.8f, 1.85f, 0f), 1.25f, true);
+
+            // Farol místico en el pilar derecho
+            CreateMysticLantern(goalRoot, cainosSprites, "VillageLamp_CathedralPortal", new Vector3(293.8f, 2.1f, 0f), new Color(0.85f, 0.88f, 1.0f, 1f));
+
+            // 2. Cartel Gótico Nocturno de Iglesia (Recurso 1)
+            // Se coloca en X: 292.2, apoyado naturalmente sobre el suelo (Y=0.17)
+            GameObject signGo = new GameObject("EndGoal_GothicSign");
+            signGo.transform.SetParent(gameplayParent, false);
+            signGo.transform.position = new Vector3(292.2f, 0.17f, 0f);
+
+            // Añadir visual ajustado del sprite
+            SpriteRenderer sr = AddFitted(signGo.transform, "GothicSign_Visual", gothicSignSprite,
+                new Vector2(291.1f, 0.17f), new Vector2(293.3f, 2.45f), "Gameplay", 3, Color.white);
+
+            // Luz mística dorada sobre el cartel para que destaque en la noche
+            GameObject lightGo = new GameObject("GothicSign_Light2D");
+            lightGo.transform.SetParent(signGo.transform, false);
+            lightGo.transform.position = new Vector3(292.2f, 1.6f, 0f);
+            Light2D l2d = lightGo.AddComponent<Light2D>();
+            l2d.lightType = Light2D.LightType.Point;
+            l2d.color = new Color(0.95f, 0.88f, 0.65f, 1f);
+            l2d.intensity = 1.45f;
+            l2d.pointLightOuterRadius = 3.6f;
+
+            // Trigger e interactable para la finalización del nivel
+            BoxCollider2D trig = signGo.AddComponent<BoxCollider2D>();
+            trig.isTrigger = true;
+            trig.size = new Vector2(3.6f, 3.8f);
+            trig.offset = new Vector2(0f, 1.9f);
+
+            signGo.AddComponent<Level3VillageEndingTrigger>();
+
+            // Snap to ground
+            SnapToGround(signGo, 0.02f);
         }
 
         public static LoreObject CreateIlluminatedLoreStand(
@@ -3585,6 +3645,204 @@ namespace Level3.Editor
             Level2LoreReader reader = root.AddComponent<Level2LoreReader>();
             reader.SetupReferences(panel.gameObject, title, body);
             panel.gameObject.SetActive(false);
+        }
+
+        private static void BuildLevel3VillageEndingUI(Transform uiRoot, Sprite cathedralSprite)
+        {
+            GameObject root = new GameObject("Level3VillageEnding_Canvas", typeof(RectTransform));
+            root.transform.SetParent(uiRoot, false);
+            int uiLayer = LayerMask.NameToLayer("UI");
+            if (uiLayer >= 0) root.layer = uiLayer;
+
+            Canvas canvas = root.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 450;
+
+            CanvasScaler scaler = root.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.matchWidthOrHeight = 0.5f;
+
+            root.AddComponent<GraphicRaycaster>();
+            CanvasGroup rootGroup = root.AddComponent<CanvasGroup>();
+            rootGroup.alpha = 0f;
+            rootGroup.blocksRaycasts = false;
+            rootGroup.interactable = false;
+
+            // 1. Dark fade overlay
+            RectTransform fadeRt = NewUiChild(root.transform, "FadeOverlay");
+            fadeRt.anchorMin = Vector2.zero;
+            fadeRt.anchorMax = Vector2.one;
+            fadeRt.offsetMin = fadeRt.offsetMax = Vector2.zero;
+            Image fadeImg = fadeRt.gameObject.AddComponent<Image>();
+            fadeImg.color = new Color(0.04f, 0.03f, 0.06f, 1.0f);
+            fadeImg.raycastTarget = false;
+
+            // 2. Content Group
+            RectTransform contentRt = NewUiChild(root.transform, "ContentRoot");
+            contentRt.anchorMin = Vector2.zero;
+            contentRt.anchorMax = Vector2.one;
+            contentRt.offsetMin = contentRt.offsetMax = Vector2.zero;
+            CanvasGroup contentGroup = contentRt.gameObject.AddComponent<CanvasGroup>();
+            contentGroup.alpha = 0f;
+
+            // 3. Cathedral Background Image (Recurso 2)
+            RectTransform cathRt = NewUiChild(contentRt, "CathedralBackground");
+            cathRt.anchorMin = Vector2.zero;
+            cathRt.anchorMax = Vector2.one;
+            cathRt.offsetMin = cathRt.offsetMax = Vector2.zero;
+            Image cathImg = cathRt.gameObject.AddComponent<Image>();
+            cathImg.sprite = cathedralSprite;
+            cathImg.preserveAspect = true;
+            cathImg.color = new Color(0.92f, 0.94f, 1.0f, 1.0f);
+            cathImg.raycastTarget = false;
+
+            // 4. Sombras y viñetas para legibilidad del texto
+            RectTransform topShadeRt = NewUiChild(contentRt, "TopShade");
+            topShadeRt.anchorMin = new Vector2(0f, 0.72f);
+            topShadeRt.anchorMax = Vector2.one;
+            topShadeRt.offsetMin = topShadeRt.offsetMax = Vector2.zero;
+            Image topShade = topShadeRt.gameObject.AddComponent<Image>();
+            topShade.color = new Color(0.04f, 0.02f, 0.08f, 0.65f);
+            topShade.raycastTarget = false;
+
+            RectTransform botShadeRt = NewUiChild(contentRt, "BottomShade");
+            botShadeRt.anchorMin = Vector2.zero;
+            botShadeRt.anchorMax = new Vector2(1f, 0.38f);
+            botShadeRt.offsetMin = botShadeRt.offsetMax = Vector2.zero;
+            Image botShade = botShadeRt.gameObject.AddComponent<Image>();
+            botShade.color = new Color(0.03f, 0.02f, 0.06f, 0.75f);
+            botShade.raycastTarget = false;
+
+            // 5. Título: NIVEL 3 COMPLETADO
+            RectTransform titleRt = NewUiChild(contentRt, "Title");
+            titleRt.anchorMin = new Vector2(0.1f, 0.83f);
+            titleRt.anchorMax = new Vector2(0.9f, 0.96f);
+            titleRt.offsetMin = titleRt.offsetMax = Vector2.zero;
+            TextMeshProUGUI titleTmp = titleRt.gameObject.AddComponent<TextMeshProUGUI>();
+            titleTmp.text = "NIVEL 3 COMPLETADO";
+            titleTmp.fontSize = 58f;
+            titleTmp.fontStyle = FontStyles.Bold;
+            titleTmp.alignment = TextAlignmentOptions.Center;
+            titleTmp.color = new Color(1f, 0.88f, 0.38f, 1f);
+            titleTmp.raycastTarget = false;
+
+            // Línea divisoria ornamental dorada
+            RectTransform divRt = NewUiChild(contentRt, "DividerLine");
+            divRt.anchorMin = divRt.anchorMax = divRt.pivot = new Vector2(0.5f, 0.825f);
+            divRt.sizeDelta = new Vector2(620f, 3f);
+            divRt.anchoredPosition = Vector2.zero;
+            Image divImg = divRt.gameObject.AddComponent<Image>();
+            divImg.color = new Color(0.85f, 0.72f, 0.35f, 0.8f);
+            divImg.raycastTarget = false;
+
+            // 6. Texto narrativo del cierre
+            RectTransform narrRt = NewUiChild(contentRt, "NarrativeText");
+            narrRt.anchorMin = new Vector2(0.12f, 0.22f);
+            narrRt.anchorMax = new Vector2(0.88f, 0.33f);
+            narrRt.offsetMin = narrRt.offsetMax = Vector2.zero;
+            TextMeshProUGUI narrTmp = narrRt.gameObject.AddComponent<TextMeshProUGUI>();
+            narrTmp.text = "La aldea ha quedado atrás. Una antigua catedral espera bajo la luz de la luna...";
+            narrTmp.fontSize = 28f;
+            narrTmp.fontStyle = FontStyles.Italic;
+            narrTmp.alignment = TextAlignmentOptions.Center;
+            narrTmp.textWrappingMode = TextWrappingModes.Normal;
+            narrTmp.color = new Color(0.92f, 0.95f, 1f, 0.95f);
+            narrTmp.raycastTarget = false;
+
+            // 7. Nota de lore
+            RectTransform loreRt = NewUiChild(contentRt, "LoreNoteText");
+            loreRt.anchorMin = new Vector2(0.12f, 0.16f);
+            loreRt.anchorMax = new Vector2(0.88f, 0.22f);
+            loreRt.offsetMin = loreRt.offsetMax = Vector2.zero;
+            TextMeshProUGUI loreTmp = loreRt.gameObject.AddComponent<TextMeshProUGUI>();
+            loreTmp.text = "El misterio de la Poción Maestra aguarda en el interior del templo sagrado (Nivel 4).";
+            loreTmp.fontSize = 20f;
+            loreTmp.alignment = TextAlignmentOptions.Center;
+            loreTmp.color = new Color(0.82f, 0.74f, 0.58f, 0.9f);
+            loreTmp.raycastTarget = false;
+
+            // 8. Estadísticas
+            RectTransform statsRt = NewUiChild(contentRt, "StatsText");
+            statsRt.anchorMin = new Vector2(0.2f, 0.11f);
+            statsRt.anchorMax = new Vector2(0.8f, 0.16f);
+            statsRt.offsetMin = statsRt.offsetMax = Vector2.zero;
+            TextMeshProUGUI statsTmp = statsRt.gameObject.AddComponent<TextMeshProUGUI>();
+            statsTmp.text = "Puntaje: 0   ·   Tiempo: 00:00";
+            statsTmp.fontSize = 22f;
+            statsTmp.alignment = TextAlignmentOptions.Center;
+            statsTmp.color = new Color(1f, 0.92f, 0.7f, 1f);
+            statsTmp.raycastTarget = false;
+
+            // Texto de aviso / feedback para el Nivel 4
+            RectTransform noticeRt = NewUiChild(contentRt, "NoticePromptText");
+            noticeRt.anchorMin = new Vector2(0.15f, 0.07f);
+            noticeRt.anchorMax = new Vector2(0.85f, 0.12f);
+            noticeRt.offsetMin = noticeRt.offsetMax = Vector2.zero;
+            TextMeshProUGUI noticeTmp = noticeRt.gameObject.AddComponent<TextMeshProUGUI>();
+            noticeTmp.text = string.Empty;
+            noticeTmp.fontSize = 22f;
+            noticeTmp.fontStyle = FontStyles.Bold;
+            noticeTmp.alignment = TextAlignmentOptions.Center;
+            noticeTmp.color = new Color(1f, 0.85f, 0.2f, 1f);
+            noticeTmp.raycastTarget = false;
+
+            // 9. Botones
+            RectTransform btnPanelRt = NewUiChild(contentRt, "ButtonPanel");
+            btnPanelRt.anchorMin = btnPanelRt.anchorMax = btnPanelRt.pivot = new Vector2(0.5f, 0.045f);
+            btnPanelRt.sizeDelta = new Vector2(800f, 55f);
+            btnPanelRt.anchoredPosition = Vector2.zero;
+
+            Button btnContinue = CreateGothicButton(btnPanelRt, "BtnContinue", "Continuar", new Vector2(-220f, 0f), new Vector2(200f, 48f), new Color(0.2f, 0.14f, 0.06f, 0.92f), new Color(1f, 0.88f, 0.4f, 1f));
+            Button btnMenu = CreateGothicButton(btnPanelRt, "BtnMenu", "Menú Principal", new Vector2(0f, 0f), new Vector2(190f, 48f), new Color(0.12f, 0.12f, 0.16f, 0.88f), new Color(0.9f, 0.9f, 0.95f, 1f));
+            Button btnRetry = CreateGothicButton(btnPanelRt, "BtnRetry", "Reintentar", new Vector2(220f, 0f), new Vector2(180f, 48f), new Color(0.12f, 0.12f, 0.16f, 0.88f), new Color(0.85f, 0.85f, 0.9f, 1f));
+
+            Level3VillageEndingCutscene cutscene = root.AddComponent<Level3VillageEndingCutscene>();
+            cutscene.SetReferences(
+                rootGroup,
+                contentGroup,
+                fadeImg,
+                cathImg,
+                titleTmp,
+                narrTmp,
+                loreTmp,
+                statsTmp,
+                noticeTmp,
+                btnContinue,
+                btnMenu,
+                btnRetry);
+        }
+
+        private static Button CreateGothicButton(Transform parent, string name, string label, Vector2 pos, Vector2 size, Color bgColor, Color textColor)
+        {
+            RectTransform rt = NewUiChild(parent, name);
+            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta = size;
+            rt.anchoredPosition = pos;
+
+            Image bg = rt.gameObject.AddComponent<Image>();
+            bg.color = bgColor;
+
+            Button btn = rt.gameObject.AddComponent<Button>();
+            ColorBlock cb = btn.colors;
+            cb.normalColor = bgColor;
+            cb.highlightedColor = new Color(Mathf.Min(1f, bgColor.r + 0.18f), Mathf.Min(1f, bgColor.g + 0.18f), Mathf.Min(1f, bgColor.b + 0.18f), 1f);
+            cb.pressedColor = new Color(bgColor.r * 0.7f, bgColor.g * 0.7f, bgColor.b * 0.7f, 1f);
+            btn.colors = cb;
+
+            RectTransform txtRt = NewUiChild(rt, "Label");
+            txtRt.anchorMin = Vector2.zero;
+            txtRt.anchorMax = Vector2.one;
+            txtRt.offsetMin = txtRt.offsetMax = Vector2.zero;
+            TextMeshProUGUI tmp = txtRt.gameObject.AddComponent<TextMeshProUGUI>();
+            tmp.text = label;
+            tmp.fontSize = 20f;
+            tmp.fontStyle = FontStyles.Bold;
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.color = textColor;
+            tmp.raycastTarget = false;
+
+            return btn;
         }
 
         private static RectTransform NewUiChild(Transform parent, string name)
