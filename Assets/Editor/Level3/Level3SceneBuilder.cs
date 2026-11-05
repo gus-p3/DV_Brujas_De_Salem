@@ -2503,6 +2503,107 @@ namespace Level3.Editor
             signGo.AddComponent<Level3VillageEndingTrigger>();
 
             SnapToGround(signGo, 0.02f);
+
+            // Casas coloniales completas que enmarcan el final del camino y la Plaza de la Catedral
+            BuildCathedralSquareHouses(viaEnv, viaGameplay, cainosSprites);
+        }
+
+        private static void BuildCathedralSquareHouses(
+            Transform envParent,
+            Transform gameplayParent,
+            Sprite[] cainosSprites)
+        {
+            const float g = StreetY;
+            Transform housesRoot = new GameObject("Cathedral_Square_Houses").transform;
+            housesRoot.SetParent(envParent, false);
+
+            Sprite[] slices = AssetDatabase.LoadAllAssetsAtPath(Level2ArtPath + "houses_sprite_clean.png").OfType<Sprite>().ToArray();
+            Sprite doorSp = LoadFirstSprite(Level2ArtPath + "Village_Door_Locked.png");
+
+            Color nightTownTint = new Color(0.76f, 0.74f, 0.86f, 1f);
+            Color midgroundTownTint = new Color(0.58f, 0.56f, 0.70f, 1f);
+
+            // 1. CASAS DE FONDO / MIDGROUND: Skyline colonial continuo que abraza la Vía Sacra y la Catedral (X: 360..376)
+            Transform bgTown = new GameObject("Midground_Colonial_Street").transform;
+            bgTown.SetParent(housesRoot, false);
+
+            // Casa Midground 1 (X: 360.5..365.2)
+            Sprite spMg1 = slices.FirstOrDefault(s => s != null && s.name == "houses_sprite.png_7");
+            AddFitted(bgTown, "Midground_House_1", spMg1, new Vector2(360.2f, g - 0.05f), new Vector2(365.2f, g + 7.8f), "Midground", 2, midgroundTownTint);
+
+            // Casa Midground 2 (X: 364.5..369.2)
+            Sprite spMg2 = slices.FirstOrDefault(s => s != null && s.name == "houses_sprite.png_2");
+            AddFitted(bgTown, "Midground_House_2", spMg2, new Vector2(364.2f, g - 0.05f), new Vector2(369.5f, g + 8.4f), "Midground", 1, midgroundTownTint);
+
+            // Casa Midground 3 (X: 368.6..373.8)
+            Sprite spMg3 = slices.FirstOrDefault(s => s != null && s.name == "houses_sprite.png_18");
+            AddFitted(bgTown, "Midground_House_3", spMg3, new Vector2(368.5f, g - 0.05f), new Vector2(373.8f, g + 9.0f), "Midground", 2, midgroundTownTint);
+
+            // Casa Midground 4 (X: 372.8..377.2)
+            Sprite spMg4 = slices.FirstOrDefault(s => s != null && s.name == "houses_sprite.png_10");
+            AddFitted(bgTown, "Midground_House_4", spMg4, new Vector2(372.6f, g - 0.05f), new Vector2(377.4f, g + 8.0f), "Midground", 1, midgroundTownTint);
+
+            // Luces cálidas en las ventanas de las casas de fondo
+            for (int i = 0; i < 4; i++)
+            {
+                float winX = 362.5f + i * 4.2f;
+                GameObject winLight = new GameObject($"Window_WarmLight_{i}");
+                winLight.transform.SetParent(bgTown, false);
+                winLight.transform.position = new Vector3(winX, g + 3.2f, 0f);
+                Light2D wl = winLight.AddComponent<Light2D>();
+                wl.lightType = Light2D.LightType.Point;
+                wl.color = new Color(1f, 0.75f, 0.45f, 0.85f);
+                wl.intensity = 0.8f;
+                wl.pointLightOuterRadius = 2.4f;
+                winLight.AddComponent<LanternFlicker>();
+            }
+
+            // 2. CASAS EN PRIMER PLANO (Gameplay) EN LA PLAZA FINAL:
+            // Casa A: Casa de Guardia de la Catedral (Oeste de la plaza, X: 362.8..367.0)
+            Transform houseA = new GameObject("House_Cathedral_GuardStation").transform;
+            houseA.SetParent(housesRoot, false);
+            Sprite spFg1 = slices.FirstOrDefault(s => s != null && s.name == "houses_sprite.png_3");
+            AddFitted(houseA, "GuardStation_Facade", spFg1, new Vector2(362.6f, g - 0.08f), new Vector2(367.0f, g + 6.8f), "Gameplay", 2, nightTownTint);
+
+            // Puerta con tablones y farol
+            AddFitted(houseA, "GuardStation_Door", doorSp, new Vector2(363.5f, g - 0.02f), new Vector2(364.7f, g + 1.95f), "Gameplay", 3, new Color(0.9f, 0.85f, 0.8f, 1f));
+            AddFitted(houseA, "GuardStation_DoorPlanks", FindAtlasSprite(cainosSprites, "TX Village Props - Barricade"),
+                new Vector2(363.3f, g - 0.02f), new Vector2(364.9f, g + 1.15f), "Gameplay", 4, Color.white);
+            CreateMysticLantern(houseA, cainosSprites, "Lamp_GuardStation", new Vector3(365.6f, 1.85f, 0f), new Color(1f, 0.85f, 0.45f, 1f));
+            PlaceCainosSprite(houseA, cainosSprites, "GuardStation_Barrel", "TX Village Props - Barrel", new Vector3(366.2f, 0.5f, 0f), 1.0f, true);
+
+            // Puerta atrancada interactiva para la Casa de la Guardia
+            GameObject doorGoA = new GameObject("BarredDoor_GuardStation");
+            doorGoA.transform.SetParent(gameplayParent, false);
+            doorGoA.transform.position = new Vector3(364.1f, g, 0f);
+            BoxCollider2D colA = doorGoA.AddComponent<BoxCollider2D>();
+            colA.isTrigger = true;
+            colA.size = new Vector2(2.0f, 2.4f);
+            colA.offset = new Vector2(0f, 1.2f);
+            BarredHouseDoor barredA = doorGoA.AddComponent<BarredHouseDoor>();
+            barredA.Configure("barred_door_guardstation", "Guardia de la Catedral", "Cerrado por orden de la Santa Inquisición: la guardia vigila el pórtico de la Catedral.");
+
+            // Casa B: Residencia y Pórtico Capitular de la Catedral (Este de la plaza, X: 369.8..374.2)
+            Transform houseB = new GameObject("House_Cathedral_ChapterHouse").transform;
+            houseB.SetParent(housesRoot, false);
+            Sprite spFg2 = slices.FirstOrDefault(s => s != null && s.name == "houses_sprite.png_19");
+            AddFitted(houseB, "ChapterHouse_Facade", spFg2, new Vector2(369.8f, g - 0.08f), new Vector2(374.2f, g + 6.8f), "Gameplay", 2, nightTownTint);
+
+            // Puerta con farol y barriles
+            AddFitted(houseB, "ChapterHouse_Door", doorSp, new Vector2(370.8f, g - 0.02f), new Vector2(372.0f, g + 1.95f), "Gameplay", 3, new Color(0.9f, 0.85f, 0.8f, 1f));
+            CreateMysticLantern(houseB, cainosSprites, "Lamp_ChapterHouse", new Vector3(372.7f, 1.85f, 0f), new Color(1f, 0.85f, 0.45f, 1f));
+            PlaceCainosSprite(houseB, cainosSprites, "ChapterHouse_Crate", "TX Village Props - Crate Small", new Vector3(372.6f, 0.65f, 0f), 1.1f, true);
+
+            // Puerta atrancada interactiva para la Residencia Capitular
+            GameObject doorGoB = new GameObject("BarredDoor_ChapterHouse");
+            doorGoB.transform.SetParent(gameplayParent, false);
+            doorGoB.transform.position = new Vector3(371.4f, g, 0f);
+            BoxCollider2D colB = doorGoB.AddComponent<BoxCollider2D>();
+            colB.isTrigger = true;
+            colB.size = new Vector2(2.0f, 2.4f);
+            colB.offset = new Vector2(0f, 1.2f);
+            BarredHouseDoor barredB = doorGoB.AddComponent<BarredHouseDoor>();
+            barredB.Configure("barred_door_chapterhouse", "Residencia de la Catedral", "Entrada reservada para el Alto Clero. El paso hacia la Catedral se abre al frente.");
         }
 
         public static LoreObject CreateIlluminatedLoreStand(
