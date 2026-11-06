@@ -60,6 +60,7 @@ namespace Level3.Editor
         private const string VillagerPreacherPrefabPath = "Assets/Prefabs/VillagerPreacher.prefab";
         private const string GothicSignArtPath = "Assets/Screenshots/NIVEL2/Evidencias/Cartel gótico nocturno de iglesia (1).png";
         private const string CathedralArtPath = "Assets/Screenshots/NIVEL2/Evidencias/Catedral gótica bajo la luna(1).png";
+        private const string CathedralFeatheredArtPath = "Assets/Art/Environment/Level3/Catedral_Moonlit_Feathered.png";
 
         [MenuItem("Tools/Level 3/Build Complete Level 3 Scene")]
         public static void BuildCompleteLevel3Scene()
@@ -371,11 +372,6 @@ namespace Level3.Editor
             CanvasGroup cardGroup = cardGo.GetComponent<CanvasGroup>();
             if (cardGroup != null) cardGroup.alpha = 0f; // invisible en el editor; en juego decide Awake()
 
-            if (village)
-            {
-                Sprite cathedralSprite = LoadFirstSprite(CathedralArtPath);
-                BuildLevel3VillageEndingUI(uiRoot, cathedralSprite);
-            }
 
             HUDController hudCtrl = uiRoot.GetComponentInChildren<HUDController>(true);
             if (hudCtrl != null)
@@ -407,7 +403,7 @@ namespace Level3.Editor
                     var useLimitsProp = so.FindProperty("useLimits");
                     if (useLimitsProp != null) useLimitsProp.boolValue = true;
                     if (minProp != null) minProp.vector2Value = village ? new Vector2(Part2WestWallX - 1f, -1f) : new Vector2(-2f, -1f);
-                    if (maxProp != null) maxProp.vector2Value = village ? new Vector2(296f, 18f) : new Vector2(Part1EastWallX - 0.5f, 18f);
+                    if (maxProp != null) maxProp.vector2Value = village ? new Vector2(373f, 18f) : new Vector2(Part1EastWallX - 0.5f, 18f);
                     so.ApplyModifiedPropertiesWithoutUndo();
                 }
             }
@@ -1396,11 +1392,11 @@ namespace Level3.Editor
             Transform act3Npcs = new GameObject("Act3_NPCs").transform;
             act3Npcs.SetParent(npcsRoot, false);
 
-            // Suelo de la Aldea (X: 138 a 298) y muros límite: oeste (llegada desde el Sendero) y este tras el Huerto Parroquial en X: 294.5
+            // Suelo de la Aldea (X: 138 a 378) y muros límite: oeste (llegada desde el Sendero) y este tras la Vía Sacra en X: 371.5
             Sprite groundSprite = AssetDatabase.LoadAssetAtPath<Sprite>(GroundSpritePath);
-            CreateGroundSegment(act3Env, "Ground_Village", 138f, 160f, groundLayer, groundSprite);
+            CreateGroundSegment(act3Env, "Ground_Village", 138f, 240f, groundLayer, groundSprite);
             CreateSolidWall(act3Env, "Boundary_WestTrailWall", new Vector2(Part2WestWallX, 6f), new Vector2(1.5f, 14f), groundLayer, null);
-            CreateSolidWall(act3Env, "Boundary_EastChurchWall", new Vector2(294.5f, 6f), new Vector2(1.5f, 14f), groundLayer, null);
+            CreateSolidWall(act3Env, "Boundary_EastChurchWall", new Vector2(371.5f, 6f), new Vector2(1.5f, 14f), groundLayer, null);
 
             CreatePotionRefillStation(act3Gameplay, "PotionRefillStation_ReturnTrail", new Vector3(150.5f, 0.72f, 0f),
                 "refill_return_trail_1", "Alijo del Sendero de Regreso", PotionType.Sleep, 2, sleepFlaskSprite);
@@ -1423,8 +1419,8 @@ namespace Level3.Editor
                 "Lore_Clue_1_Sacristan",
                 new Vector3(154.4f, 0.17f, 0f),
                 "clue_sacristan_1",
-                "Nota del Sacristán I",
-                "Por orden del Juez escondí la Llave de la Cripta en el Cofre de Madera de mi casa, junto a la cama. Atranqué la puerta: solo un gato podría colarse por la ventana alta, trepando por las cajas. Y que nadie haga ruido: duermo con un ojo abierto.");
+                "Diario del Sacristán",
+                "En mi casa solo guardo brebajes de sigilo para pasar desapercibido. La Santa Inquisición confiscó la Llave de la Cripta y la encerró en el cofre del Despacho del Inquisidor, en el Atrio.");
 
             InstantiatePickup(act3Pickups, potSleepPrefab, "PotionPickup_Act3_Rear_Sleep", new Vector3(156.0f, 0.65f, 0f));
 
@@ -1437,21 +1433,17 @@ namespace Level3.Editor
                 WestEntry = HouseOpening.HighWindow,
                 EastExit = HouseOpening.CatFlap,
                 FacadeSlices = new[] { "houses_sprite.png_3", "houses_sprite.png_19" },
-                EntryHint = "Entra como Gato [T]: trepa por las cajas hasta la ventana alta.",
+                EntryHint = "Entra como Gato [T]: trepa por las cajas hasta la ventana alta para saquear los elixires del sacristán.",
                 BedX = 164.8f,
                 ChestX = 168.3f,
-                ChestObjectName = "Chest_Act3_1_Wooden",
-                ChestId = "chest_act3_crypt_wooden",
-                ChestName = "Cofre de Madera del Sacristán",
-                ChestKind = "Wooden",
-                ChestNeedsKey = false,
-                RewardKeyId = "crypt_chest_key",
-                RewardKeyName = "Llave de la Cripta",
+                InsidePickupPrefab = potSleepPrefab,
+                InsidePickupName = "PotionPickup_House_Sacristan_Sleep",
             };
             sacristan.Decor.Add(new HouseDecor("Interior_Bookshelf.png", 162.5f, 1.5f, 2.0f));
             sacristan.Decor.Add(new HouseDecor("Interior_Fireplace.png", 166.7f, 1.8f, 2.2f));
             sacristan.Decor.Add(new HouseDecor("Interior_Window_Shutters.png", 164.8f, 1.1f, 0.95f, 2.35f));
             BuildInfiltrationHouse(sacristan, act3Env, act3Gameplay, act3Npcs, groundLayer, cainosSprites, chestSprites, villagerPrefab);
+            InstantiatePickup(act3Pickups, potBlindPrefab, "PotionPickup_House_Sacristan_Blind", new Vector3(162.8f, 0.65f, 0f));
 
             // ------------------------------------------------------------------
             // TRAMO 3.2: CALLE DEL CAMPANERO, PISTA #2 Y GUARDIA DEL BALCÓN (X: 170 a 194)
@@ -1466,7 +1458,7 @@ namespace Level3.Editor
                 new Vector3(173.8f, 0.17f, 0f),
                 "clue_captain_diary_2",
                 "Diario del Capitán de la Guardia",
-                "El guardia de la linterna dorada vigila el balcón y el tejado de la Casa del Campanero: él lleva la Llave de la Reja del Atrio. Dentro de la casa, junto al campanero dormido, está el Cofre de Hierro; se abre con la Llave de la Cripta y guarda la Llave del Cofre del Inquisidor. Solo se entra por la gatera.");
+                "El guardia de la linterna dorada vigila el balcón de la Casa del Campanero: él lleva la Llave de la Reja del Atrio. Tras la reja, en la Casa del Inquisidor, se oculta el cofre de madera con la Llave de la Cripta.");
 
             CreateForestHideout(act3Env, "Hideout_CryptYard_1", 176.8f, 0f, 3.0f, 3.4f, cornCluster, stalkA, stalkB, stalkC);
 
@@ -1483,23 +1475,17 @@ namespace Level3.Editor
                 EastExit = HouseOpening.CatFlap,
                 FacadeSlices = new[] { "houses_sprite.png_7", "houses_sprite.png_17" },
                 FacadeTint = new Color(0.84f, 0.82f, 0.9f, 1f),
-                EntryHint = "Entra como Gato [T] por la gatera de la pared.",
+                EntryHint = "Entra como Gato [T] por la gatera de la pared para conseguir brebajes de hipnosis.",
                 BedX = 187.6f,
                 ChestX = 191.5f,
-                ChestObjectName = "Chest_Act3_2_Iron",
-                ChestId = "chest_act3_belfry_iron",
-                ChestName = "Cofre de Hierro del Campanero",
-                ChestKind = "Iron",
-                ChestNeedsKey = true,
-                NeedKeyId = "crypt_chest_key",
-                NeedKeyName = "Llave de la Cripta",
-                RewardKeyId = "inquisitor_chest_key",
-                RewardKeyName = "Llave del Cofre del Inquisidor",
+                InsidePickupPrefab = potHypnoPrefab,
+                InsidePickupName = "PotionPickup_House_Campanero_Hypno",
             };
             campanero.Decor.Add(new HouseDecor("Interior_Table_Chairs.png", 184.7f, 2.1f, 1.25f));
             campanero.Decor.Add(new HouseDecor("Interior_Bookshelf.png", 189.8f, 1.5f, 2.0f));
             campanero.Decor.Add(new HouseDecor("Interior_Window_Shutters.png", 185.4f, 1.1f, 0.95f, 2.35f));
             BuildInfiltrationHouse(campanero, act3Env, act3Gameplay, act3Npcs, groundLayer, cainosSprites, chestSprites, villagerPrefab);
+            InstantiatePickup(act3Pickups, heartPrefab, "HeartPickup_House_Campanero", new Vector3(184.2f, 0.65f, 0f));
 
             // Balcón y escalones rústicos de madera hasta el tejado del Campanero (reemplaza la escalera problemática)
             Sprite balconySprite = LoadFirstSprite(Level2ArtPath + "Village_Balcony_Platform.png");
@@ -1563,7 +1549,7 @@ namespace Level3.Editor
                 new Vector3(217.8f, 0.17f, 0f),
                 "clue_priest_confession_3",
                 "Confesión del Párroco",
-                "La Llave Maestra de la Iglesia de Salem descansa en el Cofre Dorado de la Casa del Inquisidor; solo la Llave del Inquisidor lo abre. Él duerme con el sueño ligero: entra como gato por el conducto de ventilación y camina despacio.");
+                "La Llave de la Cripta descansa en el cofre del Despacho del Inquisidor. Esa llave abrirá el Cofre de Hierro en el Panteón Antiguo, el cual guarda el acceso a la Botica Monacal donde se oculta la Llave Maestra de la Iglesia.");
 
             var inquisidor = new VillageHouseSpec
             {
@@ -1579,15 +1565,13 @@ namespace Level3.Editor
                 EntryHint = "Entra como Gato [T] por el conducto de ventilación junto a la puerta.",
                 BedX = 228.6f,
                 ChestX = 232.6f,
-                ChestObjectName = "Chest_Act3_3_Golden",
-                ChestId = "chest_act3_sanctuary_golden",
-                ChestName = "Cofre Dorado del Inquisidor",
-                ChestKind = "Golden",
-                ChestNeedsKey = true,
-                NeedKeyId = "inquisitor_chest_key",
-                NeedKeyName = "Llave del Cofre del Inquisidor",
-                RewardKeyId = Level3StateController.ChurchMasterKeyId,
-                RewardKeyName = "Llave Maestra de la Iglesia",
+                ChestObjectName = "Chest_Act3_1_Wooden",
+                ChestId = "chest_act3_crypt_wooden",
+                ChestName = "Cofre de Madera del Inquisidor",
+                ChestKind = "Wooden",
+                ChestNeedsKey = false,
+                RewardKeyId = "crypt_chest_key",
+                RewardKeyName = "Llave de la Cripta",
             };
             inquisidor.Decor.Add(new HouseDecor("Interior_Fireplace.png", 225.4f, 1.8f, 2.2f));
             inquisidor.Decor.Add(new HouseDecor("Interior_Wardrobe.png", 230.8f, 1.2f, 2.1f));
@@ -1615,8 +1599,8 @@ namespace Level3.Editor
             InstantiatePickup(act3Pickups, potHypnoPrefab, "PotionPickup_Atrium_Hypno", new Vector3(246.0f, 0.65f, 0f));
             InstantiatePickup(act3Pickups, heartPrefab, "HeartPickup_Atrium", new Vector3(250.0f, 0.65f, 0f));
 
-            // La Iglesia de Salem (X: 250 a 260) y ChurchDoorGoal en X: 255
-            BuildSalemChurchMonumentAndGoal(act3Env, act3Gameplay, cainosSprites, logBSprite, logCSprite, gateSprite);
+            // Capilla del Atrio (X: 250 a 260) — Monumento colonial central (sin ChurchDoorGoal, el final es al cierre de la aldea)
+            BuildSalemAtriumChapelMonument(act3Env, cainosSprites, logBSprite, logCSprite, gateSprite);
 
             // TRAMO 3.5: AMPLIACIÓN DE LA ALDEA — HUERTO PARROQUIAL Y CLAUSTRO (X: 260 a 292)
             BuildParishGardenAndCloisterExtension(
@@ -1639,13 +1623,78 @@ namespace Level3.Editor
                 stalkB,
                 stalkC);
 
-            // TRAMO 3.6: FINAL DEL NIVEL 3 — CARTEL GÓTICO NOCTURNO Y ACCESO A LA CATEDRAL (X: 291 a 294)
+            // TRAMO 3.6: EL ANTIGUO PANTEÓN Y CRIPTAS DE SALEM (X: 292 a 325)
+            BuildSalemAncientCemeteryExtension(
+                act3Env,
+                act3Gameplay,
+                act3Pickups,
+                act3Npcs,
+                cainosSprites,
+                chestSprites,
+                groundLayer,
+                groundMask,
+                guardPrefab,
+                checkpointPrefab,
+                villagerPrefab,
+                villagerFPrefab,
+                signSprite,
+                potBlindPrefab,
+                potSleepPrefab,
+                heartPrefab,
+                cornCluster,
+                stalkA,
+                stalkB,
+                stalkC);
+
+            // TRAMO 3.7: EL CALLEJÓN BOTICARIO DEL MONASTERIO (X: 325 a 350)
+            BuildMonasteryAlleyExtension(
+                act3Env,
+                act3Gameplay,
+                act3Pickups,
+                act3Npcs,
+                cainosSprites,
+                chestSprites,
+                groundLayer,
+                groundMask,
+                guardPrefab,
+                checkpointPrefab,
+                villagerPrefab,
+                signSprite,
+                sleepFlaskSprite,
+                potHypnoPrefab,
+                potSleepPrefab,
+                heartPrefab,
+                cornCluster,
+                stalkA,
+                stalkB,
+                stalkC);
+
+            // TRAMO 3.8: LA GRAN VÍA SACRA Y FINAL DEL NIVEL 3 (X: 350 a 375)
             Sprite gothicSignSprite = LoadFirstSprite(GothicSignArtPath);
-            BuildGothicCathedralFinalGoal(act3Env, act3Gameplay, cainosSprites, gothicSignSprite);
+            Sprite cathedralSprite = GetFeatheredCathedralSprite();
+            BuildProcessionalViaSacraAndFinalGoal(
+                act3Env,
+                act3Gameplay,
+                act3Pickups,
+                act3Npcs,
+                cainosSprites,
+                chestSprites,
+                groundLayer,
+                groundMask,
+                guardPrefab,
+                checkpointPrefab,
+                villagerPrefab,
+                villagerPreacherPrefab,
+                signSprite,
+                gothicSignSprite,
+                cathedralSprite,
+                potSleepPrefab,
+                potBlindPrefab,
+                heartPrefab);
 
             DecorateVillageStreet(act3Env, cainosSprites);
 
-            log.AppendLine("  - Acto 3 (X: 146..292): Aldea de Salem ampliada con 3 casas atrancadas, escalones rústicos al tejado del Campanero, Reja del Atrio (X:212), Iglesia (X:255) y Huerto Parroquial con terraza del claustro (X:260..292).");
+            log.AppendLine("  - Acto 3 (X: 146..372): Aldea de Salem ampliada y balanceada con 6 casas coloniales completas (Sacristán, Campanero, Inquisidor, Guardián del Panteón, Botica Monacal y Residencia Capitular), infiltración para gato, aldeanos dormidos y deambulantes, Panteón, Callejón Monacal y la Gran Vía Sacra de la Catedral.");
         }
 
         // =========================================================================
@@ -1703,6 +1752,8 @@ namespace Level3.Editor
             public string NeedKeyName = string.Empty;
             public string RewardKeyId;
             public string RewardKeyName;
+            public GameObject InsidePickupPrefab;
+            public string InsidePickupName;
             public readonly List<HouseDecor> Decor = new List<HouseDecor>();
         }
 
@@ -1851,25 +1902,33 @@ namespace Level3.Editor
             CreateCatOnlyTrigger(gameplayParent, $"CatOnlyPassage_{s.Id}_East", new Vector3((innerMaxX + s.X1) * 0.5f, (eb + et) * 0.5f, 0f),
                 $"{s.Name}: el hueco es demasiado estrecho para una bruja. Pulsa [T] y entra como Gato.");
 
-            // ---- Aldeano dormido y cofre con llave
+            // ---- Aldeano dormido y cofre con llave (o recompensa interior)
             BuildSleepingVillager(npcsParent, s, house, villagerPrefab);
 
-            CreateLevel3TreasureChest(
-                gameplayParent,
-                chestAtlas,
-                s.ChestObjectName,
-                new Vector3(s.ChestX, g + 0.5f, 0f),
-                s.ChestId,
-                s.ChestName,
-                s.ChestKind,
-                s.ChestNeedsKey,
-                s.NeedKeyId,
-                s.NeedKeyName,
-                s.RewardKeyId,
-                s.RewardKeyName,
-                catCanOpen: true,
-                sortingLayer: "Gameplay",
-                sortingOrder: 1);
+            if (!string.IsNullOrEmpty(s.ChestId))
+            {
+                CreateLevel3TreasureChest(
+                    gameplayParent,
+                    chestAtlas,
+                    s.ChestObjectName,
+                    new Vector3(s.ChestX, g + 0.5f, 0f),
+                    s.ChestId,
+                    s.ChestName,
+                    s.ChestKind,
+                    s.ChestNeedsKey,
+                    s.NeedKeyId,
+                    s.NeedKeyName,
+                    s.RewardKeyId,
+                    s.RewardKeyName,
+                    catCanOpen: true,
+                    sortingLayer: "Gameplay",
+                    sortingOrder: 1);
+            }
+            else if (s.InsidePickupPrefab != null)
+            {
+                float px = s.ChestX > 0f ? s.ChestX : centerX + 1.5f;
+                InstantiatePickup(gameplayParent, s.InsidePickupPrefab, s.InsidePickupName ?? $"Pickup_House_{s.Id}", new Vector3(px, g + 0.65f, 0f));
+            }
 
             return house;
         }
@@ -1970,15 +2029,14 @@ namespace Level3.Editor
             PlaceCainosSprite(deco, cainos, "Village_Pumpkin_2", "TX Village Props - Pumpkin 01", new Vector3(251.0f, 0.5f, 0f), 0.9f, true);
         }
 
-        private static void BuildSalemChurchMonumentAndGoal(
+        private static void BuildSalemAtriumChapelMonument(
             Transform envParent,
-            Transform gameplayParent,
             Sprite[] cainosSprites,
             Sprite wallSprite,
             Sprite roofSprite,
             Sprite doorSprite)
         {
-            GameObject churchRoot = new GameObject("Salem_Church_Monument");
+            GameObject churchRoot = new GameObject("Salem_Atrium_Chapel");
             churchRoot.transform.SetParent(envParent, false);
             churchRoot.transform.position = new Vector3(255f, 0.17f, 0f);
 
@@ -1987,51 +2045,29 @@ namespace Level3.Editor
             Sprite naveSp = slices.FirstOrDefault(s => s != null && s.name == "houses_sprite.png_2");
             Sprite towerSp = slices.FirstOrDefault(s => s != null && s.name == "houses_sprite.png_18");
             Color stone = new Color(0.66f, 0.65f, 0.78f, 1f);
-            AddFitted(churchRoot.transform, "Church_StoneNave", naveSp, new Vector2(249.8f, 0.07f), new Vector2(260.2f, 10.6f), "Midground", 2, stone);
-            AddFitted(churchRoot.transform, "Church_BellTower", towerSp, new Vector2(253.2f, 8.4f), new Vector2(256.8f, 15.2f), "Midground", 1, stone);
-            PlaceCainosSprite(churchRoot.transform, cainosSprites, "Church_Cross_Top", "TX Village Props - Gravestone 02", new Vector3(255.0f, 15.0f, 0f), 1.1f);
+            AddFitted(churchRoot.transform, "Chapel_StoneNave", naveSp, new Vector2(249.8f, 0.07f), new Vector2(260.2f, 10.6f), "Midground", 2, stone);
+            AddFitted(churchRoot.transform, "Chapel_BellTower", towerSp, new Vector2(253.2f, 8.4f), new Vector2(256.8f, 15.2f), "Midground", 1, stone);
+            PlaceCainosSprite(churchRoot.transform, cainosSprites, "Chapel_Cross_Top", "TX Village Props - Gravestone 02", new Vector3(255.0f, 15.0f, 0f), 1.1f);
 
             // Columnas del pórtico (apoyadas en el suelo)
-            PlaceCainosSprite(churchRoot.transform, cainosSprites, "Church_Pillar_L", "TX Village Props - Stall Tent Pillar", new Vector3(252.9f, 1.85f, 0f), 1.2f, true);
-            PlaceCainosSprite(churchRoot.transform, cainosSprites, "Church_Pillar_R", "TX Village Props - Stall Tent Pillar", new Vector3(257.1f, 1.85f, 0f), 1.2f, true);
+            PlaceCainosSprite(churchRoot.transform, cainosSprites, "Chapel_Pillar_L", "TX Village Props - Stall Tent Pillar", new Vector3(252.9f, 1.85f, 0f), 1.2f, true);
+            PlaceCainosSprite(churchRoot.transform, cainosSprites, "Chapel_Pillar_R", "TX Village Props - Stall Tent Pillar", new Vector3(257.1f, 1.85f, 0f), 1.2f, true);
 
             // Faroles consagrados a ambos lados del pórtico
-            CreateMysticLantern(churchRoot.transform, cainosSprites, "Church_Lantern_Left", new Vector3(251.5f, 1.35f, 0f), new Color(1f, 0.85f, 0.35f, 1f));
-            CreateMysticLantern(churchRoot.transform, cainosSprites, "Church_Lantern_Right", new Vector3(258.5f, 1.35f, 0f), new Color(1f, 0.85f, 0.35f, 1f));
+            CreateMysticLantern(churchRoot.transform, cainosSprites, "Chapel_Lantern_Left", new Vector3(251.5f, 1.35f, 0f), new Color(1f, 0.85f, 0.35f, 1f));
+            CreateMysticLantern(churchRoot.transform, cainosSprites, "Chapel_Lantern_Right", new Vector3(258.5f, 1.35f, 0f), new Color(1f, 0.85f, 0.35f, 1f));
 
-            // Gran Puerta de la Iglesia (ChurchDoorGoal) en X: 255, Y: 0.17
-            GameObject doorGo = new GameObject("Church_MainDoor_Goal");
-            doorGo.transform.SetParent(gameplayParent, false);
+            // Puerta colonial cerrada de la capilla (ornamental de fondo, no termina el nivel ni pide llave de iglesia)
+            GameObject doorGo = new GameObject("Chapel_ClosedDoor");
+            doorGo.transform.SetParent(churchRoot.transform, false);
             doorGo.transform.position = new Vector3(255f, 0.17f, 0f);
 
             Sprite wingSp = LoadFirstSprite(Level2ArtPath + "Village_Door_Locked.png");
             if (wingSp == null) wingSp = doorSprite;
-            Color wingColor = new Color(0.78f, 0.62f, 0.45f, 1f);
+            Color wingColor = new Color(0.70f, 0.58f, 0.45f, 1f);
 
-            SpriteRenderer lwSr = AddFitted(doorGo.transform, "LeftDoorWing", wingSp, new Vector2(253.7f, 0.13f), new Vector2(255f, 3.1f), "Gameplay", 3, wingColor);
-            SpriteRenderer rwSr = AddFitted(doorGo.transform, "RightDoorWing", wingSp, new Vector2(255f, 0.13f), new Vector2(256.3f, 3.1f), "Gameplay", 3, wingColor, true);
-
-            GameObject lightGo = new GameObject("SanctuaryPortal_Light2D");
-            lightGo.transform.SetParent(doorGo.transform, false);
-            lightGo.transform.localPosition = new Vector3(0f, 2.0f, 0f);
-            Light2D portalLight = lightGo.AddComponent<Light2D>();
-            portalLight.lightType = Light2D.LightType.Point;
-            portalLight.color = new Color(1f, 0.90f, 0.45f, 1f);
-            portalLight.intensity = 1.65f;
-            portalLight.pointLightOuterRadius = 5.0f;
-
-            BoxCollider2D goalTrigger = doorGo.AddComponent<BoxCollider2D>();
-            goalTrigger.isTrigger = true;
-            goalTrigger.size = new Vector2(3.6f, 4.4f);
-            goalTrigger.offset = new Vector2(0f, 2.2f);
-
-            ChurchDoorGoal goal = doorGo.AddComponent<ChurchDoorGoal>();
-            var soGoal = new SerializedObject(goal);
-            soGoal.FindProperty("doorRenderer").objectReferenceValue = lwSr;
-            soGoal.FindProperty("leftDoorWing").objectReferenceValue = lwSr != null ? lwSr.transform : null;
-            soGoal.FindProperty("rightDoorWing").objectReferenceValue = rwSr != null ? rwSr.transform : null;
-            soGoal.FindProperty("sanctuaryPortalLight").objectReferenceValue = portalLight;
-            soGoal.ApplyModifiedPropertiesWithoutUndo();
+            AddFitted(doorGo.transform, "LeftDoorWing", wingSp, new Vector2(253.7f, 0.13f), new Vector2(255f, 3.1f), "Gameplay", 2, wingColor);
+            AddFitted(doorGo.transform, "RightDoorWing", wingSp, new Vector2(255f, 0.13f), new Vector2(256.3f, 3.1f), "Gameplay", 2, wingColor, true);
         }
 
         private static void BuildParishGardenAndCloisterExtension(
@@ -2116,51 +2152,482 @@ namespace Level3.Editor
             CreateMysticLantern(gardenEnv, cainosSprites, "VillageLamp_Garden_End", new Vector3(291.6f, 1.2f, 0f), new Color(1f, 0.82f, 0.35f, 1f));
         }
 
-        private static void BuildGothicCathedralFinalGoal(
+        private static void BuildSalemAncientCemeteryExtension(
             Transform envParent,
             Transform gameplayParent,
+            Transform pickupsParent,
+            Transform npcsParent,
             Sprite[] cainosSprites,
-            Sprite gothicSignSprite)
+            Sprite[] chestSprites,
+            int groundLayer,
+            int groundMask,
+            GameObject guardPrefab,
+            GameObject checkpointPrefab,
+            GameObject villagerPrefab,
+            GameObject villagerFPrefab,
+            Sprite signSprite,
+            GameObject potBlindPrefab,
+            GameObject potSleepPrefab,
+            GameObject heartPrefab,
+            Sprite cornCluster,
+            Sprite stalkA,
+            Sprite stalkB,
+            Sprite stalkC)
         {
-            Transform goalRoot = new GameObject("Act3_GothicCathedralGoal_Env").transform;
-            goalRoot.SetParent(envParent, false);
+            Transform cemEnv = new GameObject("Act3_Cemetery_Env").transform;
+            cemEnv.SetParent(envParent, false);
 
-            // 1. Pilares góticos y antorchas que enmarcan la salida hacia la catedral
-            PlaceCainosSprite(goalRoot, cainosSprites, "CathedralPath_Pillar_L", "TX Village Props - Stall Tent Pillar", new Vector3(290.8f, 1.85f, 0f), 1.25f, true);
-            PlaceCainosSprite(goalRoot, cainosSprites, "CathedralPath_Pillar_R", "TX Village Props - Stall Tent Pillar", new Vector3(293.8f, 1.85f, 0f), 1.25f, true);
+            Transform cemGameplay = new GameObject("Act3_Cemetery_Gameplay").transform;
+            cemGameplay.SetParent(gameplayParent, false);
 
-            // Farol místico en el pilar derecho
-            CreateMysticLantern(goalRoot, cainosSprites, "VillageLamp_CathedralPortal", new Vector3(293.8f, 2.1f, 0f), new Color(0.85f, 0.88f, 1.0f, 1f));
+            Transform cemPickups = new GameObject("Act3_Cemetery_Pickups").transform;
+            cemPickups.SetParent(pickupsParent, false);
 
-            // 2. Cartel Gótico Nocturno de Iglesia (Recurso 1)
-            // Se coloca en X: 292.2, apoyado naturalmente sobre el suelo (Y=0.17)
-            GameObject signGo = new GameObject("EndGoal_GothicSign");
-            signGo.transform.SetParent(gameplayParent, false);
-            signGo.transform.position = new Vector3(292.2f, 0.17f, 0f);
+            Transform cemNpcs = new GameObject("Act3_Cemetery_NPCs").transform;
+            cemNpcs.SetParent(npcsParent, false);
 
-            // Añadir visual ajustado del sprite
-            SpriteRenderer sr = AddFitted(signGo.transform, "GothicSign_Visual", gothicSignSprite,
-                new Vector2(291.1f, 0.17f), new Vector2(293.3f, 2.45f), "Gameplay", 3, Color.white);
+            // 1. Verja de hierro forjado gótico de entrada al Panteón (X: 293..295)
+            PlaceCainosSprite(cemEnv, cainosSprites, "Cemetery_Gate_Pillar_L", "TX Village Props - Fence 02 Pillar", new Vector3(293.2f, 1.25f, 0f), 1.3f, true);
+            PlaceCainosSprite(cemEnv, cainosSprites, "Cemetery_Gate_Rail_1", "TX Village Props - Fence 02 Rail", new Vector3(294.4f, 1.05f, 0f), 1.25f, true);
+            PlaceCainosSprite(cemEnv, cainosSprites, "Cemetery_Gate_Pillar_R", "TX Village Props - Fence 02 Pillar", new Vector3(295.6f, 1.25f, 0f), 1.3f, true);
+            CreateMysticLantern(cemEnv, cainosSprites, "VillageLamp_Cemetery_Entry", new Vector3(294.4f, 1.85f, 0f), new Color(0.65f, 0.78f, 1f, 1f));
 
-            // Luz mística dorada sobre el cartel para que destaque en la noche
-            GameObject lightGo = new GameObject("GothicSign_Light2D");
-            lightGo.transform.SetParent(signGo.transform, false);
-            lightGo.transform.position = new Vector3(292.2f, 1.6f, 0f);
-            Light2D l2d = lightGo.AddComponent<Light2D>();
-            l2d.lightType = Light2D.LightType.Point;
-            l2d.color = new Color(0.95f, 0.88f, 0.65f, 1f);
-            l2d.intensity = 1.45f;
-            l2d.pointLightOuterRadius = 3.6f;
+            // 2. Checkpoint del Panteón
+            CreateCheckpoint(cemGameplay, checkpointPrefab, "Checkpoint_Act3_Cemetery", new Vector3(296.5f, 0.17f, 0f));
 
-            // Trigger e interactable para la finalización del nivel
-            BoxCollider2D trig = signGo.AddComponent<BoxCollider2D>();
-            trig.isTrigger = true;
-            trig.size = new Vector2(3.6f, 3.8f);
-            trig.offset = new Vector2(0f, 1.9f);
+            // 3. Casa 4: Casa del Guardián del Panteón (X: 300..312) - COFRE #2 (HIERRO)
+            var guardian = new VillageHouseSpec
+            {
+                Id = "guardian",
+                Name = "Casa del Guardián del Panteón",
+                X0 = 300.0f,
+                X1 = 312.0f,
+                WestEntry = HouseOpening.HighWindow,
+                EastExit = HouseOpening.CatFlap,
+                FacadeSlices = new[] { "houses_sprite.png_0", "houses_sprite.png_18" },
+                FacadeTint = new Color(0.78f, 0.77f, 0.85f, 1f),
+                EntryHint = "Entra como Gato [T]: trepa por las cajas junto al muro del panteón hasta la ventana alta.",
+                BedX = 305.5f,
+                ChestX = 309.5f,
+                ChestObjectName = "Chest_Act3_2_Iron",
+                ChestId = "chest_act3_belfry_iron",
+                ChestName = "Cofre de Hierro del Panteón",
+                ChestKind = "Iron",
+                ChestNeedsKey = true,
+                NeedKeyId = "crypt_chest_key",
+                NeedKeyName = "Llave de la Cripta",
+                RewardKeyId = "inquisitor_chest_key",
+                RewardKeyName = "Llave de la Botica Monacal",
+            };
+            guardian.Decor.Add(new HouseDecor("Interior_Fireplace.png", 303.0f, 1.8f, 2.2f));
+            guardian.Decor.Add(new HouseDecor("Interior_Bookshelf.png", 308.5f, 1.5f, 2.0f));
+            guardian.Decor.Add(new HouseDecor("Interior_Window_Shutters.png", 305.5f, 1.1f, 0.95f, 2.35f));
+            BuildInfiltrationHouse(guardian, cemEnv, cemGameplay, cemNpcs, groundLayer, cainosSprites, chestSprites, villagerPrefab);
+            InstantiatePickup(cemPickups, potBlindPrefab, "PotionPickup_House_Guardian_Blind", new Vector3(303.2f, 0.65f, 0f));
 
-            signGo.AddComponent<Level3VillageEndingTrigger>();
+            // Recompensa y farol en el tejado de la casa del guardián
+            CreateMysticLantern(cemEnv, cainosSprites, "VillageLamp_Guardian_Roof", new Vector3(306.0f, HouseRoofTop + 0.85f, 0f), new Color(0.72f, 0.84f, 1f, 1f));
+            InstantiatePickup(cemPickups, heartPrefab, "HeartPickup_Guardian_Roof", new Vector3(308.0f, HouseRoofTop + 0.55f, 0f));
 
-            // Snap to ground
+            // Cajas y repisa este para descenso suave desde el tejado hacia el cementerio
+            CreateOneWayLedge(cemEnv, "Guardian_Roof_Step_East", 312.2f, 313.8f, 2.1f, groundLayer, null, true);
+            PlaceCainosSprite(cemEnv, cainosSprites, "Guardian_Crate_East_1", "TX Village Props - Crate Small", new Vector3(313.0f, 1.05f, 0f), 1.1f, true);
+
+            // 4. Escondite de niebla y maleza en el cementerio (X: 314..317)
+            CreateForestHideout(cemEnv, "Hideout_CemeteryMist", 315.5f, 0f, 3.2f, 3.4f, cornCluster, stalkA, stalkB, stalkC);
+
+            // 5. Aldeana enlutada (NPC de ambiente) paseando entre las tumbas
+            CreateVillager(cemNpcs, villagerFPrefab != null ? villagerFPrefab : villagerPrefab,
+                "Villager_CemeteryMourner", new Vector3(317.0f, 0.17f, 0f), WanderPattern.WalkAndReturn, 2.2f);
+
+            // 6. Guardia inquisidor patrullando el sendero de tumbas (X: 313 a 322)
+            Transform[] wpCemGuard = CreateWaypoints(cemNpcs, "Waypoints_Guard_Cemetery", new Vector2(313.5f, 0.17f), new Vector2(322.0f, 0.17f));
+            CreateGuard(cemNpcs, guardPrefab, "Guard_Cemetery", new Vector3(318.5f, 0.17f, 0f), wpCemGuard, PatrolMode.PingPong, groundMask);
+
+            // Lápidas y calabazas en el camino
+            PlaceCainosSprite(cemEnv, cainosSprites, "Cemetery_Grave_1", "TX Village Props - Gravestone 02", new Vector3(314.0f, 0.8f, 0f), 1.15f, true);
+            PlaceCainosSprite(cemEnv, cainosSprites, "Cemetery_Grave_2", "TX Village Props - Gravestone 01", new Vector3(320.0f, 0.8f, 0f), 1.15f, true);
+            PlaceCainosSprite(cemEnv, cainosSprites, "Cemetery_Pumpkin_1", "TX Village Props - Pumpkin 01", new Vector3(321.2f, 0.5f, 0f), 1.0f, true);
+
+            // 7. Letrero histórico del Panteón Antiguo (X: 322.5)
+            CreateWorldSign(
+                cemGameplay,
+                "Sign_Act3_Cemetery",
+                new Vector2(322.5f, 0.9f),
+                signSprite,
+                "Panteón de los Primeros Colonos de Salem: aquí yacen los fundadores puritanos y los inquisidores que erigieron la catedral. La niebla se espesa hacia la botica monacal.");
+
+            // 8. Cruz de piedra y descanso previo al callejón (X: 323.5)
+            PlaceCainosSprite(cemEnv, cainosSprites, "Cemetery_Cross_End", "TX Village Props - Gravestone 01", new Vector3(323.6f, 0.8f, 0f), 1.15f, true);
+            InstantiatePickup(cemPickups, potSleepPrefab, "PotionPickup_Cemetery_Sleep", new Vector3(324.5f, 0.65f, 0f));
+            CreateMysticLantern(cemEnv, cainosSprites, "VillageLamp_Cemetery_End", new Vector3(325.2f, 1.25f, 0f), new Color(0.75f, 0.85f, 1f, 1f));
+        }
+
+        private static void BuildMonasteryAlleyExtension(
+            Transform envParent,
+            Transform gameplayParent,
+            Transform pickupsParent,
+            Transform npcsParent,
+            Sprite[] cainosSprites,
+            Sprite[] chestSprites,
+            int groundLayer,
+            int groundMask,
+            GameObject guardPrefab,
+            GameObject checkpointPrefab,
+            GameObject villagerPrefab,
+            Sprite signSprite,
+            Sprite sleepFlaskSprite,
+            GameObject potHypnoPrefab,
+            GameObject potSleepPrefab,
+            GameObject heartPrefab,
+            Sprite cornCluster,
+            Sprite stalkA,
+            Sprite stalkB,
+            Sprite stalkC)
+        {
+            Transform monEnv = new GameObject("Act3_MonasteryAlley_Env").transform;
+            monEnv.SetParent(envParent, false);
+
+            Transform monGameplay = new GameObject("Act3_MonasteryAlley_Gameplay").transform;
+            monGameplay.SetParent(gameplayParent, false);
+
+            Transform monPickups = new GameObject("Act3_MonasteryAlley_Pickups").transform;
+            monPickups.SetParent(pickupsParent, false);
+
+            Transform monNpcs = new GameObject("Act3_MonasteryAlley_NPCs").transform;
+            monNpcs.SetParent(npcsParent, false);
+
+            // 1. Checkpoint del Callejón Monacal
+            CreateCheckpoint(monGameplay, checkpointPrefab, "Checkpoint_Act3_MonasteryAlley", new Vector3(326.5f, 0.17f, 0f));
+
+            // Escalones rústicos de madera para subir al tejado de la Botica (X: 325.2..327.6)
+            Sprite balconySprite = LoadFirstSprite(Level2ArtPath + "Village_Balcony_Platform.png");
+            CreateOneWayLedge(monEnv, "Boticario_Step_1", 325.2f, 326.6f, 1.45f, groundLayer, balconySprite, true);
+            PlaceCainosSprite(monEnv, cainosSprites, "Boticario_Crate_Support_1", "TX Village Props - Crate Small", new Vector3(325.9f, 0.70f, 0f), 1.1f, true);
+
+            CreateOneWayLedge(monEnv, "Boticario_Step_2", 326.7f, 328.0f, 2.70f, groundLayer, balconySprite, true);
+            PlaceCainosSprite(monEnv, cainosSprites, "Boticario_Barrel_Support_2", "TX Village Props - Barrel", new Vector3(327.3f, 1.95f, 0f), 1.0f, true);
+
+            // 2. Casa 5: Botica y Almacén Monacal (X: 328..340) - COFRE #3 (DORADO, LLAVE MAESTRA DE LA IGLESIA)
+            var boticario = new VillageHouseSpec
+            {
+                Id = "boticario",
+                Name = "Botica Monacal",
+                X0 = 328.0f,
+                X1 = 340.0f,
+                WestEntry = HouseOpening.CatFlap,
+                EastExit = HouseOpening.Duct,
+                FacadeSlices = new[] { "houses_sprite.png_14", "houses_sprite.png_15" },
+                FacadeTint = new Color(0.85f, 0.82f, 0.88f, 1f),
+                EntryHint = "Entra como Gato [T] por la gatera lateral bajo los estantes de ungüentos.",
+                BedX = 333.5f,
+                ChestX = 337.5f,
+                ChestObjectName = "Chest_Act3_3_Golden",
+                ChestId = "chest_act3_sanctuary_golden",
+                ChestName = "Cofre Dorado de la Botica Monacal",
+                ChestKind = "Golden",
+                ChestNeedsKey = true,
+                NeedKeyId = "inquisitor_chest_key",
+                NeedKeyName = "Llave de la Botica Monacal",
+                RewardKeyId = Level3StateController.ChurchMasterKeyId,
+                RewardKeyName = "Llave Maestra de la Iglesia",
+            };
+            boticario.Decor.Add(new HouseDecor("Interior_Table_Chairs.png", 331.0f, 2.1f, 1.25f));
+            boticario.Decor.Add(new HouseDecor("Interior_Bookshelf.png", 336.5f, 1.5f, 2.0f));
+            boticario.Decor.Add(new HouseDecor("Interior_Window_Shutters.png", 333.5f, 1.1f, 0.95f, 2.35f));
+            BuildInfiltrationHouse(boticario, monEnv, monGameplay, monNpcs, groundLayer, cainosSprites, chestSprites, villagerPrefab);
+
+            // Recompensa y farol sobre el tejado de la botica
+            CreateMysticLantern(monEnv, cainosSprites, "VillageLamp_Boticario_Roof", new Vector3(334.0f, HouseRoofTop + 0.85f, 0f), new Color(1f, 0.88f, 0.5f, 1f));
+            InstantiatePickup(monPickups, potHypnoPrefab, "PotionPickup_Monastery_Roof_Hypno", new Vector3(336.0f, HouseRoofTop + 0.55f, 0f));
+
+            // 3. Estación de recarga de pociones del monasterio (X: 341.5)
+            CreatePotionRefillStation(monGameplay, "PotionRefillStation_Monastery", new Vector3(341.5f, 0.72f, 0f),
+                "refill_monastery_alley", "Alijo del Boticario Monacal", PotionType.Sleep, 2, sleepFlaskSprite);
+
+            // 4. Aldeano boticario trabajando en el callejón
+            CreateVillager(monNpcs, villagerPrefab, "Villager_AlleyHerbalist", new Vector3(343.5f, 0.17f, 0f), WanderPattern.WalkAndReturn, 2.5f);
+
+            // 5. Escondite de paja y fardos (X: 344.5..347.5)
+            CreateForestHideout(monEnv, "Hideout_MonasteryBarrels", 345.5f, 0f, 3.2f, 3.4f, cornCluster, stalkA, stalkB, stalkC);
+
+            // 6. Guardia de patrulla del callejón (X: 342 a 349)
+            Transform[] wpMonGuard = CreateWaypoints(monNpcs, "Waypoints_Guard_Monastery", new Vector2(342.5f, 0.17f), new Vector2(349.0f, 0.17f));
+            CreateGuard(monNpcs, guardPrefab, "Guard_Monastery", new Vector3(346.0f, 0.17f, 0f), wpMonGuard, PatrolMode.PingPong, groundMask);
+
+            // Barril y adorno
+            PlaceCainosSprite(monEnv, cainosSprites, "Monastery_Barrel_1", "TX Village Props - Barrel", new Vector3(347.5f, 0.5f, 0f), 1.0f, true);
+
+            // 7. Letrero del Callejón Monacal (X: 348.5)
+            CreateWorldSign(
+                monGameplay,
+                "Sign_Act3_Monastery",
+                new Vector2(348.5f, 0.9f),
+                signSprite,
+                "Callejón Boticario del Monasterio: Las hierbas sagradas se almacenaban aquí antes del juicio. La Residencia Capitular y la Gran Vía Sacra se abren adelante.");
+
+            // 8. Corazón de recuperación en el umbral hacia la residencia capitular
+            InstantiatePickup(monPickups, heartPrefab, "HeartPickup_MonasteryAlley", new Vector3(349.5f, 0.65f, 0f));
+        }
+
+        private static Sprite GetFeatheredCathedralSprite()
+        {
+            Sprite sp = LoadFirstSprite(CathedralFeatheredArtPath);
+            if (sp != null) return sp;
+
+            string srcPath = CathedralArtPath;
+            TextureImporter srcImp = AssetImporter.GetAtPath(srcPath) as TextureImporter;
+            bool wasReadable = srcImp != null && srcImp.isReadable;
+            if (srcImp != null && !wasReadable)
+            {
+                srcImp.isReadable = true;
+                srcImp.SaveAndReimport();
+            }
+
+            Texture2D srcTex = AssetDatabase.LoadAssetAtPath<Texture2D>(srcPath);
+            if (srcTex != null)
+            {
+                int w = srcTex.width;
+                int h = srcTex.height;
+                Color[] pixels = srcTex.GetPixels();
+                Color[] outPixels = new Color[pixels.Length];
+                float fadeX = 0.25f;
+                float fadeBottom = 0.28f;
+                float fadeTop = 0.20f;
+
+                for (int y = 0; y < h; y++)
+                {
+                    float v = (float)y / (h - 1);
+                    float aY = 1f;
+                    if (v < fadeBottom) aY = Mathf.SmoothStep(0f, 1f, v / fadeBottom);
+                    else if (v > 1f - fadeTop) aY = Mathf.SmoothStep(0f, 1f, (1f - v) / fadeTop);
+
+                    for (int x = 0; x < w; x++)
+                    {
+                        float u = (float)x / (w - 1);
+                        float aX = 1f;
+                        if (u < fadeX) aX = Mathf.SmoothStep(0f, 1f, u / fadeX);
+                        else if (u > 1f - fadeX) aX = Mathf.SmoothStep(0f, 1f, (1f - u) / fadeX);
+
+                        int idx = y * w + x;
+                        Color c = pixels[idx];
+                        outPixels[idx] = new Color(c.r, c.g, c.b, c.a * aX * aY);
+                    }
+                }
+
+                Texture2D dstTex = new Texture2D(w, h, TextureFormat.RGBA32, false);
+                dstTex.SetPixels(outPixels);
+                dstTex.Apply();
+
+                byte[] pngData = dstTex.EncodeToPNG();
+                File.WriteAllBytes(CathedralFeatheredArtPath, pngData);
+                AssetDatabase.ImportAsset(CathedralFeatheredArtPath, ImportAssetOptions.ForceUpdate);
+
+                TextureImporter dstImp = AssetImporter.GetAtPath(CathedralFeatheredArtPath) as TextureImporter;
+                if (dstImp != null)
+                {
+                    dstImp.textureType = TextureImporterType.Sprite;
+                    dstImp.spritePixelsPerUnit = 100;
+                    dstImp.alphaIsTransparency = true;
+                    dstImp.SaveAndReimport();
+                }
+
+                if (srcImp != null && !wasReadable)
+                {
+                    srcImp.isReadable = false;
+                    srcImp.SaveAndReimport();
+                }
+
+                sp = LoadFirstSprite(CathedralFeatheredArtPath);
+            }
+
+            return sp != null ? sp : LoadFirstSprite(CathedralArtPath);
+        }
+
+        private static void BuildProcessionalViaSacraAndFinalGoal(
+            Transform envParent,
+            Transform gameplayParent,
+            Transform pickupsParent,
+            Transform npcsParent,
+            Sprite[] cainosSprites,
+            Sprite[] chestSprites,
+            int groundLayer,
+            int groundMask,
+            GameObject guardPrefab,
+            GameObject checkpointPrefab,
+            GameObject villagerPrefab,
+            GameObject villagerPreacherPrefab,
+            Sprite signSprite,
+            Sprite gothicSignSprite,
+            Sprite cathedralSprite,
+            GameObject potSleepPrefab,
+            GameObject potBlindPrefab,
+            GameObject heartPrefab)
+        {
+            Transform viaEnv = new GameObject("Act3_ViaSacra_Env").transform;
+            viaEnv.SetParent(envParent, false);
+
+            Transform viaGameplay = new GameObject("Act3_ViaSacra_Gameplay").transform;
+            viaGameplay.SetParent(gameplayParent, false);
+
+            Transform viaPickups = new GameObject("Act3_ViaSacra_Pickups").transform;
+            viaPickups.SetParent(pickupsParent, false);
+
+            Transform viaNpcs = new GameObject("Act3_ViaSacra_NPCs").transform;
+            viaNpcs.SetParent(npcsParent, false);
+
+            // 1. Casa 6: Residencia del Mayordomo Capitular (X: 350..361) - Última casa colonial
+            var capitular = new VillageHouseSpec
+            {
+                Id = "capitular",
+                Name = "Residencia Capitular",
+                X0 = 350.0f,
+                X1 = 361.0f,
+                WestEntry = HouseOpening.HighWindow,
+                EastExit = HouseOpening.CatFlap,
+                FacadeSlices = new[] { "houses_sprite.png_16", "houses_sprite.png_4" },
+                FacadeTint = new Color(0.82f, 0.80f, 0.90f, 1f),
+                EntryHint = "Entra como Gato [T]: trepa por las cajas hasta la ventana alta enrejada.",
+                BedX = 355.0f,
+                ChestX = 358.5f,
+                InsidePickupPrefab = potSleepPrefab,
+                InsidePickupName = "PotionPickup_House_Capitular_Sleep",
+            };
+            capitular.Decor.Add(new HouseDecor("Interior_Fireplace.png", 352.5f, 1.8f, 2.2f));
+            capitular.Decor.Add(new HouseDecor("Interior_Wardrobe.png", 358.0f, 1.2f, 2.1f));
+            capitular.Decor.Add(new HouseDecor("Interior_Window_Shutters.png", 355.0f, 1.1f, 0.95f, 2.35f));
+            BuildInfiltrationHouse(capitular, viaEnv, viaGameplay, viaNpcs, groundLayer, cainosSprites, chestSprites, villagerPrefab);
+
+            // Recompensa y farol en el tejado de la residencia capitular
+            CreateMysticLantern(viaEnv, cainosSprites, "VillageLamp_Capitular_Roof", new Vector3(355.5f, HouseRoofTop + 0.85f, 0f), new Color(0.95f, 0.85f, 0.55f, 1f));
+            InstantiatePickup(viaPickups, potBlindPrefab, "PotionPickup_Capitular_Roof_Blind", new Vector3(357.5f, HouseRoofTop + 0.55f, 0f));
+
+            // Corazón adicional dentro de la casa (en el suelo)
+            InstantiatePickup(viaPickups, heartPrefab, "HeartPickup_House_Capitular", new Vector3(352.5f, 0.65f, 0f));
+
+            // 2. Portal de Salida Ceremonial de la Aldea hacia el Sendero Oscuro (X: 361.5..363.0)
+            PlaceCainosSprite(viaEnv, cainosSprites, "ViaSacra_Arch_Pillar_L", "TX Village Props - Fence 02 Pillar", new Vector3(361.8f, 1.35f, 0f), 1.35f, true);
+            PlaceCainosSprite(viaEnv, cainosSprites, "ViaSacra_Arch_Pillar_R", "TX Village Props - Fence 02 Pillar", new Vector3(363.2f, 1.35f, 0f), 1.35f, true);
+            CreateMysticLantern(viaEnv, cainosSprites, "VillageLamp_ViaSacra_Portal", new Vector3(362.5f, 1.95f, 0f), new Color(0.95f, 0.85f, 0.55f, 1f));
+
+            // 3. Checkpoint previo al sendero del bosque oscuro (X: 363.8)
+            CreateCheckpoint(viaGameplay, checkpointPrefab, "Checkpoint_Act3_ViaSacra", new Vector3(363.8f, 0.17f, 0f));
+
+            // 4. Aldeano acólito rezando al borde de la aldea
+            CreateVillager(viaNpcs, villagerPreacherPrefab != null ? villagerPreacherPrefab : villagerPrefab,
+                "Villager_ViaSacra_Acolyte", new Vector3(365.2f, 0.17f, 0f), WanderPattern.LookAround, 2.0f);
+
+            // 5. Guardia inquisidor de la guardia de honor (X: 363.5 a 367.0)
+            Transform[] wpViaGuard = CreateWaypoints(viaNpcs, "Waypoints_Guard_ViaSacra", new Vector2(363.5f, 0.17f), new Vector2(367.0f, 0.17f));
+            CreateGuard(viaNpcs, guardPrefab, "Guard_ViaSacra", new Vector3(365.5f, 0.17f, 0f), wpViaGuard, PatrolMode.PingPong, groundMask);
+
+            // 6. FONDO ESCÉNICO DIFUMINADO: CATEDRAL GÓTICA BAJO LA LUNA
+            // Se difumina suavemente hacia el cielo nocturno y la silueta del bosque sin cortes rectangulares
+            if (cathedralSprite != null)
+            {
+                GameObject cathedralBg = new GameObject("Cathedral_Moonlit_Backdrop");
+                cathedralBg.transform.SetParent(viaEnv, false);
+                cathedralBg.transform.position = new Vector3(372.0f, 5.8f, 0f);
+                SpriteRenderer catSr = cathedralBg.AddComponent<SpriteRenderer>();
+                catSr.sprite = cathedralSprite;
+                catSr.sortingLayerName = "Background";
+                catSr.sortingOrder = 4;
+                // Tinte nocturno armónico que lo integra de manera natural con el cielo y el fondo de la aldea
+                catSr.color = new Color(0.76f, 0.74f, 0.88f, 0.95f);
+                cathedralBg.transform.localScale = new Vector3(1.22f, 1.22f, 1f);
+            }
+
+            // 7. BOSQUE MUY OSCURO: árboles retorcidos, niebla difusora y transición nocturna (X: 366..378)
+            string treesPath = DarkForestPath + "env_trees";
+            Color deepNightTint = new Color(0.14f, 0.11f, 0.22f, 0.95f);
+            Color frontTreeTint = new Color(0.18f, 0.15f, 0.26f, 1f);
+
+            // Siluetas lejanas en el fondo entre la catedral y el sendero
+            PlaceForestDecor(viaEnv, "DarkForest_Back_1", PackSprite(DarkForestPath + "bgrd_tree1"), 368.5f, 1.55f, false, -2, deepNightTint, 0.15f);
+            PlaceForestDecor(viaEnv, "DarkForest_Back_2", PackSprite(DarkForestPath + "bgrd_tree3"), 374.0f, 1.65f, true, -2, deepNightTint, 0.15f);
+
+            // Árboles retorcidos del bosque oscuro flanqueando el camino
+            PlaceForestDecor(viaEnv, "DarkForest_Tree_1", PackSprite(treesPath, "env_trees_6"), 366.5f, 1.9f, false, 2, frontTreeTint, 0.15f);
+            PlaceForestDecor(viaEnv, "DarkForest_Tree_2", PackSprite(treesPath, "env_trees_1"), 371.0f, 2.1f, true, 2, frontTreeTint, 0.15f);
+            PlaceForestDecor(viaEnv, "DarkForest_Tree_3", PackSprite(treesPath, "env_trees_5"), 375.2f, 2.3f, false, 2, frontTreeTint, 0.15f);
+
+            // Bruma y niebla difusora que abraza e integra el fondo de la catedral con el horizonte
+            Sprite fogSprite = LoadFirstSprite(FogSpritePath);
+            if (fogSprite != null)
+            {
+                // Capa difusora inferior sobre la base de la catedral
+                GameObject baseFog = new GameObject("Cathedral_Base_BlendFog");
+                baseFog.transform.SetParent(viaEnv, false);
+                baseFog.transform.position = new Vector3(372.0f, 2.5f, 0f);
+                SpriteRenderer bSr = baseFog.AddComponent<SpriteRenderer>();
+                bSr.sprite = fogSprite;
+                bSr.sortingLayerName = "Background";
+                bSr.sortingOrder = 6;
+                bSr.color = new Color(0.10f, 0.08f, 0.18f, 0.75f);
+                baseFog.transform.localScale = new Vector3(5.5f, 3.2f, 1f);
+
+                // Capa difusora lateral izquierda para transición suave con el cielo de la aldea
+                GameObject leftFog = new GameObject("Cathedral_Left_BlendFog");
+                leftFog.transform.SetParent(viaEnv, false);
+                leftFog.transform.position = new Vector3(365.0f, 5.5f, 0f);
+                SpriteRenderer lSr = leftFog.AddComponent<SpriteRenderer>();
+                lSr.sprite = fogSprite;
+                lSr.sortingLayerName = "Background";
+                lSr.sortingOrder = 6;
+                lSr.color = new Color(0.08f, 0.07f, 0.16f, 0.65f);
+                leftFog.transform.localScale = new Vector3(4.0f, 4.5f, 1f);
+
+                // Niebla en el suelo a lo largo del sendero oscuro
+                for (int f = 0; f < 3; f++)
+                {
+                    float fx = 366f + f * 4.5f;
+                    GameObject fogGo = new GameObject($"DarkForest_Fog_{f}");
+                    fogGo.transform.SetParent(viaEnv, false);
+                    fogGo.transform.position = new Vector3(fx, 1.8f, 0f);
+                    SpriteRenderer fogSr = fogGo.AddComponent<SpriteRenderer>();
+                    fogSr.sprite = fogSprite;
+                    fogSr.sortingLayerName = "Midground";
+                    fogSr.sortingOrder = 3;
+                    fogSr.color = new Color(0.06f, 0.05f, 0.12f, 0.70f);
+                    fogGo.transform.localScale = new Vector3(3.5f, 2.0f, 1f);
+                }
+            }
+
+            // 8. FINAL DEL RECORRIDO: ÚNICAMENTE EL CARTEL GÓTICO NOCTURNO (Recurso 1)
+            // El cartel es el único elemento que da a entender que el camino oscuro va a la iglesia.
+            GameObject signGo = new GameObject("Church_MainDoor_Goal");
+            signGo.transform.SetParent(viaGameplay, false);
+            signGo.transform.position = new Vector3(368.5f, 0.17f, 0f);
+
+            SpriteRenderer signSr = AddFitted(signGo.transform, "GothicSign_Visual", gothicSignSprite,
+                new Vector2(367.3f, 0.17f), new Vector2(369.7f, 2.55f), "Gameplay", 3, Color.white);
+
+            // Luz mística focal dorada que ilumina el cartel en la penumbra
+            GameObject signLightGo = new GameObject("GothicSign_Light2D");
+            signLightGo.transform.SetParent(signGo.transform, false);
+            signLightGo.transform.position = new Vector3(368.5f, 1.7f, 0f);
+            Light2D signLight = signLightGo.AddComponent<Light2D>();
+            signLight.lightType = Light2D.LightType.Point;
+            signLight.color = new Color(1f, 0.90f, 0.65f, 1f);
+            signLight.intensity = 1.75f;
+            signLight.pointLightOuterRadius = 4.2f;
+
+            BoxCollider2D goalTrigger = signGo.AddComponent<BoxCollider2D>();
+            goalTrigger.isTrigger = true;
+            goalTrigger.size = new Vector2(3.6f, 4.4f);
+            goalTrigger.offset = new Vector2(0f, 2.2f);
+
+            ChurchDoorGoal goal = signGo.AddComponent<ChurchDoorGoal>();
+            var soGoal = new SerializedObject(goal);
+            soGoal.FindProperty("doorDisplayName").stringValue = "Sendero hacia la Iglesia de Salem";
+            soGoal.FindProperty("requiredKeyId").stringValue = ChurchDoorGoal.RequiredMasterKeyId;
+            soGoal.FindProperty("requiredKeyDisplayName").stringValue = "Llave Maestra de la Iglesia";
+            soGoal.FindProperty("doorRenderer").objectReferenceValue = signSr;
+            soGoal.FindProperty("leftDoorWing").objectReferenceValue = null;
+            soGoal.FindProperty("rightDoorWing").objectReferenceValue = null;
+            soGoal.FindProperty("sanctuaryPortalLight").objectReferenceValue = signLight;
+            soGoal.ApplyModifiedPropertiesWithoutUndo();
+
             SnapToGround(signGo, 0.02f);
         }
 
@@ -3648,6 +4115,12 @@ namespace Level3.Editor
         }
 
         private static void BuildLevel3VillageEndingUI(Transform uiRoot, Sprite cathedralSprite)
+        {
+            // Sin UI de desenlace narrativo; la ambientación vive en el fondo del mundo.
+            return;
+        }
+
+        private static void UnusedEndingUI(Transform uiRoot, Sprite cathedralSprite)
         {
             GameObject root = new GameObject("Level3VillageEnding_Canvas", typeof(RectTransform));
             root.transform.SetParent(uiRoot, false);

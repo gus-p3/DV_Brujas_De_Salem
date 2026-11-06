@@ -308,7 +308,7 @@ namespace Level3.Editor
             {
                 string req = new SerializedObject(d).FindProperty("requiredKeyId").stringValue;
                 Check(r, req == ChurchDoorGoal.RequiredMasterKeyId, $"ChurchDoorGoal requiere '{req}'", $"ChurchDoorGoal requiere '{req}' (esperado church_master_key)");
-                Check(r, Mathf.Abs(d.transform.position.x - 255f) <= 1.5f, $"ChurchDoorGoal en X={d.transform.position.x:F1}", $"ChurchDoorGoal fuera de X≈255 ({d.transform.position.x:F1})");
+                Check(r, d.transform.position.x >= 365f, $"ChurchDoorGoal al final del recorrido (X={d.transform.position.x:F1})", $"ChurchDoorGoal debe estar al final del nivel X>=365 ({d.transform.position.x:F1})");
             }
 
             // Toda cerradura con llave debe tener su llave obtenible
