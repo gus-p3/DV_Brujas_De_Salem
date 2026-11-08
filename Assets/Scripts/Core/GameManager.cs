@@ -345,9 +345,9 @@ public class GameManager : MonoBehaviour
         OnHeartsChanged?.Invoke(currentHearts, maxHearts);
         OnStatsUpdated?.Invoke();
 
-        if (AudioManager.Instance != null && AudioManager.Instance.levelMusicClip != null)
+        if (AudioManager.Instance != null)
         {
-            AudioManager.Instance.PlayMusic(AudioManager.Instance.levelMusicClip);
+            AudioManager.Instance.PlayMusicForScene(SceneManager.GetActiveScene().name);
         }
     }
 

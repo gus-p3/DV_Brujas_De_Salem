@@ -134,6 +134,7 @@ MonoBehaviour:
   lanternOrigin: {fileID: 1824885132692808136}
   facingReference: {fileID: 4974559713387957055}
   coneTiltDegrees: 0
+  handOffset: {x: 0.45, y: 1.05}
   suspicionTime: 1.2
   lostTargetDelay: 2
   captureDistance: 1.2
@@ -206,7 +207,7 @@ Transform:
   m_GameObject: {fileID: 6012871363723277335}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.45, y: 1, z: 0}
+  m_LocalPosition: {x: 0.45, y: 1.05, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

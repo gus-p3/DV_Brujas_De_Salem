@@ -95,7 +95,28 @@ public class HUDController : MonoBehaviour
         if (catEnergySlider == null)
         {
             Transform t = transform.Find("CatSlider");
-            if (t != null) catEnergySlider = t.GetComponent<Slider>();
+            if (t != null)
+            {
+                catEnergySlider = t.GetComponent<Slider>();
+            }
+            else if (flightEnergySlider != null)
+            {
+                // Si la escena no tiene CatSlider maquetado en el HUD_Canvas (p. ej. Nivel 2),
+                // se genera dinámicamente clonando la barra de vuelo y posicionándola bajo los corazones
+                GameObject catObj = Instantiate(flightEnergySlider.gameObject, transform);
+                catObj.name = "CatSlider";
+                RectTransform rt = catObj.GetComponent<RectTransform>();
+                if (rt != null)
+                {
+                    rt.anchorMin = new Vector2(0f, 1f);
+                    rt.anchorMax = new Vector2(0f, 1f);
+                    rt.pivot = new Vector2(0f, 1f);
+                    rt.anchoredPosition = new Vector2(40f, -120f);
+                    rt.sizeDelta = new Vector2(240f, 18f);
+                }
+                catEnergySlider = catObj.GetComponent<Slider>();
+                catObj.SetActive(false);
+            }
         }
         transformation = Object.FindFirstObjectByType<TransformationManager>();
         if (transformation != null)

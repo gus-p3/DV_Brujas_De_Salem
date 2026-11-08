@@ -46,4 +46,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
   musicSource: {fileID: 0}
   sfxSource: {fileID: 0}
-  audioMixer: {fileID: 0}
+  menuMusicClip: {fileID: 8300000, guid: dc730019d40038c47a16a2ba4ee13e8d, type: 3}
+  levelMusicClip: {fileID: 8300000, guid: 53880a9832446bc4481ed64cc746f83d, type: 3}
+  level2MusicClip: {fileID: 8300000, guid: 6dae52985b904c34cbfb1604038de8d4, type: 3}
+  level3MusicClip: {fileID: 8300000, guid: 23b0078a86b82af4c94de8651204579f, type: 3}
+  buttonClickClip: {fileID: 0}
+  jumpClip: {fileID: 0}
+  transformClip: {fileID: 0}
+  captureClip: {fileID: 0}
+  heartBreakClip: {fileID: 0}
+  heartHealClip: {fileID: 0}
+  checkpointClip: {fileID: 0}
+  footstepHumanClip: {fileID: 0}
+  footstepCatClip: {fileID: 0}
+  landClip: {fileID: 0}
+  broomFlyClip: {fileID: 0}
+  ladderStepClip: {fileID: 0}
+  potionSelectClip: {fileID: 0}
+  potionThrowClip: {fileID: 0}
+  potionShatterClip: {fileID: 0}
+  chestOpenClip: {fileID: 0}
+  chestLockedClip: {fileID: 0}
+  keyPickupClip: {fileID: 0}
+  ingredientPickupClip: {fileID: 0}
+  potionPickupClip: {fileID: 0}
+  doorOpenClip: {fileID: 0}
+  loreReadClip: {fileID: 0}
+  villagerNoticeClip: {fileID: 0}
+  villagerScreamClip: {fileID: 0}
+  guardAlertClip: {fileID: 0}
+  frenzyAlarmClip: {fileID: 0}
+  gateUnlockClip: {fileID: 0}
+  errorBuzzClip: {fileID: 0}

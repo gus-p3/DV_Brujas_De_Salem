@@ -22,12 +22,14 @@ public class EnemySight : MonoBehaviour
     [SerializeField] private LayerMask targetMask;
 
     [Header("Referencias")]
-    [Tooltip("Punto desde donde sale la luz del farol. Si está vacío se usa este transform.")]
+    [Tooltip("Punto desde donde sale la luz del farol. Si está vacío se busca o crea automáticamente a la altura de la mano.")]
     [SerializeField] private Transform lanternOrigin;
     [Tooltip("Transform que indica hacia dónde mira el guardia. Se mira a la derecha si su escala X es positiva y a la izquierda si es negativa.")]
     [SerializeField] private Transform facingReference;
     [Tooltip("Ángulo extra (grados) para inclinar el cono, positivo hacia arriba.")]
     [SerializeField] private float coneTiltDegrees = 0f;
+    [Tooltip("Desplazamiento local de la mano que sostiene el farol (x adelante, y arriba respecto a la base de los pies).")]
+    [SerializeField] private Vector2 handOffset = new Vector2(0.45f, 1.05f);
 
     [Header("Estados de alerta")]
     [Tooltip("Segundos viendo al objetivo para pasar de Sospecha a Alerta.")]
@@ -89,7 +91,43 @@ public class EnemySight : MonoBehaviour
     public AlertState CurrentState => state;
     public bool IsTargetVisible => targetVisible;
 
-    private Transform Origin => lanternOrigin != null ? lanternOrigin : transform;
+    /// <summary>
+    /// Devuelve la posición de mundo desde donde alumbra el farol, situado en la mano del guardia
+    /// a la altura correspondiente (~1.05u del suelo) y adelantado en la dirección de la marcha.
+    /// Garantiza que la luz NUNCA emane desde los pies del guardia.
+    /// </summary>
+    public Vector3 GetLanternWorldPosition()
+    {
+        float sign = (facingReference != null ? facingReference.lossyScale.x : transform.lossyScale.x) >= 0f ? 1f : -1f;
+
+        if (lanternOrigin != null && lanternOrigin != transform)
+        {
+            Vector3 lp = lanternOrigin.localPosition;
+            if (lp.y < 0.5f) lp.y = handOffset.y;
+            lp.x = Mathf.Abs(lp.x > 0.05f ? lp.x : handOffset.x) * sign;
+            lanternOrigin.localPosition = lp;
+            return lanternOrigin.position;
+        }
+
+        return transform.position + new Vector3(sign * handOffset.x, handOffset.y, 0f);
+    }
+
+    private Transform Origin
+    {
+        get
+        {
+            if (lanternOrigin != null && lanternOrigin != transform)
+            {
+                Vector3 lp = lanternOrigin.localPosition;
+                if (lp.y < 0.5f) lp.y = handOffset.y;
+                float sign = (facingReference != null ? facingReference.lossyScale.x : transform.lossyScale.x) >= 0f ? 1f : -1f;
+                lp.x = Mathf.Abs(lp.x > 0.05f ? lp.x : handOffset.x) * sign;
+                lanternOrigin.localPosition = lp;
+                return lanternOrigin;
+            }
+            return transform;
+        }
+    }
 
     private bool isSuppressed = false;
     private Color? suppressedColor = null;
@@ -102,6 +140,25 @@ public class EnemySight : MonoBehaviour
         {
             Transform visual = transform.Find("Visual");
             if (visual != null) facingReference = visual;
+        }
+
+        if (lanternOrigin == null || lanternOrigin == transform)
+        {
+            Transform found = transform.Find("LanternOrigin");
+            if (found == null)
+            {
+                GameObject go = new GameObject("LanternOrigin");
+                go.transform.SetParent(transform, false);
+                go.transform.localPosition = new Vector3(handOffset.x, handOffset.y, 0f);
+                found = go.transform;
+            }
+            lanternOrigin = found;
+        }
+        else if (lanternOrigin.localPosition.y < 0.5f)
+        {
+            Vector3 lp = lanternOrigin.localPosition;
+            lp.y = handOffset.y;
+            lanternOrigin.localPosition = lp;
         }
 
         int groundLayer = LayerMask.NameToLayer("Ground");
@@ -219,7 +276,7 @@ public class EnemySight : MonoBehaviour
             rayLengths = new float[rayCount];
         }
 
-        Vector2 origin = Origin.position;
+        Vector2 origin = GetLanternWorldPosition();
         Vector2 forward = GetFacingDirection();
         float startAngle = -viewAngle * 0.5f;
         float step = viewAngle / (rayCount - 1);
@@ -558,7 +615,7 @@ public class EnemySight : MonoBehaviour
         }
 
         Transform coneTransform = coneFilter.transform;
-        Vector3 origin = Origin.position;
+        Vector3 origin = GetLanternWorldPosition();
 
         // Los vértices se calculan en mundo y se pasan a local: el cono sigue bien aunque el guardia se voltee con escala negativa
         vertices[0] = coneTransform.InverseTransformPoint(origin);
@@ -613,12 +670,12 @@ public class EnemySight : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        Transform origin = Origin;
+        Vector3 originPos = Application.isPlaying ? GetLanternWorldPosition() : transform.position + new Vector3(0.45f, handOffset.y, 0f);
         Gizmos.color = Color.yellow;
         Vector2 forward = GetFacingDirection();
-        Gizmos.DrawLine(origin.position, origin.position + (Vector3)(Rotate(forward, viewAngle * 0.5f) * viewDistance));
-        Gizmos.DrawLine(origin.position, origin.position + (Vector3)(Rotate(forward, -viewAngle * 0.5f) * viewDistance));
+        Gizmos.DrawLine(originPos, originPos + (Vector3)(Rotate(forward, viewAngle * 0.5f) * viewDistance));
+        Gizmos.DrawLine(originPos, originPos + (Vector3)(Rotate(forward, -viewAngle * 0.5f) * viewDistance));
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(origin.position, captureDistance);
+        Gizmos.DrawWireSphere(originPos, captureDistance);
     }
 }

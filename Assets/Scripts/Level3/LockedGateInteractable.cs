@@ -261,7 +261,7 @@ namespace Level3
 
         private string GetMissingKeyMessage()
         {
-            return $"Cerrado: Necesitas {requiredKeyDisplayName} (Duerme al guardia brillante: lanza una poción con [Q] o clic)";
+            return $"Cerrado: Necesitas {requiredKeyDisplayName} (Duerme al guardia brillante: lanza una poción con [{Level2Controls.ThrowPotionKey}] o clic)";
         }
 
         private void TryShowThrottledLockedWarning(string message)
