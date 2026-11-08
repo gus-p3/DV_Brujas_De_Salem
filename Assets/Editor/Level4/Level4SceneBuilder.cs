@@ -41,6 +41,19 @@ namespace Salem.Editor
         private static LayerMask _groundMask;
         private static Sprite[] _cainos;
 
+        // Arte nuevo de Docs/Level4_Prompts_NanoBanana.md: si el archivo existe se usa; si no, el respaldo actual.
+        // (La ventana y el portón reemplazan sus archivos actuales, así que no necesitan ruta propia.)
+        private const string NewTombstones = Garden + "Panteon_Tombstones_Sheet.png";
+        private const string NewMausoleum = Garden + "Panteon_Mausoleum.png";
+        private const string NewCarpet = L4 + "Carpet_Velvet_Runner.png";
+        private const string NewCreaky = L4 + "Creaky_Floorboard.png";
+        private const string NewInquisitorSheet = "Assets/Art/Characters/Inquisitor/Inquisitor_Sheet.png";
+        private const string NewFogStrip = L4 + "FX_GroundFog_Strip.png";
+        private const string NewSky = Garden + "Storm_Parallax_Sky.png";
+        private const string NewFar = Garden + "Storm_Parallax_Far.png";
+        private const string NewNear = Garden + "Storm_Parallax_Near.png";
+        private const string NewGround = Garden + "Withered_Ground_Tile.png";
+
         [MenuItem("Salem/Build Level 4 Scene")]
         public static void BuildScene()
         {
@@ -51,6 +64,7 @@ namespace Salem.Editor
             }
             ProjectSetup.Configure();
             L3.EnsurePixelArtImport(DF);
+            PrepareNewArt();
             _ground = LayerMask.NameToLayer("Ground");
             _groundMask = 1 << _ground;
             _cainos = AssetDatabase.LoadAllAssetsAtPath(Cainos).OfType<Sprite>().ToArray();
@@ -261,13 +275,13 @@ namespace Salem.Editor
 
             // --- Seto escondite 1 + Mausoleo A (tejado escalable) + Guardia 1 ---
             Hedge(env, "Hideout_Hedge_1", 10.6f, G, 3.2f);
-            Mausoleum(env, "Mausoleum_A", Named(DF + "castle_env", "castle_env_7"), 15.5f, G, 2.3f);
+            Mausoleum(env, "Mausoleum_A", Opt(NewMausoleum) ?? Named(DF + "castle_env", "castle_env_7"), 15.5f, G, 2.3f);
             Fit(env, "Mausoleum_A_Column", Named(DF + "env_mon", "env_mon_6"), 12.7f, G - 0.05f, 2.9f, "Midground", 2, NightStone);
             Guard(npcs, "Guard_Panteon_1", 9f, 21f, G);
             L3.CreateMysticLantern(env, _cainos, "Lamp_Crypts", new Vector3(20.6f, 1.35f, 0f), new Color(0.55f, 1f, 0.75f, 1f));
 
             // --- Terraza: Mausoleo B, poción y Guardia 2 ---
-            Mausoleum(env, "Mausoleum_B", Named(DF + "env_mon", "env_mon_11"), 29f, TerraceY, 2.4f);
+            Mausoleum(env, "Mausoleum_B", Opt(NewMausoleum) ?? Named(DF + "env_mon", "env_mon_11"), 29f, TerraceY, 2.4f);
             L3.CreateMysticLantern(env, _cainos, "Lamp_Terrace", new Vector3(24.4f, 2.7f, 0f), new Color(1f, 0.82f, 0.45f, 1f));
             Graves(env, TerraceY, 25.6f, 31.6f, 33.2f);
             Guard(npcs, "Guard_Panteon_Terrace", 24.6f, 33.2f, TerraceY);
@@ -301,12 +315,15 @@ namespace Salem.Editor
         private static void BuildStormParallax(Transform bg)
         {
             // Cielo verde esmeralda (cubre el vuelo hasta Y 17, sin bloqueo vertical que lo deje atrás)
-            L3.AddParallaxBand(bg, "Sky_StormyCemetery", Load(Garden + "Stormy_Cemetery_GreenNight_BG.png"), 7.2f, 1.3f, 0, 0.95f, new Color(0.9f, 1f, 0.94f, 1f));
+            L3.AddParallaxBand(bg, "Sky_StormyCemetery", Opt(NewSky) ?? Load(Garden + "Stormy_Cemetery_GreenNight_BG.png"), 7.2f, 1.3f, 0, 0.95f, new Color(0.9f, 1f, 0.94f, 1f));
             L3.AddParallaxLandmark(bg, "Cathedral_Far", Load(Env + "Level3/Catedral_Moonlit_Feathered.png"), 62f, 64f, 7.4f, 1.15f, 2, 0.86f, new Color(0.38f, 0.55f, 0.48f, 0.9f));
-            L3.AddParallaxBand(bg, "Hills_Graveyard", Named(DF + "top_far_bgrnd", "top_far_bgrnd_1"), 3.6f, 1.7f, 4, 0.8f, new Color(0.11f, 0.22f, 0.18f, 0.95f));
+            Sprite far = Opt(NewFar), near = Opt(NewNear);
+            if (far != null) L3.AddParallaxBand(bg, "Storm_Far", far, 2.9f, 0.8f, 4, 0.8f, new Color(0.7f, 0.82f, 0.76f, 1f));
+            else L3.AddParallaxBand(bg, "Hills_Graveyard", Named(DF + "top_far_bgrnd", "top_far_bgrnd_1"), 3.6f, 1.7f, 4, 0.8f, new Color(0.11f, 0.22f, 0.18f, 0.95f));
             L3.AddParallaxBand(bg, "Hills_Ridge", Named(DF + "top_far_bgrnd", "top_far_bgrnd_0"), 1.9f, 2.2f, 5, 0.72f, new Color(0.09f, 0.18f, 0.15f, 1f));
             L3.AddParallaxBand(bg, "Trees_Far", Load(DF + "bgrd_tree1.png"), 2.7f, 1.45f, 6, 0.62f, new Color(0.10f, 0.20f, 0.16f, 1f));
-            L3.AddParallaxBand(bg, "Trees_Mid", Load(DF + "bgrd_tree3.png"), 2.6f, 1.55f, 7, 0.46f, new Color(0.07f, 0.15f, 0.12f, 0.92f));
+            if (near != null) L3.AddParallaxBand(bg, "Storm_Near", near, 2.15f, 0.7f, 7, 0.46f, new Color(0.55f, 0.66f, 0.6f, 1f));
+            else L3.AddParallaxBand(bg, "Trees_Mid", Load(DF + "bgrd_tree3.png"), 2.6f, 1.55f, 7, 0.46f, new Color(0.07f, 0.15f, 0.12f, 0.92f));
         }
 
         private static void BuildSealedGate(Transform env, Transform play)
@@ -369,18 +386,18 @@ namespace Salem.Editor
 
         private static void BuildFog(Transform env, Transform fx)
         {
-            Sprite fog = Load(Env + "Level3/FX_Level3_SoftFog.png");
+            Sprite fog = Opt(NewFogStrip) ?? Load(Env + "Level3/FX_Level3_SoftFog.png");
             // Banco lejano con paralaje, banco a ras de suelo entre lápidas y velo frontal
             GameObject far = new GameObject("Fog_Far_Parallax");
             far.transform.SetParent(fx, false);
             for (float x = -12f; x < 70f; x += 8f)
-                FogBlob(far.transform, fog, new Vector3(x, 2.2f, 0f), new Vector2(11f, 1.8f), new Color(0.5f, 0.78f, 0.66f, 0.16f + 0.06f * Mathf.Sin(x)), "Background", 9, 2.2f);
+                FogBlob(far.transform, fog, new Vector3(x, 2.2f, 0f), new Vector2(22f, 3.6f), new Color(0.5f, 0.78f, 0.66f, 0.16f + 0.06f * Mathf.Sin(x)), "Background", 9, 2.2f);
             far.AddComponent<ParallaxLayer>().Setup(0.35f, false, true);
 
             for (float x = -4f; x < 76f; x += 7f)
-                FogBlob(env, fog, new Vector3(x, (x > 23f && x < 34f ? TerraceY : G) + 0.2f, 0f), new Vector2(6f, 0.9f), new Color(0.62f, 0.86f, 0.74f, 0.12f + 0.05f * Mathf.Cos(x)), "Midground", 6, 1.4f);
+                FogBlob(env, fog, new Vector3(x, (x > 23f && x < 34f ? TerraceY : G) + 0.2f, 0f), new Vector2(12f, 1.8f), new Color(0.62f, 0.86f, 0.74f, 0.12f + 0.05f * Mathf.Cos(x)), "Midground", 6, 1.4f);
             for (float x = 2f; x < 76f; x += 13f)
-                FogBlob(env, fog, new Vector3(x, -0.15f, 0f), new Vector2(7f, 0.7f), new Color(0.66f, 0.9f, 0.78f, 0.12f), "Foreground", 8, 2.6f);
+                FogBlob(env, fog, new Vector3(x, -0.15f, 0f), new Vector2(14f, 1.4f), new Color(0.66f, 0.9f, 0.78f, 0.12f), "Foreground", 8, 2.6f);
         }
 
         private static void BuildStorm(Transform fx, Light2D global)
@@ -586,7 +603,13 @@ namespace Salem.Editor
             col.size = new Vector2(1.0f, 2.7f);
             col.offset = new Vector2(0f, 1.37f);
 
-            SpriteRenderer sr = Fit(inq.transform, "Visual", Load("Assets/Art/Characters/Inquisitor/Inquisitor_Boss_Stylized.png"), x, G, 3.0f, "Gameplay", 6, Color.white);
+            // Hoja 6x5 (Docs/Level4_Prompts_NanoBanana.md #7); sin ella, la pose única actual
+            Sprite[] idleF = Frames(NewInquisitorSheet, 0, 1), walkF = Frames(NewInquisitorSheet, 6, 7, 8, 9, 10, 11),
+                listenF = Frames(NewInquisitorSheet, 12, 13, 14), chargeF = Frames(NewInquisitorSheet, 18, 19, 20, 21, 22, 23),
+                stunF = Frames(NewInquisitorSheet, 24, 25, 26, 27);
+            bool sheet = idleF != null && idleF.Length > 0;
+            Sprite pose = sheet ? idleF[0] : Load("Assets/Art/Characters/Inquisitor/Inquisitor_Boss_Stylized.png");
+            SpriteRenderer sr = Fit(inq.transform, "Visual", pose, x, G, 3.0f, "Gameplay", 6, Color.white);
             sr.flipX = true; // empieza mirando a la izquierda (hacia la bruja)
 
             GameObject lantern = new GameObject("LanternOrigin");
@@ -613,6 +636,11 @@ namespace Salem.Editor
             so.FindProperty("alertIcon").objectReferenceValue = alert.gameObject;
             so.FindProperty("alertSfx").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/SFX_InquisitorAlert.wav");
             so.FindProperty("stompSfx").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/SFX_InquisitorStomp.wav");
+            if (sheet)
+            {
+                SetFrames(so, "idleFrames", idleF); SetFrames(so, "walkFrames", walkF); SetFrames(so, "listenFrames", listenF);
+                SetFrames(so, "chargeFrames", chargeF); SetFrames(so, "stunnedFrames", stunF);
+            }
             SerializedProperty wpProp = so.FindProperty("patrolWaypoints");
             wpProp.arraySize = wps.Length;
             for (int i = 0; i < wps.Length; i++) wpProp.GetArrayElementAtIndex(i).objectReferenceValue = wps[i];
@@ -627,6 +655,56 @@ namespace Salem.Editor
         {
             // Hojas en modo Multiple: el corte más grande es el arte principal (los demás son restos del recorte)
             return AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>().OrderByDescending(s => s.rect.width * s.rect.height).FirstOrDefault();
+        }
+
+        /// <summary>Sprite principal de un asset opcional, o null si todavía no existe.</summary>
+        private static Sprite Opt(string path) => System.IO.File.Exists(path) ? Load(path) : null;
+
+        /// <summary>Cuadros de una hoja cortada en orden de lectura (izq→der, arriba→abajo).</summary>
+        private static void SetFrames(SerializedObject so, string field, Sprite[] frames)
+        {
+            SerializedProperty p = so.FindProperty(field);
+            p.arraySize = frames.Length;
+            for (int i = 0; i < frames.Length; i++) p.GetArrayElementAtIndex(i).objectReferenceValue = frames[i];
+        }
+
+        private static Sprite[] Frames(string path, params int[] indices)
+        {
+            if (!System.IO.File.Exists(path)) return null;
+            string baseName = System.IO.Path.GetFileNameWithoutExtension(path);
+            var all = AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>().ToDictionary(s => s.name);
+            return indices.Select(i => all.TryGetValue($"{baseName}_{i}", out Sprite s) ? s : null).Where(s => s != null).ToArray();
+        }
+
+        /// <summary>
+        /// Ajustes de importación del arte nuevo: pixel art con filtro Point y 64 ppu; las hojas se cortan en celdas
+        /// (SpriteSheetSlicer) solo si aún no están cortadas. El Inquisidor es cel-shaded: conserva filtro Bilinear.
+        /// </summary>
+        private static void PrepareNewArt()
+        {
+            foreach (string p in new[] { Garden + "Gothic_Cat_Entry_Window.png", Garden + "Panteon_Iron_Gate.png", NewMausoleum, NewCarpet, NewCreaky, NewGround })
+                Import(p, FilterMode.Point);
+            foreach (string p in new[] { NewFogStrip, NewSky, NewFar, NewNear })
+                Import(p, FilterMode.Bilinear);
+            Slice(NewTombstones, 128, 256, FilterMode.Point);
+            Slice(NewInquisitorSheet, 256, 384, FilterMode.Bilinear);
+        }
+
+        private static void Import(string path, FilterMode filter)
+        {
+            if (!System.IO.File.Exists(path) || !(AssetImporter.GetAtPath(path) is TextureImporter ti)) return;
+            if (ti.textureType == TextureImporterType.Sprite && ti.filterMode == filter && ti.textureCompression == TextureImporterCompression.Uncompressed && Mathf.Approximately(ti.spritePixelsPerUnit, 64f)) return;
+            SpriteImportDefaults.Apply(ti);
+            ti.spritePixelsPerUnit = 64f;
+            ti.filterMode = filter;
+            ti.SaveAndReimport();
+        }
+
+        private static void Slice(string path, int cellW, int cellH, FilterMode filter)
+        {
+            if (!System.IO.File.Exists(path)) return;
+            if (AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>().Count() <= 1) SpriteSheetSlicer.SliceSheet(path, cellW, cellH);
+            Import(path, filter);
         }
 
         private static Sprite Named(string pathNoExt, string name) => L3.PackSprite(pathNoExt, name);
@@ -653,6 +731,18 @@ namespace Salem.Editor
             g.layer = _ground;
             g.transform.position = new Vector3((x0 + x1) * 0.5f, topY - 2.085f, 0f);
             g.AddComponent<BoxCollider2D>().size = new Vector2(x1 - x0, 4.17f);
+
+            Sprite custom = Opt(NewGround);
+            if (custom != null)
+            {
+                // Tile propio 4x2u: la superficie pisable está 16 px (0.25u) bajo el borde superior
+                int n = Mathf.Max(1, Mathf.RoundToInt((x1 - x0) / 4f));
+                float w = (x1 - x0) / n;
+                for (int i = 0; i < n; i++)
+                    L3.AddFitted(g.transform, "Withered_Ground_Tile", custom, new Vector2(x0 + i * w, topY - 1.75f), new Vector2(x0 + (i + 1) * w + 0.01f, topY + 0.25f), "Midground", order + 1, Color.white);
+                L3.AddFitted(g.transform, "Dirt_Fill", Load(Env + "Placeholder_Square.png"), new Vector2(x0, topY - 4.2f), new Vector2(x1, topY - 1.7f), "Midground", order, new Color(0.03f, 0.02f, 0.02f, 1f));
+                return;
+            }
 
             Sprite strip = Named(DF + "env_ground", "env_ground_32");
             Sprite dirt = Named(DF + "env_ground", "env_ground_40");
@@ -708,10 +798,14 @@ namespace Salem.Editor
         private static void Graves(Transform parent, float baseY, params float[] xs)
         {
             string[] names = { "TX Village Props - Gravestone 01", "TX Village Props - Gravestone 02", "TX Village Props - Gravestone 03", "TX Village Props - Gravestone 04" };
+            Sprite[] stones = Frames(NewTombstones, 0, 1, 2, 3, 4, 5);
+            if (stones == null || stones.Length == 0) stones = names.Select(n => _cainos.FirstOrDefault(s => s.name == n)).ToArray();
+            bool custom = System.IO.File.Exists(NewTombstones);
             for (int i = 0; i < xs.Length; i++)
             {
-                Sprite sp = _cainos.FirstOrDefault(s => s.name == names[(i + Mathf.RoundToInt(xs[i])) % names.Length]);
-                Fit(parent, "Gravestone", sp, xs[i], baseY - 0.08f, 0.9f + (i % 3) * 0.18f, "Midground", 3, Moss, i % 2 == 1);
+                Sprite sp = stones[(i + Mathf.RoundToInt(xs[i])) % stones.Length];
+                float h = (custom ? 1.3f : 0.9f) + (i % 3) * 0.18f;
+                Fit(parent, "Gravestone", sp, xs[i], baseY - 0.08f, h, "Midground", 3, custom ? Color.white : Moss, i % 2 == 1);
             }
         }
 
@@ -763,12 +857,12 @@ namespace Salem.Editor
             return l;
         }
 
-        private static void FogBlob(Transform parent, Sprite fog, Vector3 pos, Vector2 scale, Color color, string layer, int order, float drift)
+        private static void FogBlob(Transform parent, Sprite fog, Vector3 pos, Vector2 size, Color color, string layer, int order, float drift)
         {
             GameObject go = new GameObject("Fog_Bank");
             go.transform.SetParent(parent, false);
             go.transform.position = pos;
-            go.transform.localScale = new Vector3(scale.x, scale.y, 1f);
+            go.transform.localScale = new Vector3(size.x / fog.bounds.size.x, size.y / fog.bounds.size.y, 1f);
             SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
             sr.sprite = fog;
             sr.color = color;
@@ -783,7 +877,7 @@ namespace Salem.Editor
 
         private static void Carpet(Transform parent, string name, float x0, float x1, Sprite square)
         {
-            // shortcut: alfombra hecha con rectángulos teñidos; sustituir por Carpet_Velvet_Runner cuando exista el arte
+            // shortcut: sin Carpet_Velvet_Runner.png la alfombra son rectángulos teñidos; se sustituye solo al existir el archivo
             GameObject go = new GameObject(name);
             go.transform.SetParent(parent, false);
             go.transform.position = new Vector3((x0 + x1) * 0.5f, G + 0.15f, 0f);
@@ -791,6 +885,16 @@ namespace Salem.Editor
             col.isTrigger = true;
             col.size = new Vector2(x1 - x0, 0.5f);
             go.AddComponent<SilentCarpet>();
+            Sprite runner = Opt(NewCarpet);
+            if (runner != null)
+            {
+                // Tira tileable 4x0.5u, en tramos iguales para no aplastar el último
+                int n = Mathf.Max(1, Mathf.RoundToInt((x1 - x0) / 4f));
+                float w = (x1 - x0) / n;
+                for (int i = 0; i < n; i++)
+                    L3.AddFitted(go.transform, "Velvet_Runner", runner, new Vector2(x0 + i * w, G - 0.12f), new Vector2(x0 + (i + 1) * w + 0.01f, G + 0.13f), "Gameplay", 1, Color.white);
+                return;
+            }
             L3.AddFitted(go.transform, "Velvet", square, new Vector2(x0, G - 0.06f), new Vector2(x1, G + 0.05f), "Gameplay", 1, new Color(0.45f, 0.06f, 0.09f));
             L3.AddFitted(go.transform, "Gold_Trim", square, new Vector2(x0, G + 0.03f), new Vector2(x1, G + 0.06f), "Gameplay", 1, new Color(0.78f, 0.6f, 0.22f));
         }
@@ -807,7 +911,13 @@ namespace Salem.Editor
             var so = new SerializedObject(creak);
             so.FindProperty("creakSfx").objectReferenceValue = sfx;
             so.ApplyModifiedPropertiesWithoutUndo();
-            // shortcut: duela floja = tablón aclarado y levantado; sustituir por Creaky_Floorboard cuando exista el arte
+            Sprite board = Opt(NewCreaky);
+            if (board != null)
+            {
+                L3.AddFitted(go.transform, "Creaky_Floorboard", board, new Vector2(x0, G - 0.96f), new Vector2(x1, G + 0.04f), "Gameplay", 1, Color.white);
+                return;
+            }
+            // shortcut: duela floja = tablón aclarado y levantado; se sustituye solo al existir Creaky_Floorboard.png
             SpriteRenderer sr = L3.AddFitted(go.transform, "Loose_Plank", planks, new Vector2(x0, G - 0.3f), new Vector2(x1, G + 0.04f), "Gameplay", 1, new Color(0.95f, 0.78f, 0.55f));
             sr.transform.rotation = Quaternion.Euler(0f, 0f, 2.5f);
         }

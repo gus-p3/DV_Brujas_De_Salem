@@ -49,11 +49,13 @@ namespace Salem.Level4
         [Tooltip("El arte mira a la derecha; si mirara a la izquierda, desmarcar.")]
         [SerializeField] private bool spriteFacesRight = true;
         [SerializeField] private GameObject alertIcon;
-        [SerializeField] private Sprite idleSprite;
-        [SerializeField] private Sprite walkSprite;
-        [SerializeField] private Sprite listenSprite;
-        [SerializeField] private Sprite chargeSprite;
-        [SerializeField] private Sprite stunnedSprite;
+        [Tooltip("Cuadros por estado; con un solo cuadro funciona como pose fija.")]
+        [SerializeField] private Sprite[] idleFrames;
+        [SerializeField] private Sprite[] walkFrames;
+        [SerializeField] private Sprite[] listenFrames;
+        [SerializeField] private Sprite[] chargeFrames;
+        [SerializeField] private Sprite[] stunnedFrames;
+        [SerializeField] private float animFps = 8f;
 
         [Header("Status")]
         [SerializeField] private InquisitorState currentState = InquisitorState.Patrolling;
@@ -197,11 +199,11 @@ namespace Salem.Level4
             _stateTimer = listeningDuration;
             if (_rb != null) _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
             PlayAlert();
-            SetSprite(listenSprite);
         }
 
         private void UpdateListening()
         {
+            SetSprite(listenFrames);
             _stateTimer -= Time.deltaTime;
             if (_stateTimer <= 0f) EnterChargeState();
         }
@@ -209,11 +211,11 @@ namespace Salem.Level4
         private void EnterChargeState()
         {
             currentState = InquisitorState.Charging;
-            SetSprite(chargeSprite);
         }
 
         private void UpdateCharging()
         {
+            SetSprite(chargeFrames);
             float dx = _targetNoisePosition.x - transform.position.x;
             FaceDirection(dx);
 
@@ -242,7 +244,7 @@ namespace Salem.Level4
         private void UpdateSearching()
         {
             _stateTimer -= Time.deltaTime;
-            SetSprite(idleSprite);
+            SetSprite(idleFrames);
             // Mira a ambos lados mientras busca
             if (Mathf.Repeat(_stateTimer, 1.6f) < Time.deltaTime) FaceDirection(_facingRight ? -1f : 1f);
             if (_stateTimer <= 0f) currentState = InquisitorState.Patrolling;
@@ -250,7 +252,7 @@ namespace Salem.Level4
 
         private void UpdatePatrol()
         {
-            SetSprite(walkSprite);
+            SetSprite(walkFrames);
             if (patrolWaypoints == null || patrolWaypoints.Length == 0) return;
 
             Transform targetWp = patrolWaypoints[_currentWaypointIndex];
@@ -271,7 +273,7 @@ namespace Salem.Level4
         {
             _stateTimer -= Time.deltaTime;
             if (_rb != null) _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
-            SetSprite(stunnedSprite);
+            SetSprite(stunnedFrames);
             if (spriteRenderer != null) spriteRenderer.color = Color.Lerp(Color.white, new Color(0.6f, 0.7f, 1f), Mathf.PingPong(Time.time * 2f, 1f));
             if (_stateTimer <= 0f)
             {
@@ -280,9 +282,12 @@ namespace Salem.Level4
             }
         }
 
-        private void SetSprite(Sprite s)
+        /// <summary>Se llama cada cuadro desde el estado activo; el índice sale del reloj, así no hace falta guardar estado.</summary>
+        private void SetSprite(Sprite[] frames)
         {
-            if (spriteRenderer != null && s != null) spriteRenderer.sprite = s;
+            if (spriteRenderer == null || frames == null || frames.Length == 0) return;
+            Sprite s = frames[(int)(Time.time * animFps) % frames.Length];
+            if (s != null) spriteRenderer.sprite = s;
         }
 
         public void ApplyStun(float duration)

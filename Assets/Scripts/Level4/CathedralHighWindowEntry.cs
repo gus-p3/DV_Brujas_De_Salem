@@ -74,6 +74,8 @@ namespace Salem.Level4
         private void EnterCathedral()
         {
             _entered = true;
+            // Apagar el patio desactiva este disparador y Unity llama OnTriggerExit2D al instante (borra _player)
+            GameObject player = _player;
             Level2.InteractionPromptUI.Instance?.HidePrompt();
             if (enterFx != null) enterFx.Play();
             if (enterSfx != null) AudioManager.Instance?.PlaySFX(enterSfx);
@@ -83,11 +85,11 @@ namespace Salem.Level4
             // El método sigue ejecutándose aunque este objeto (dentro del patio) quede inactivo.
             if (courtyardSection != null) courtyardSection.SetActive(false);
 
-            if (interiorSpawnPoint != null && _player != null)
+            if (interiorSpawnPoint != null && player != null)
             {
-                var rb = _player.GetComponent<Rigidbody2D>();
+                var rb = player.GetComponent<Rigidbody2D>();
                 if (rb != null) rb.linearVelocity = Vector2.zero;
-                _player.transform.position = interiorSpawnPoint.position;
+                player.transform.position = interiorSpawnPoint.position;
                 Physics2D.SyncTransforms();
                 CheckpointManager.Instance?.SetCheckpoint(interiorSpawnPoint.position);
             }

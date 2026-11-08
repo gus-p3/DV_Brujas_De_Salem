@@ -59,14 +59,15 @@ namespace Salem.Level4
                 }
             }
 
-            // Ensure Master Potion is available
+            // La Poción Maestra se lleva (x1) pero queda sellada: solo PoisonFatherEncounter la habilita frente al Padre.
+            // La carga va antes de Lock porque Lock dispara OnStatsUpdated y el HUD lee MasterCharges en ese momento.
             if (ensureMasterPotion && GameManager.Instance != null)
             {
-                GameManager.Instance.UnlockMasterPotionUsage();
                 if (GameManager.Instance.MasterCharges <= 0)
                 {
                     GameManager.Instance.MasterCharges = 1;
                 }
+                GameManager.Instance.LockMasterPotionUsage();
             }
         }
 

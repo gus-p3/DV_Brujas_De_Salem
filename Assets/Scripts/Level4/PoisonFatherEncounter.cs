@@ -33,6 +33,7 @@ namespace Salem.Level4
             if (other.CompareTag("Player"))
             {
                 _isPlayerNear = true;
+                GameManager.Instance?.UnlockMasterPotionUsage(); // solo frente al Padre se puede lanzar/verter
                 if (Level2.InteractionPromptUI.Instance != null)
                 {
                     Level2.InteractionPromptUI.Instance.ShowPrompt(readyPrompt, transform, 1.2f);
@@ -45,6 +46,7 @@ namespace Salem.Level4
             if (other.CompareTag("Player"))
             {
                 _isPlayerNear = false;
+                if (!_isPoisoned) GameManager.Instance?.LockMasterPotionUsage();
                 if (Level2.InteractionPromptUI.Instance != null)
                 {
                     Level2.InteractionPromptUI.Instance.HidePrompt();
@@ -65,6 +67,12 @@ namespace Salem.Level4
         private IEnumerator PoisonSequence()
         {
             _isPoisoned = true;
+            if (GameManager.Instance != null)
+            {
+                // Si además se lanzó con E en el mismo cuadro, la carga ya se gastó: no bajar de 0
+                GameManager.Instance.MasterCharges = 0;
+                GameManager.Instance.LockMasterPotionUsage();
+            }
             if (Level2.InteractionPromptUI.Instance != null)
             {
                 Level2.InteractionPromptUI.Instance.HidePrompt();

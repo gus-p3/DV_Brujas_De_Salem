@@ -217,11 +217,11 @@ namespace Salem.Editor
 
             var inqAI = go.AddComponent<InquisitorGuardAI>();
             SetPrivateField(inqAI, "spriteRenderer", sr);
-            SetPrivateField(inqAI, "idleSprite", idle);
-            SetPrivateField(inqAI, "walkSprite", walk);
-            SetPrivateField(inqAI, "listenSprite", listen);
-            SetPrivateField(inqAI, "chargeSprite", charge);
-            SetPrivateField(inqAI, "stunnedSprite", stunned);
+            SetPrivateField(inqAI, "idleFrames", new[] { idle });
+            SetPrivateField(inqAI, "walkFrames", new[] { walk });
+            SetPrivateField(inqAI, "listenFrames", new[] { listen });
+            SetPrivateField(inqAI, "chargeFrames", new[] { charge });
+            SetPrivateField(inqAI, "stunnedFrames", new[] { stunned });
             SetPrivateField(inqAI, "alertSfx", AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/SFX_InquisitorAlert.wav"));
             SetPrivateField(inqAI, "stompSfx", AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/SFX_InquisitorStomp.wav"));
 

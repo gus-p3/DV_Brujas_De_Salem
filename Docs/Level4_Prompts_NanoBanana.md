@@ -142,6 +142,7 @@ black at the bottom. The walkable top surface must be a clean flat line 16px bel
 - Bucle de lluvia ambiental (`SFX_RainLoop`).
 
 ### Después de generar
-1, 2 y 9 reemplazan archivos existentes o se cambian con una ruta en el builder. 3–8 y 10 necesitan una pequeña
-conexión en `Level4SceneBuilder.cs` (sustituir los atajos marcados con `shortcut:` y el Inquisidor de una sola pose).
-Luego: menú **Salem → Build Level 4 Scene**.
+Guarda cada PNG con su nombre y ruta exactos y ejecuta **Salem → Build Level 4 Scene** (fuera de Play).
+El builder detecta cada archivo por sí solo: lo importa (64 ppu; Point para pixel art, Bilinear para niebla, cielo
+e Inquisidor), corta las hojas (lápidas 128×256, Inquisidor 256×384) y lo usa. Lo que falte sigue con el arte actual.
+Si un asset nuevo no se ve bien, bórralo y vuelve a construir: regresa el de respaldo.
