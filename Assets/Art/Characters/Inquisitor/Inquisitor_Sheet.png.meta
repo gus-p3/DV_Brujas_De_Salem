@@ -1,0 +1,884 @@
+fileFormatVersion: 2
+guid: de261e190d8f8d24ebcb8cf732d3c66e
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 8180867943097458651
+    second: Inquisitor_Sheet_0
+  - first:
+      213: 7574054188424368383
+    second: Inquisitor_Sheet_1
+  - first:
+      213: -5489176168630293911
+    second: Inquisitor_Sheet_2
+  - first:
+      213: -7586872591921716856
+    second: Inquisitor_Sheet_3
+  - first:
+      213: -8592013224629667854
+    second: Inquisitor_Sheet_4
+  - first:
+      213: 49042893680312578
+    second: Inquisitor_Sheet_5
+  - first:
+      213: -1056620872432597936
+    second: Inquisitor_Sheet_6
+  - first:
+      213: -774866465146741368
+    second: Inquisitor_Sheet_7
+  - first:
+      213: 8436642361926743139
+    second: Inquisitor_Sheet_8
+  - first:
+      213: 5058599343961233162
+    second: Inquisitor_Sheet_9
+  - first:
+      213: -5397907761308584098
+    second: Inquisitor_Sheet_10
+  - first:
+      213: -6757301730850038170
+    second: Inquisitor_Sheet_11
+  - first:
+      213: -2603047378851496401
+    second: Inquisitor_Sheet_12
+  - first:
+      213: -7506537428015726276
+    second: Inquisitor_Sheet_13
+  - first:
+      213: -4494445832116629953
+    second: Inquisitor_Sheet_14
+  - first:
+      213: 6843030717045614107
+    second: Inquisitor_Sheet_15
+  - first:
+      213: 6558001720764286514
+    second: Inquisitor_Sheet_16
+  - first:
+      213: -5565658075915458020
+    second: Inquisitor_Sheet_17
+  - first:
+      213: -8361358144435459924
+    second: Inquisitor_Sheet_18
+  - first:
+      213: 5203785028092990301
+    second: Inquisitor_Sheet_19
+  - first:
+      213: 8414009173898596775
+    second: Inquisitor_Sheet_20
+  - first:
+      213: -680113673185895316
+    second: Inquisitor_Sheet_21
+  - first:
+      213: 7818101951184237953
+    second: Inquisitor_Sheet_22
+  - first:
+      213: -9070995481028989185
+    second: Inquisitor_Sheet_23
+  - first:
+      213: 6770303051374005092
+    second: Inquisitor_Sheet_24
+  - first:
+      213: -688502026002007805
+    second: Inquisitor_Sheet_25
+  - first:
+      213: -5870373780732495787
+    second: Inquisitor_Sheet_26
+  - first:
+      213: -169069363631953055
+    second: Inquisitor_Sheet_27
+  - first:
+      213: 4957037164791389925
+    second: Inquisitor_Sheet_28
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_0
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 1551
+        width: 209
+        height: 312
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bdf54b6dc08488170800000000000000
+      internalID: 8180867943097458651
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_1
+      rect:
+        serializedVersion: 2
+        x: 277
+        y: 1551
+        width: 213
+        height: 312
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ff01892c7227c1960800000000000000
+      internalID: 7574054188424368383
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_2
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 1167
+        width: 209
+        height: 312
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96a60478b5782d3b0800000000000000
+      internalID: -5489176168630293911
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_3
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 1167
+        width: 207
+        height: 312
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 881eb5a139306b690800000000000000
+      internalID: -7586872591921716856
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_4
+      rect:
+        serializedVersion: 2
+        x: 535
+        y: 1167
+        width: 210
+        height: 312
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f77d70ae7903c880800000000000000
+      internalID: -8592013224629667854
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_5
+      rect:
+        serializedVersion: 2
+        x: 788
+        y: 1167
+        width: 215
+        height: 312
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2018290804c3ea000800000000000000
+      internalID: 49042893680312578
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_6
+      rect:
+        serializedVersion: 2
+        x: 1044
+        y: 1167
+        width: 216
+        height: 312
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 054446c2ae02651f0800000000000000
+      internalID: -1056620872432597936
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_7
+      rect:
+        serializedVersion: 2
+        x: 1298
+        y: 1167
+        width: 219
+        height: 312
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88dd09c2e0f1f35f0800000000000000
+      internalID: -774866465146741368
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_8
+      rect:
+        serializedVersion: 2
+        x: 42
+        y: 783
+        width: 171
+        height: 312
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 364f7a76789f41570800000000000000
+      internalID: 8436642361926743139
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_9
+      rect:
+        serializedVersion: 2
+        x: 287
+        y: 783
+        width: 193
+        height: 312
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a0755dd3d41c33640800000000000000
+      internalID: 5058599343961233162
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_10
+      rect:
+        serializedVersion: 2
+        x: 545
+        y: 783
+        width: 189
+        height: 312
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e57b0ec8d77c615b0800000000000000
+      internalID: -5397907761308584098
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_11
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 399
+        width: 234
+        height: 257
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66e1d84a0ed3932a0800000000000000
+      internalID: -6757301730850038170
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_12
+      rect:
+        serializedVersion: 2
+        x: 267
+        y: 399
+        width: 234
+        height: 259
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f2e7b02533e10ebd0800000000000000
+      internalID: -2603047378851496401
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_13
+      rect:
+        serializedVersion: 2
+        x: 523
+        y: 399
+        width: 234
+        height: 252
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c31c2f50bfb63d790800000000000000
+      internalID: -7506537428015726276
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_14
+      rect:
+        serializedVersion: 2
+        x: 779
+        y: 399
+        width: 234
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f3e047a045580a1c0800000000000000
+      internalID: -4494445832116629953
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_15
+      rect:
+        serializedVersion: 2
+        x: 1035
+        y: 399
+        width: 234
+        height: 259
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b1627946e2457fe50800000000000000
+      internalID: 6843030717045614107
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_16
+      rect:
+        serializedVersion: 2
+        x: 1291
+        y: 399
+        width: 234
+        height: 259
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2364e8ab1d3b20b50800000000000000
+      internalID: 6558001720764286514
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_17
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 15
+        width: 234
+        height: 292
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1a66c3d77fc2c2b0800000000000000
+      internalID: -5565658075915458020
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_18
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 304
+        width: 23
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca8ea19611d76fb80800000000000000
+      internalID: -8361358144435459924
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_19
+      rect:
+        serializedVersion: 2
+        x: 173
+        y: 297
+        width: 23
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d539af689ee873840800000000000000
+      internalID: 5203785028092990301
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_20
+      rect:
+        serializedVersion: 2
+        x: 267
+        y: 15
+        width: 234
+        height: 293
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a19a1ba3c094c470800000000000000
+      internalID: 8414009173898596775
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_21
+      rect:
+        serializedVersion: 2
+        x: 357
+        y: 303
+        width: 24
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c6c5ed6b730cf86f0800000000000000
+      internalID: -680113673185895316
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_22
+      rect:
+        serializedVersion: 2
+        x: 429
+        y: 296
+        width: 25
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 185ff127d4a7f7c60800000000000000
+      internalID: 7818101951184237953
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_23
+      rect:
+        serializedVersion: 2
+        x: 523
+        y: 15
+        width: 234
+        height: 294
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ffee7129ba95d1280800000000000000
+      internalID: -9070995481028989185
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_24
+      rect:
+        serializedVersion: 2
+        x: 614
+        y: 306
+        width: 24
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46b04ee21c2f4fd50800000000000000
+      internalID: 6770303051374005092
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_25
+      rect:
+        serializedVersion: 2
+        x: 687
+        y: 297
+        width: 24
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 30973012e03f176f0800000000000000
+      internalID: -688502026002007805
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_26
+      rect:
+        serializedVersion: 2
+        x: 878
+        y: 299
+        width: 23
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5583ca4262e388ea0800000000000000
+      internalID: -5870373780732495787
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_27
+      rect:
+        serializedVersion: 2
+        x: 950
+        y: 289
+        width: 24
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 16be05e3f4857adf0800000000000000
+      internalID: -169069363631953055
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inquisitor_Sheet_28
+      rect:
+        serializedVersion: 2
+        x: 779
+        y: 15
+        width: 234
+        height: 287
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5eedcc1b90feac440800000000000000
+      internalID: 4957037164791389925
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Inquisitor_Sheet_0: 8180867943097458651
+      Inquisitor_Sheet_1: 7574054188424368383
+      Inquisitor_Sheet_10: -5397907761308584098
+      Inquisitor_Sheet_11: -6757301730850038170
+      Inquisitor_Sheet_12: -2603047378851496401
+      Inquisitor_Sheet_13: -7506537428015726276
+      Inquisitor_Sheet_14: -4494445832116629953
+      Inquisitor_Sheet_15: 6843030717045614107
+      Inquisitor_Sheet_16: 6558001720764286514
+      Inquisitor_Sheet_17: -5565658075915458020
+      Inquisitor_Sheet_18: -8361358144435459924
+      Inquisitor_Sheet_19: 5203785028092990301
+      Inquisitor_Sheet_2: -5489176168630293911
+      Inquisitor_Sheet_20: 8414009173898596775
+      Inquisitor_Sheet_21: -680113673185895316
+      Inquisitor_Sheet_22: 7818101951184237953
+      Inquisitor_Sheet_23: -9070995481028989185
+      Inquisitor_Sheet_24: 6770303051374005092
+      Inquisitor_Sheet_25: -688502026002007805
+      Inquisitor_Sheet_26: -5870373780732495787
+      Inquisitor_Sheet_27: -169069363631953055
+      Inquisitor_Sheet_28: 4957037164791389925
+      Inquisitor_Sheet_3: -7586872591921716856
+      Inquisitor_Sheet_4: -8592013224629667854
+      Inquisitor_Sheet_5: 49042893680312578
+      Inquisitor_Sheet_6: -1056620872432597936
+      Inquisitor_Sheet_7: -774866465146741368
+      Inquisitor_Sheet_8: 8436642361926743139
+      Inquisitor_Sheet_9: 5058599343961233162
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

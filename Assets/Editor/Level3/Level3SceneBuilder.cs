@@ -264,7 +264,7 @@ namespace Level3.Editor
             Debug.Log($"[Level3SceneBuilder] Escena {scenePath} construida exitosamente.\n" + log);
         }
 
-        private static void EnsureWitchLevel3Components(GameObject witch)
+        internal static void EnsureWitchLevel3Components(GameObject witch)
         {
             if (witch == null) return;
 
@@ -488,7 +488,7 @@ namespace Level3.Editor
         // =========================================================================
 
         /// <summary>Los packs son pixel art: filtro Point y sin compresión para que no se vean borrosos al escalarlos.</summary>
-        private static void EnsurePixelArtImport(string folder)
+        internal static void EnsurePixelArtImport(string folder)
         {
             string dir = folder.TrimEnd('/');
             if (!AssetDatabase.IsValidFolder(dir)) return;
@@ -505,7 +505,7 @@ namespace Level3.Editor
             }
         }
 
-        private static Sprite PackSprite(string pathNoExt, string spriteName = null)
+        internal static Sprite PackSprite(string pathNoExt, string spriteName = null)
         {
             Sprite[] all = AssetDatabase.LoadAllAssetsAtPath(pathNoExt + ".png").OfType<Sprite>().ToArray();
             if (all.Length == 0) return null;
@@ -513,7 +513,7 @@ namespace Level3.Editor
         }
 
         /// <summary>Franja de paralaje infinita (3 copias) teñida; devuelve sus renderers para el fundido por zona.</summary>
-        private static List<SpriteRenderer> AddParallaxBand(Transform bgRoot, string name, Sprite sp, float centerY, float scale, int order, float factor, Color tint)
+        internal static List<SpriteRenderer> AddParallaxBand(Transform bgRoot, string name, Sprite sp, float centerY, float scale, int order, float factor, Color tint)
         {
             var list = new List<SpriteRenderer>();
             if (sp == null) return list;
@@ -533,7 +533,7 @@ namespace Level3.Editor
         }
 
         /// <summary>Silueta lejana única (sin repetir) que aparece en worldX cuando la cámara está en anchorCamX.</summary>
-        private static SpriteRenderer AddParallaxLandmark(Transform bgRoot, string name, Sprite sp, float anchorCamX, float worldX, float y, float scale, int order, float factor, Color tint)
+        internal static SpriteRenderer AddParallaxLandmark(Transform bgRoot, string name, Sprite sp, float anchorCamX, float worldX, float y, float scale, int order, float factor, Color tint)
         {
             if (sp == null) return null;
             GameObject go = new GameObject(name);
@@ -3746,14 +3746,14 @@ namespace Level3.Editor
         // HELPERS DE ARTE, SUELO Y UI DEL NIVEL 3
         // =========================================================================
 
-        private static Transform NewChild(Transform parent, string name)
+        internal static Transform NewChild(Transform parent, string name)
         {
             GameObject go = new GameObject(name);
             go.transform.SetParent(parent, false);
             return go.transform;
         }
 
-        private static Sprite LoadFirstSprite(string path)
+        internal static Sprite LoadFirstSprite(string path)
         {
             return AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>().FirstOrDefault();
         }
@@ -3764,7 +3764,7 @@ namespace Level3.Editor
         }
 
         /// <summary>Límites del área opaca del sprite (malla ajustada), en unidades locales respecto al pivote.</summary>
-        private static void VisibleExtents(Sprite sp, out float minX, out float maxX, out float minY, out float maxY)
+        internal static void VisibleExtents(Sprite sp, out float minX, out float maxX, out float minY, out float maxY)
         {
             minX = minY = float.MaxValue;
             maxX = maxY = float.MinValue;
@@ -3788,7 +3788,7 @@ namespace Level3.Editor
         }
 
         /// <summary>Crea un sprite cuyo área visible ocupa exactamente el rectángulo [min, max] de mundo.</summary>
-        private static SpriteRenderer AddFitted(Transform parent, string name, Sprite sp, Vector2 min, Vector2 max, string layer, int order, Color color, bool flipX = false)
+        internal static SpriteRenderer AddFitted(Transform parent, string name, Sprite sp, Vector2 min, Vector2 max, string layer, int order, Color color, bool flipX = false)
         {
             if (sp == null) return null;
             VisibleExtents(sp, out float vx0, out float vx1, out float vy0, out float vy1);
@@ -3809,13 +3809,13 @@ namespace Level3.Editor
             return sr;
         }
 
-        private static SpriteRenderer AddRect(Transform parent, string name, Vector2 min, Vector2 max, string layer, int order, Color color)
+        internal static SpriteRenderer AddRect(Transform parent, string name, Vector2 min, Vector2 max, string layer, int order, Color color)
         {
             Sprite square = LoadFirstSprite(PlaceholderSquarePath);
             return AddFitted(parent, name, square, min, max, layer, order, color);
         }
 
-        private static GameObject AddSolidBox(Transform parent, string name, Vector2 min, Vector2 max, int layer, Color visualColor)
+        internal static GameObject AddSolidBox(Transform parent, string name, Vector2 min, Vector2 max, int layer, Color visualColor)
         {
             GameObject go = new GameObject(name);
             go.transform.SetParent(parent, false);
@@ -3831,7 +3831,7 @@ namespace Level3.Editor
         }
 
         /// <summary>Repisa de un solo sentido con collider sin escalar y cara superior exacta en <paramref name="topY"/>.</summary>
-        private static GameObject CreateOneWayLedge(Transform parent, string name, float minX, float maxX, float topY, int layer, Sprite sprite, bool drawVisual)
+        internal static GameObject CreateOneWayLedge(Transform parent, string name, float minX, float maxX, float topY, int layer, Sprite sprite, bool drawVisual)
         {
             const float thickness = 0.35f;
             GameObject go = new GameObject(name);
@@ -3862,7 +3862,7 @@ namespace Level3.Editor
         }
 
         /// <summary>Apoya la base visible del objeto sobre la superficie Ground más cercana (y lo mantiene así al jugar).</summary>
-        private static GroundAnchor SnapToGround(GameObject go, float sink)
+        internal static GroundAnchor SnapToGround(GameObject go, float sink)
         {
             GroundAnchor anchor = go.GetComponent<GroundAnchor>();
             if (anchor == null) anchor = go.AddComponent<GroundAnchor>();
@@ -3896,7 +3896,7 @@ namespace Level3.Editor
             return anchor;
         }
 
-        private static TextMeshPro AddWorldText(Transform parent, string name, Vector3 localPos, string text, float size, Color color, string layer, int order, Vector2 box)
+        internal static TextMeshPro AddWorldText(Transform parent, string name, Vector3 localPos, string text, float size, Color color, string layer, int order, Vector2 box)
         {
             GameObject go = new GameObject(name);
             go.transform.SetParent(parent, false);
@@ -4342,7 +4342,7 @@ namespace Level3.Editor
             return tmp;
         }
 
-        private static GameObject CloneObject(GameObject src, Transform parent)
+        internal static GameObject CloneObject(GameObject src, Transform parent)
         {
             GameObject c;
             if (PrefabUtility.IsAnyPrefabInstanceRoot(src))
@@ -4360,7 +4360,7 @@ namespace Level3.Editor
             return c;
         }
 
-        private static bool IsUnderCopied(Transform t, HashSet<GameObject> copied)
+        internal static bool IsUnderCopied(Transform t, HashSet<GameObject> copied)
         {
             for (Transform p = t.parent; p != null; p = p.parent)
             {
@@ -4369,7 +4369,7 @@ namespace Level3.Editor
             return false;
         }
 
-        private static void FixCrossSceneRefs(MonoBehaviour mb, Scene srcScene, GameObject witch)
+        internal static void FixCrossSceneRefs(MonoBehaviour mb, Scene srcScene, GameObject witch)
         {
             if (mb == null) return;
             var so = new SerializedObject(mb);

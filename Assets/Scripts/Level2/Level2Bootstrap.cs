@@ -81,6 +81,7 @@ namespace Level2
                     Debug.Log("[Level2Bootstrap] Mitigación E-04: Forma de gato reseteada a forma humana al entrar.");
                 }
                 tm.IsInHideout = false;
+                tm.CatEnergyDrainMultiplier = 1f;
             }
 
             if (player != null)
@@ -148,9 +149,10 @@ namespace Level2
             }
 
             // 8. Música ambiental del mercado
-            if (playLevelMusic && AudioManager.Instance != null && AudioManager.Instance.levelMusicClip != null)
+            if (playLevelMusic && AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlayMusic(AudioManager.Instance.levelMusicClip);
+                AudioClip clip = AudioManager.Instance.level2MusicClip != null ? AudioManager.Instance.level2MusicClip : AudioManager.Instance.levelMusicClip;
+                if (clip != null) AudioManager.Instance.PlayMusic(clip);
             }
 
             Debug.Log("[Level2Bootstrap] Escena Level2 inicializada con estado limpio y sanitizado.");

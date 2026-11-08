@@ -21,6 +21,8 @@ public class AudioManager : MonoBehaviour
     [Header("Clips de Música")]
     public AudioClip menuMusicClip;
     public AudioClip levelMusicClip;
+    public AudioClip level2MusicClip;
+    public AudioClip level3MusicClip;
 
     [Header("Clips de SFX Base")]
     public AudioClip buttonClickClip;
@@ -73,10 +75,29 @@ public class AudioManager : MonoBehaviour
         if (transform.parent != null) transform.SetParent(null);
         DontDestroyOnLoad(gameObject);
 
+#if UNITY_EDITOR
+        LoadMusicFromAssetsIfNull();
+#endif
+
         EnsureAudioSources();
         GenerateProvisionalClipsIfMissing();
         LoadMuteState();
+        LoadVolumeSettings();
     }
+
+#if UNITY_EDITOR
+    private void LoadMusicFromAssetsIfNull()
+    {
+        if (menuMusicClip == null)
+            menuMusicClip = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/Music/BGM_Menu.wav");
+        if (levelMusicClip == null)
+            levelMusicClip = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/Music/BGM_Level1_Forest.wav");
+        if (level2MusicClip == null)
+            level2MusicClip = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/Music/BGM_Level2_Village.wav");
+        if (level3MusicClip == null)
+            level3MusicClip = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/Music/BGM_Level3_Church.wav");
+    }
+#endif
 
     private void OnEnable()
     {
@@ -111,7 +132,7 @@ public class AudioManager : MonoBehaviour
 
         musicSource.loop = true;
         musicSource.playOnAwake = false;
-        musicSource.volume = 0.28f;
+        musicSource.volume = 0.45f;
 
         if (sfxSource == null)
         {
@@ -153,13 +174,29 @@ public class AudioManager : MonoBehaviour
         if (sfxSource != null) sfxSource.mute = isMuted;
     }
 
+    private void LoadVolumeSettings()
+    {
+        float musicVol = PlayerPrefs.GetFloat("MusicVolume", 1.0f);
+        if (musicSource != null) musicSource.volume = musicVol * 0.45f;
+        float sfxVol = PlayerPrefs.GetFloat("SFXVolume", 1.0f);
+        if (sfxSource != null) sfxSource.volume = sfxVol * 0.82f;
+    }
+
     public void PlayMusicForScene(string sceneName)
     {
         if (sceneName == "MainMenu")
         {
             PlayMusic(menuMusicClip);
         }
-        else if (sceneName.StartsWith("Level"))
+        else if (sceneName == "Level2")
+        {
+            PlayMusic(level2MusicClip != null ? level2MusicClip : levelMusicClip);
+        }
+        else if (sceneName.StartsWith("Level3"))
+        {
+            PlayMusic(level3MusicClip != null ? level3MusicClip : levelMusicClip);
+        }
+        else if (sceneName.StartsWith("Level") || sceneName.StartsWith("Test"))
         {
             PlayMusic(levelMusicClip);
         }
@@ -495,13 +532,35 @@ public class AudioManager : MonoBehaviour
 
         if (levelMusicClip == null)
         {
-            // Tema colonial nocturno de Salem (16 compases breves con bajo continuo y armónicos de clavecín)
+            // Tema colonial nocturno del bosque (Nivel 1)
             float[] notes =
             {
                 164.81f, 196.00f, 246.94f, 220.00f, 196.00f, 185.00f, 164.81f, 146.83f,
                 164.81f, 220.00f, 261.63f, 246.94f, 196.00f, 220.00f, 185.00f, 164.81f
             };
-            levelMusicClip = CreateMelodyClip("BGM_Level", notes, 0.45f, 0.14f, 82.41f);
+            levelMusicClip = CreateMelodyClip("BGM_Level", notes, 0.45f, 0.22f, 82.41f);
+        }
+
+        if (level2MusicClip == null)
+        {
+            // Tema de infiltración en la aldea y mercado de Salem (Nivel 2)
+            float[] notesVillage =
+            {
+                220.00f, 246.94f, 261.63f, 329.63f, 293.66f, 261.63f, 246.94f, 220.00f,
+                196.00f, 220.00f, 246.94f, 293.66f, 261.63f, 220.00f, 207.65f, 220.00f
+            };
+            level2MusicClip = CreateMelodyClip("BGM_Level2", notesVillage, 0.38f, 0.22f, 110.00f);
+        }
+
+        if (level3MusicClip == null)
+        {
+            // Tema de la catedral y rito del caldero (Nivel 3)
+            float[] notesChurch =
+            {
+                146.83f, 174.61f, 220.00f, 207.65f, 174.61f, 164.81f, 146.83f, 130.81f,
+                146.83f, 196.00f, 220.00f, 261.63f, 220.00f, 174.61f, 155.56f, 146.83f
+            };
+            level3MusicClip = CreateMelodyClip("BGM_Level3", notesChurch, 0.50f, 0.24f, 73.42f);
         }
     }
 

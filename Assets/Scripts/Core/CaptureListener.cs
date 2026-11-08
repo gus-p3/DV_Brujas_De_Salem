@@ -19,7 +19,8 @@ public class CaptureListener : MonoBehaviour
 
     public void ConnectEnemies()
     {
-        EnemySight[] enemies = FindObjectsByType<EnemySight>(FindObjectsSortMode.None);
+        // Incluye inactivos: los guardias de secciones que se activan después (Nivel 4) también deben capturar
+        EnemySight[] enemies = FindObjectsByType<EnemySight>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (var enemy in enemies)
         {
             if (enemy != null)

@@ -8,7 +8,7 @@ namespace Level3
     /// Garantiza:
     /// - Time.timeScale = 1f.
     /// - Limpieza de estados residuales (fuerza forma humana al iniciar, cancela invulnerabilidad y frenesí).
-    /// - Fija el esquema de controles del nivel: [E] interactúa y [Q] o clic izquierdo lanzan pociones.
+    /// - Fija el esquema de controles del nivel: [Q] interactúa y [E] o clic izquierdo lanzan pociones.
     /// - Asegura que el jugador tenga PlayerInteractor, Level2Controls, LadderClimber, KeyInventory,
     ///   BroomInventory con escoba desbloqueada (GrantBroom()) y PotionInventory inicializado con al menos
     ///   3 pociones de dormir (Sleep) al empezar el nivel para que nunca quede bloqueado.
@@ -26,9 +26,9 @@ namespace Level3
         [SerializeField] private int minimumStartingBlindPotions = 1;
         [SerializeField] private int minimumStartingHypnotizePotions = 1;
 
-        /// <summary>Esquema de controles del Nivel 3: [E] interactúa, [Q] o clic izquierdo lanzan la poción.</summary>
-        public const KeyCode InteractKey = KeyCode.E;
-        public const KeyCode ThrowPotionKey = KeyCode.Q;
+        /// <summary>Esquema de controles del Nivel 3: [Q] interactúa, [E] o clic izquierdo lanzan la poción.</summary>
+        public const KeyCode InteractKey = KeyCode.Q;
+        public const KeyCode ThrowPotionKey = KeyCode.E;
 
         private void Awake()
         {
@@ -172,9 +172,10 @@ namespace Level3
             }
 
             // 10. Iniciar música del nivel
-            if (playLevelMusic && AudioManager.Instance != null && AudioManager.Instance.levelMusicClip != null)
+            if (playLevelMusic && AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlayMusic(AudioManager.Instance.levelMusicClip);
+                AudioClip clip = AudioManager.Instance.level3MusicClip != null ? AudioManager.Instance.level3MusicClip : AudioManager.Instance.levelMusicClip;
+                if (clip != null) AudioManager.Instance.PlayMusic(clip);
             }
 
             Debug.Log("[Level3Bootstrap] Escena Level3 inicializada con escoba activa, controles y pociones de sueño garantizadas.");

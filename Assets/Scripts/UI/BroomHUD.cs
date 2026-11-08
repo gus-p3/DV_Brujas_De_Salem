@@ -24,6 +24,12 @@ public class BroomHUD : MonoBehaviour
     [Tooltip("Color tenue del icono cuando la parte aún no se ha recolectado.")]
     [SerializeField] private Color uncollectedColor = new Color(1f, 1f, 1f, 0.25f);
 
+    private void Awake()
+    {
+        // Las piezas de la escoba solo se recogen en Level1; los demás niveles clonan su HUD y no deben mostrarlo
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "Level1") gameObject.SetActive(false);
+    }
+
     private void Start()
     {
         if (BroomInventory.Instance != null)

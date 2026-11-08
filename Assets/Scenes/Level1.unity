@@ -710,7 +710,7 @@ PrefabInstance:
     - target: {fileID: 3857786083608617018, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: lanternOrigin
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 37764556}
     - target: {fileID: 4266521949662367328, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: m_Name
       value: Guard_6B_Techo
@@ -783,6 +783,11 @@ PrefabInstance:
 --- !u!4 &37764555 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8960725040163654727, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
+  m_PrefabInstance: {fileID: 37764554}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &37764556 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1824885132692808136, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
   m_PrefabInstance: {fileID: 37764554}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &39648204
@@ -6393,7 +6398,7 @@ PrefabInstance:
     - target: {fileID: 3857786083608617018, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: lanternOrigin
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 418504472}
     - target: {fileID: 4266521949662367328, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: m_Name
       value: Guard_Z2
@@ -6462,6 +6467,11 @@ PrefabInstance:
 --- !u!4 &418504471 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8960725040163654727, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
+  m_PrefabInstance: {fileID: 418504470}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &418504472 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1824885132692808136, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
   m_PrefabInstance: {fileID: 418504470}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &419048219
@@ -7990,6 +8000,9 @@ MonoBehaviour:
   blindChargesText: {fileID: 638884125}
   hypnotizeChargesText: {fileID: 46919259}
   sleepChargesText: {fileID: 2018892525}
+  masterChargesText: {fileID: 0}
+  masterIconImage: {fileID: 0}
+  masterLockBadge: {fileID: 0}
   potionSelectionFrames:
   - {fileID: 632354479}
   - {fileID: 1753532600}
@@ -9467,7 +9480,7 @@ PrefabInstance:
     - target: {fileID: 3857786083608617018, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: lanternOrigin
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 610844121}
     - target: {fileID: 4266521949662367328, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: m_Name
       value: Guard_Z8_2
@@ -9540,6 +9553,11 @@ PrefabInstance:
 --- !u!4 &610844120 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8960725040163654727, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
+  m_PrefabInstance: {fileID: 610844119}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &610844121 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1824885132692808136, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
   m_PrefabInstance: {fileID: 610844119}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &615184325
@@ -14182,7 +14200,7 @@ PrefabInstance:
     - target: {fileID: 3857786083608617018, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: lanternOrigin
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 950835251}
     - target: {fileID: 4266521949662367328, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: m_Name
       value: Guard_6B_Maizal
@@ -14255,6 +14273,11 @@ PrefabInstance:
 --- !u!4 &950835250 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8960725040163654727, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
+  m_PrefabInstance: {fileID: 950835249}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &950835251 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1824885132692808136, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
   m_PrefabInstance: {fileID: 950835249}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &961137104
@@ -16274,7 +16297,7 @@ PrefabInstance:
     - target: {fileID: 3857786083608617018, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: lanternOrigin
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1095495286}
     - target: {fileID: 4266521949662367328, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: m_Name
       value: Guard_Z8_1
@@ -16343,6 +16366,11 @@ PrefabInstance:
 --- !u!4 &1095495285 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8960725040163654727, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
+  m_PrefabInstance: {fileID: 1095495284}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1095495286 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1824885132692808136, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
   m_PrefabInstance: {fileID: 1095495284}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1098235387
@@ -16422,7 +16450,7 @@ PrefabInstance:
     - target: {fileID: 3857786083608617018, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: lanternOrigin
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1112548118}
     - target: {fileID: 4266521949662367328, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: m_Name
       value: Guard_8B_2
@@ -16495,6 +16523,11 @@ PrefabInstance:
 --- !u!4 &1112548117 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8960725040163654727, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
+  m_PrefabInstance: {fileID: 1112548116}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1112548118 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1824885132692808136, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
   m_PrefabInstance: {fileID: 1112548116}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1131797216
@@ -17020,7 +17053,7 @@ PrefabInstance:
     - target: {fileID: 3857786083608617018, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: lanternOrigin
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1145088705}
     - target: {fileID: 4266521949662367328, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: m_Name
       value: Guard_Z3
@@ -17093,6 +17126,11 @@ PrefabInstance:
 --- !u!4 &1145088704 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8960725040163654727, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
+  m_PrefabInstance: {fileID: 1145088703}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1145088705 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1824885132692808136, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
   m_PrefabInstance: {fileID: 1145088703}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1154044858
@@ -17557,7 +17595,7 @@ PrefabInstance:
     - target: {fileID: 3857786083608617018, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: lanternOrigin
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1198354935}
     - target: {fileID: 4266521949662367328, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: m_Name
       value: Guard_Z4_Blocker
@@ -17630,6 +17668,11 @@ PrefabInstance:
 --- !u!4 &1198354934 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8960725040163654727, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
+  m_PrefabInstance: {fileID: 1198354933}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1198354935 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1824885132692808136, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
   m_PrefabInstance: {fileID: 1198354933}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1198744634
@@ -21772,7 +21815,7 @@ PrefabInstance:
     - target: {fileID: 3857786083608617018, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: lanternOrigin
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1506479352}
     - target: {fileID: 4266521949662367328, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: m_Name
       value: Guard_Z6_Roof
@@ -21845,6 +21888,11 @@ PrefabInstance:
 --- !u!4 &1506479351 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8960725040163654727, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
+  m_PrefabInstance: {fileID: 1506479350}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1506479352 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1824885132692808136, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
   m_PrefabInstance: {fileID: 1506479350}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1506713367
@@ -24161,6 +24209,7 @@ MonoBehaviour:
   blindProjectilePrefab: {fileID: 2356667353680941898, guid: 7884d3adabaed71418549c5e2ca687ce, type: 3}
   hypnotizeProjectilePrefab: {fileID: 712480531911346899, guid: bee051e10130b8b4d96329b0133cba89, type: 3}
   sleepProjectilePrefab: {fileID: 380322473976602085, guid: 546291bd22d549045ba7fc67e6128b39, type: 3}
+  masterPotionPrefab: {fileID: 0}
   throwSound: {fileID: 0}
   emptyChargesSound: {fileID: 0}
 --- !u!1 &1694836181
@@ -30541,7 +30590,7 @@ PrefabInstance:
     - target: {fileID: 3857786083608617018, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: lanternOrigin
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2110317522}
     - target: {fileID: 4266521949662367328, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
       propertyPath: m_Name
       value: Guard_8B_1
@@ -30614,6 +30663,11 @@ PrefabInstance:
 --- !u!4 &2110317521 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8960725040163654727, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
+  m_PrefabInstance: {fileID: 2110317520}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2110317522 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1824885132692808136, guid: b630160c6e2e4e44b8d280f40b14bfc6, type: 3}
   m_PrefabInstance: {fileID: 2110317520}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &2115041362

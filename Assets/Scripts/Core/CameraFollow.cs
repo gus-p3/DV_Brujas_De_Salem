@@ -151,6 +151,14 @@ public class CameraFollow : MonoBehaviour
         transform.position = basePosition;
     }
 
+    /// <summary>Cambia los límites en juego (p. ej. al pasar del patio al interior de la iglesia).</summary>
+    public void SetLimits(Vector2 min, Vector2 max)
+    {
+        useLimits = true;
+        minLimit = min;
+        maxLimit = max;
+    }
+
     /// <summary>Asigna el objetivo desde código (por ejemplo al instanciar a la bruja).</summary>
     public void SetTarget(Transform newTarget)
     {
