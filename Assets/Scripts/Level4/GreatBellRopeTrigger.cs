@@ -51,6 +51,14 @@ namespace Salem.Level4
             }
         }
 
+        // Si entró como bruja y se transforma ya dentro de la zona, también repica
+        private void OnTriggerStay2D(Collider2D other)
+        {
+            if (hasTolled || !other.CompareTag("Player")) return;
+            var tm = other.GetComponent<TransformationManager>();
+            if (tm != null && tm.IsCatForm) StartCoroutine(TollBellRoutine());
+        }
+
         private IEnumerator TollBellRoutine()
         {
             hasTolled = true;
@@ -72,6 +80,11 @@ namespace Salem.Level4
             foreach (var g in allGuards)
             {
                 g.ApplySleep(8.0f);
+            }
+            // Los guardias del prefab Guard patrullan con PatrolRoute, no con VillagerAI
+            foreach (var p in FindObjectsByType<PatrolRoute>(FindObjectsSortMode.None))
+            {
+                p.ApplySleep(8.0f);
             }
 
             // Shockwave expansion animation

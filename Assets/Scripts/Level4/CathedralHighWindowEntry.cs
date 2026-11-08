@@ -7,6 +7,7 @@ namespace Salem.Level4
     /// Ventana gótica alta con barrotes rotos: solo la forma de gato cabe. Con [Q] en forma de gato
     /// la bruja pasa a la nave de la iglesia (se mueve al punto interior, cambian límites de cámara,
     /// checkpoint, luz ambiental y se apaga el patio con su tormenta).
+    /// Con requireCat = false sirve de puerta/escalera entre los pisos de la torre (cualquier forma pasa).
     /// </summary>
     public class CathedralHighWindowEntry : MonoBehaviour
     {
@@ -16,6 +17,8 @@ namespace Salem.Level4
         [SerializeField] private GameObject churchInteriorSection;
         [SerializeField] private string humanHintMessage = "Los barrotes rotos son muy estrechos para una humana. Transfórmate en gato [T] para colarte.";
         [SerializeField] private string catPrompt = "[Q] Deslizarse por los barrotes al interior de la iglesia";
+        [SerializeField] private bool requireCat = true;
+        [SerializeField] private string arrivalMessage = "La nave de la iglesia. Pisa las alfombras y evita las duelas flojas: el Inquisidor tiene oído agudo.";
 
         [Header("Interior")]
         [SerializeField] private Vector2 interiorCameraMin = new Vector2(99f, -1f);
@@ -37,7 +40,7 @@ namespace Salem.Level4
         {
             if (!other.CompareTag("Player")) return;
             _player = other.gameObject;
-            _lastWasCat = !IsCat(); // fuerza mostrar el aviso en el primer Update
+            _lastWasCat = !(IsCat() || !requireCat); // fuerza mostrar el aviso en el primer Update
         }
 
         private void OnTriggerExit2D(Collider2D other)
@@ -57,7 +60,7 @@ namespace Salem.Level4
         {
             if (_player == null || _entered) return;
 
-            bool isCat = IsCat();
+            bool isCat = IsCat() || !requireCat;
             if (isCat != _lastWasCat)
             {
                 _lastWasCat = isCat;
@@ -108,7 +111,7 @@ namespace Salem.Level4
             }
 
             if (interiorMusic != null) AudioManager.Instance?.PlayMusic(interiorMusic);
-            FindFirstObjectByType<HUDController>()?.ShowMessage("La nave de la iglesia. Pisa las alfombras y evita las duelas flojas: el Inquisidor tiene oído agudo.", 4f);
+            if (!string.IsNullOrEmpty(arrivalMessage)) FindFirstObjectByType<HUDController>()?.ShowMessage(arrivalMessage, 4f);
         }
     }
 }
