@@ -174,7 +174,7 @@ public class PotionInventory : MonoBehaviour
                 HUDController hudCtrl = UnityEngine.Object.FindFirstObjectByType<HUDController>();
                 if (hudCtrl != null)
                 {
-                    hudCtrl.ShowMessage("¡La Poción Maestra está sellada! Podrás usarla al entrar a la Iglesia en el Nivel 4.", 2.2f);
+                    hudCtrl.ShowMessage(GameManager.SealedMasterPotionMessage, 2.2f);
                 }
                 PlayErrorSound();
                 return;
@@ -255,7 +255,7 @@ public class PotionInventory : MonoBehaviour
             HUDController hudCtrl = UnityEngine.Object.FindFirstObjectByType<HUDController>();
             if (hudCtrl != null)
             {
-                hudCtrl.ShowMessage("¡La Poción Maestra está sellada! Podrás usarla al entrar a la Iglesia en el Nivel 4.", 2.2f);
+                hudCtrl.ShowMessage(GameManager.SealedMasterPotionMessage, 2.2f);
             }
             PlayErrorSound();
             return;

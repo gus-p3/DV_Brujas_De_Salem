@@ -58,6 +58,15 @@ public class GameManager : MonoBehaviour
     public static event Action OnMasterPotionUsableChanged;
 
     /// <summary>
+    /// Texto a mostrar cuando el jugador intenta usar la Poción Maestra sellada.
+    /// En el Nivel 4 ya estamos en la Iglesia: se usa solo frente al Padre Parris (campanario, piso 4).
+    /// </summary>
+    public static string SealedMasterPotionMessage =>
+        SceneManager.GetActiveScene().name.StartsWith("Level4")
+            ? "La Poción Maestra solo se puede usar frente al Padre Parris, junto al altar del campanario (piso 4). Acércate a él y pulsa [E]."
+            : "¡La Poción Maestra está sellada! Podrás usarla al entrar a la Iglesia en el Nivel 4.";
+
+    /// <summary>
     /// Desbloquea el uso de la Poción Maestra para combate y selección (evento futuro de entrada a la Iglesia en Nivel 4).
     /// El estado es persistente entre cambios de escena gracias a GameManager (DontDestroyOnLoad).
     /// </summary>
