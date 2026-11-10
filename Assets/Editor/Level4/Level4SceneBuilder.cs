@@ -69,8 +69,10 @@ namespace Salem.Editor
         private const string NewBroomFlight = L4 + "Witch_Broom_Flight.png";
         private const string NewShockwave = L4 + "FX_Bell_Shockwave.png";
         private const string CreditsBg = "Assets/Art/UI/Level4/Credits_Parchment_BG_AI.png";
-        private const string PreacherArt = "Assets/Art/Characters/Villagers/preacher/";
+        private const string PreacherArt     = "Assets/Art/Characters/Villagers/preacher/";
+        private const string EvilPriestArt   = "Assets/Art/Characters/Level4/EvilPriest/";
         private const string WitchArt = "Assets/Art/Characters/Witch/";
+
 
         [MenuItem("Salem/Build Level 4 Scene")]
         public static void BuildScene()
@@ -974,6 +976,9 @@ namespace Salem.Editor
             fcol.size = new Vector2(3.4f, 2.2f);
             var encounter = father.AddComponent<PoisonFatherEncounter>();
 
+            // --- Jefe: Padre Parris Maligno ---
+            var boss = BuildEvilPriest(npcs, play, parris, fatherX);
+
             // --- Reja que cierra la escalera al piso de la campana: se abre con la alarma ---
             GameObject gate = new GameObject("Escape_Path_Gate");
             gate.transform.SetParent(play, false);
@@ -1056,9 +1061,11 @@ namespace Salem.Editor
             so.FindProperty("preacherCollapsedSprite").objectReferenceValue = Opt(NewParrisCollapsed) ?? Load(PreacherArt + "sleep_02.png");
             so.FindProperty("escapePathBlocker").objectReferenceValue = gate;
             so.FindProperty("alarmVisuals").objectReferenceValue = alarm;
+            so.FindProperty("bossAI").objectReferenceValue = boss;
             so.FindProperty("poisonSfx").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/SFX_PoisonGoblet.wav");
             so.FindProperty("alarmMusic").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/Music/BGM_Level4_Boss_Escape.wav");
             so.ApplyModifiedPropertiesWithoutUndo();
+
 
             so = new SerializedObject(bellTrigger);
             so.FindProperty("bellTransform").objectReferenceValue = pivot;
@@ -1080,6 +1087,119 @@ namespace Salem.Editor
             zone.SetActive(false); // la activa la campana
 
             return spawn;
+        }
+
+        // ------------------------------------------------------------------ //
+        //  Jefe: Padre Parris Maligno                                         //
+        // ------------------------------------------------------------------ //
+
+        /// <summary>
+        /// Instancia el jefe del campanario junto al Padre Parris normal.
+        /// Usa los sprites del preacher para la forma normal y la carpeta EvilPriest para la maligna.
+        /// Si la carpeta EvilPriest no existe, recae en los sprites del preacher con tinte rojo.
+        /// </summary>
+        private static EvilPriestBossAI BuildEvilPriest(Transform npcs, Transform play,
+            SpriteRenderer normalSr, float fatherX)
+        {
+            GameObject bossGO = new GameObject("EvilPriest_Boss");
+            bossGO.transform.SetParent(npcs, false);
+            bossGO.transform.position = new Vector3(fatherX, G - 0.02f, 0f);
+
+            var rb = bossGO.AddComponent<Rigidbody2D>();
+            rb.freezeRotation = true;
+            rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+
+            var col = bossGO.AddComponent<BoxCollider2D>();
+            col.size   = new Vector2(0.85f, 1.75f);
+            col.offset = new Vector2(0f, 0.875f);
+
+            // Renderer de la forma maligna (oculto al inicio)
+            GameObject evilSrGO = new GameObject("EvilPriest_Renderer");
+            evilSrGO.transform.SetParent(bossGO.transform, false);
+            evilSrGO.transform.localPosition = Vector3.zero;
+            var evilSr = evilSrGO.AddComponent<SpriteRenderer>();
+            evilSr.sortingLayerName = "Gameplay";
+            evilSr.sortingOrder     = 5;
+            evilSr.enabled          = false;
+
+            // Audio
+            var audioSrc = bossGO.AddComponent<AudioSource>();
+            audioSrc.spatialBlend = 0f;
+            audioSrc.playOnAwake  = false;
+
+            var boss = bossGO.AddComponent<EvilPriestBossAI>();
+
+            // ---- Cargar sprites ----
+            // Forma normal: frames idle del preacher
+            Sprite[] normalIdles = LoadFrameRange(PreacherArt + "idle_", 0, 11);
+            // Frames de transformación: screams del preacher
+            Sprite[] transformFrames = LoadFrameRange(PreacherArt + "scream_", 0, 3);
+            // Frames de stun: sleep del preacher
+            Sprite[] stunFrames = LoadFrameRange(PreacherArt + "sleep_", 0, 2);
+
+            // Forma maligna: si existe carpeta EvilPriest, usa esos sprites;
+            // si no, usa los del preacher con tinte oscuro-rojo.
+            Sprite[] evilIdles   = LoadFrameRange(EvilPriestArt + "idle_",   0, 3);
+            Sprite[] evilRuns    = LoadFrameRange(EvilPriestArt + "run_",    0, 3);
+            Sprite[] evilAttacks = LoadFrameRange(EvilPriestArt + "attack_", 0, 3);
+            Sprite[] evilThrows  = LoadFrameRange(EvilPriestArt + "throw_",  0, 3);
+            Sprite   evilCollapsed = Opt(EvilPriestArt + "collapsed.png");
+            Sprite   holyWaterSpr  = Opt(EvilPriestArt + "holy_water.png")
+                                     ?? Load(PreacherArt + "action_00.png"); // fallback
+
+            // Si no hay sprites propios, recaer en los del preacher
+            if (evilIdles   == null || evilIdles.Length == 0)  evilIdles   = LoadFrameRange(PreacherArt + "walk_",   0, 7);
+            if (evilRuns    == null || evilRuns.Length   == 0)  evilRuns    = LoadFrameRange(PreacherArt + "run_",    0, 10);
+            if (evilAttacks == null || evilAttacks.Length == 0) evilAttacks = LoadFrameRange(PreacherArt + "action_", 0, 7);
+            if (evilThrows  == null || evilThrows.Length  == 0) evilThrows  = LoadFrameRange(PreacherArt + "action_", 0, 3);
+            if (evilCollapsed == null) evilCollapsed = Load(PreacherArt + "sleep_02.png");
+
+            // Si recayó en sprites del preacher, aplicar tinte rojo oscuro al evilRenderer
+            bool usingFallback = !AssetDatabase.IsValidFolder(EvilPriestArt.TrimEnd('/'));
+            if (usingFallback) evilSr.color = new Color(0.75f, 0.15f, 0.15f);
+
+            // Serializar todos los campos
+            var so = new SerializedObject(boss);
+            so.FindProperty("normalRenderer").objectReferenceValue    = normalSr;
+            so.FindProperty("evilRenderer").objectReferenceValue      = evilSr;
+            so.FindProperty("audioSource").objectReferenceValue       = audioSrc;
+            so.FindProperty("holyWaterSprite").objectReferenceValue   = holyWaterSpr;
+            so.FindProperty("evilCollapsedSprite").objectReferenceValue = evilCollapsed;
+            SetSpriteArray(so, "normalIdleFrames",    normalIdles);
+            SetSpriteArray(so, "evilTransformFrames", transformFrames);
+            SetSpriteArray(so, "evilStunFrames",      stunFrames);
+            SetSpriteArray(so, "evilIdleFrames",      evilIdles);
+            SetSpriteArray(so, "evilRunFrames",       evilRuns);
+            SetSpriteArray(so, "evilAttackFrames",    evilAttacks);
+            SetSpriteArray(so, "evilThrowFrames",     evilThrows);
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            return boss;
+        }
+
+        /// <summary>Carga una secuencia de sprites con nombre base + índice de dos dígitos.</summary>
+        private static Sprite[] LoadFrameRange(string basePath, int from, int to)
+        {
+            var list = new System.Collections.Generic.List<Sprite>();
+            for (int i = from; i <= to; i++)
+            {
+                string path = basePath + i.ToString("D2") + ".png";
+                Sprite s = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+                if (s != null) list.Add(s);
+            }
+            return list.Count > 0 ? list.ToArray() : null;
+        }
+
+        /// <summary>Escribe un array de sprites en una propiedad serializada.</summary>
+        private static void SetSpriteArray(SerializedObject so, string propName, Sprite[] sprites)
+        {
+            if (sprites == null || sprites.Length == 0) return;
+            var prop = so.FindProperty(propName);
+            if (prop == null) return;
+            prop.arraySize = sprites.Length;
+            for (int i = 0; i < sprites.Length; i++)
+                prop.GetArrayElementAtIndex(i).objectReferenceValue = sprites[i];
         }
 
         /// <summary>Bruja en escoba para la cinemática final; sin Witch_Broom_Flight.png se arma con Witch_Fly + Witch_Broom.</summary>

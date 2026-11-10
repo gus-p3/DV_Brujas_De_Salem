@@ -12,6 +12,8 @@ namespace Salem.Level4
         [SerializeField] private Sprite preacherCollapsedSprite;
         [SerializeField] private GameObject escapePathBlocker;
         [SerializeField] private GameObject alarmVisuals;
+        [Tooltip("Referencia al jefe Padre Parris Maligno. Al envenenar el c\u00e1liz el jefe colapsa.")]
+        [SerializeField] private EvilPriestBossAI bossAI;
 
         [Header("Audio")]
         [SerializeField] private AudioClip poisonSfx;
@@ -117,7 +119,10 @@ namespace Salem.Level4
 
             yield return new WaitForSeconds(1.2f);
 
-            // Preacher collapses
+            // Colapsar el jefe si ya se había transformado
+            bossAI?.Collapse();
+
+            // Colapsar el sprite normal del Padre (por si el jefe no se había transformado aún)
             if (preacherRenderer != null && preacherCollapsedSprite != null)
             {
                 preacherRenderer.sprite = preacherCollapsedSprite;
@@ -136,17 +141,25 @@ namespace Salem.Level4
 
             yield return new WaitForSeconds(2.0f);
 
-            // Trigger alarm, open escape climb route
+            OpenEscapeRoute(hud);
+        }
+
+        /// <summary>
+        /// Abre la reja del campanario y activa la alarma.
+        /// Llamado por PoisonSequence al envenenar el cáliz.
+        /// </summary>
+        public void OpenEscapeRoute(HUDController hud = null)
+        {
             if (escapePathBlocker != null) escapePathBlocker.SetActive(false);
             if (_gateHint != null) _gateHint.SetActive(false);
             if (alarmVisuals != null) alarmVisuals.SetActive(true);
 
+            if (hud == null) hud = FindObjectOfType<HUDController>();
             if (hud != null)
             {
                 hud.ShowMessage("¡Alarma en la catedral! ¡Sube a la cúpula antes de que te atrapen!", 3.5f);
             }
 
-            // Switch to escape music
             if (alarmMusic != null && AudioManager.Instance != null)
             {
                 AudioManager.Instance.PlayMusic(alarmMusic);
