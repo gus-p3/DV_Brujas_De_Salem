@@ -22,10 +22,36 @@ namespace Salem.Level4
         [SerializeField] private string readyPrompt = "[E] Verter la Poción Maestra en el Cáliz del Padre Parris";
         [SerializeField] private string completedPrompt = "¡El cáliz ha sido envenenado! ¡La alarma ha sonado, huye hacia el campanario!";
 
+        [SerializeField] private string gateLockedPrompt = "La reja está cerrada. Se abrirá cuando la alarma suene.";
+        [SerializeField] private string gateLockedHud = "La reja del campanario no cede. Envenena el cáliz del Padre Parris con [E] para que suene la alarma y se abra el paso.";
+
         private bool _isPlayerNear = false;
         private bool _isPoisoned = false;
+        private GameObject _gateHint;
 
         public bool IsPoisoned => _isPoisoned;
+
+        private void Start()
+        {
+            CreateGateHint();
+        }
+
+        /// <summary>Zona de aviso frente a la reja (lado oeste, por donde llega el jugador).</summary>
+        private void CreateGateHint()
+        {
+            if (escapePathBlocker == null) return;
+            Collider2D blocker = escapePathBlocker.GetComponentInChildren<Collider2D>(true);
+            if (blocker == null) return;
+
+            Bounds b = blocker.bounds;
+            _gateHint = new GameObject("Escape_Gate_Hint");
+            _gateHint.transform.SetParent(escapePathBlocker.transform.parent, false);
+            _gateHint.transform.position = new Vector3(b.min.x - 1.6f, b.center.y, 0f);
+            var col = _gateHint.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(3.2f, Mathf.Max(3f, b.size.y));
+            _gateHint.AddComponent<EscapeGateHint>().Configure(gateLockedPrompt, gateLockedHud);
+        }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
@@ -112,6 +138,7 @@ namespace Salem.Level4
 
             // Trigger alarm, open escape climb route
             if (escapePathBlocker != null) escapePathBlocker.SetActive(false);
+            if (_gateHint != null) _gateHint.SetActive(false);
             if (alarmVisuals != null) alarmVisuals.SetActive(true);
 
             if (hud != null)
