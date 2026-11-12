@@ -764,7 +764,7 @@ public class HUDController : MonoBehaviour
                         }
                         if (!inv.IsPotionUnlocked(PotionType.Master))
                         {
-                            ShowMessage("¡La Poción Maestra está sellada! Podrás usarla al entrar a la Iglesia en el Nivel 4.", 2.2f);
+                            ShowMessage(GameManager.SealedMasterPotionMessage, 2.2f);
                             if (AudioManager.Instance != null) AudioManager.Instance.PlayErrorSound();
                             return;
                         }

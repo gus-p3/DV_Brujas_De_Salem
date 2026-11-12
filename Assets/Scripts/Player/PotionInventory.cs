@@ -174,7 +174,7 @@ public class PotionInventory : MonoBehaviour
                 HUDController hudCtrl = UnityEngine.Object.FindFirstObjectByType<HUDController>();
                 if (hudCtrl != null)
                 {
-                    hudCtrl.ShowMessage("¡La Poción Maestra está sellada! Podrás usarla al entrar a la Iglesia en el Nivel 4.", 2.2f);
+                    hudCtrl.ShowMessage(GameManager.SealedMasterPotionMessage, 2.2f);
                 }
                 PlayErrorSound();
                 return;
@@ -211,8 +211,9 @@ public class PotionInventory : MonoBehaviour
             }
         }
 
-        // Lanzar con tecla E, Q o clic izquierdo
-        if (Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.Q) || mouseClick)
+        // Lanzar con la tecla de lanzar de la escena (E por defecto; en el Nivel 3 es Q) o clic izquierdo.
+        // La tecla de interactuar (Q en los niveles 1, 2 y 4) nunca lanza una poción.
+        if (Input.GetKeyDown(Level2.Level2Controls.ThrowPotionKey) || mouseClick)
         {
             TryThrowPotion();
         }
@@ -255,7 +256,7 @@ public class PotionInventory : MonoBehaviour
             HUDController hudCtrl = UnityEngine.Object.FindFirstObjectByType<HUDController>();
             if (hudCtrl != null)
             {
-                hudCtrl.ShowMessage("¡La Poción Maestra está sellada! Podrás usarla al entrar a la Iglesia en el Nivel 4.", 2.2f);
+                hudCtrl.ShowMessage(GameManager.SealedMasterPotionMessage, 2.2f);
             }
             PlayErrorSound();
             return;
