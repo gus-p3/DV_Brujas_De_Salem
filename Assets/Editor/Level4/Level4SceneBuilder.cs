@@ -1214,10 +1214,12 @@ namespace Salem.Editor
             else
             {
                 // shortcut: bruja de vuelo sentada sobre la escoba suelta; se sustituye solo al existir Witch_Broom_Flight.png
-                Fit(go.transform, "Broom", Load(WitchArt + "Witch_Broom.png"), pos.x, pos.y - 0.75f, 0.5f, "Foreground", 9, Color.white);
+                // Misma pose que en el juego: la escoba va DETRÁS de la bruja (como BroomVisual, orden menor),
+                // a la altura de las rodillas/cadera, sin inclinar; ella queda sentada con las piernas por delante.
                 Sprite[] fly = Frames(WitchArt + "Witch_Fly.png", 0);
                 Sprite rider = fly != null && fly.Length > 0 ? fly[0] : Load(WitchArt + "Witch_Fly.png");
-                Fit(go.transform, "Rider", rider, pos.x + 0.1f, pos.y - 0.62f, 1.55f, "Foreground", 8, Color.white);
+                Fit(go.transform, "Rider", rider, pos.x + 0.1f, pos.y - 0.62f, 1.55f, "Foreground", 9, Color.white);
+                Fit(go.transform, "Broom", Load(WitchArt + "Witch_Broom.png"), pos.x - 0.05f, pos.y - 0.35f, 0.55f, "Foreground", 8, Color.white);
             }
             PointLight(go.transform, "Broom_Moonlight_Light2D", pos, new Color(0.8f, 0.9f, 1f), 1.2f, 3f, false);
             go.SetActive(false);
